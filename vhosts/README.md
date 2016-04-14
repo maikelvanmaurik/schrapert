@@ -1,0 +1,1 @@
+The virtual hosts are used to test the scraper

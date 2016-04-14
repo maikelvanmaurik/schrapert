@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="" tests="1" assertions="0" failures="0" errors="1" time="0.003628">
+    <testsuite name="all" tests="1" assertions="0" failures="0" errors="1" time="0.003628">
+      <testsuite name="RobotsMiddlewareTest" file="/vagrant/tests/IntegrationTest/tests/RobotsMiddlewareTest.php" tests="1" assertions="0" failures="0" errors="1" time="0.003628">
+        <testcase name="testDoesTakeRobotstxtIntoAccount" class="RobotsMiddlewareTest" file="/vagrant/tests/IntegrationTest/tests/RobotsMiddlewareTest.php" line="4" assertions="0" time="0.003628">
+          <error type="PHPUnit_Framework_Error">RobotsMiddlewareTest::testDoesTakeRobotstxtIntoAccount
+Argument 1 passed to Mvm\Scraper\RunnerBuilder::build() must be an instance of Mvm\Scraper\Configuration\Settings, none given, called in /vagrant/tests/IntegrationTest/tests/RobotsMiddlewareTest.php on line 7 and defined
+
+/vagrant/src/Scraper/RunnerBuilder.php:17
+/vagrant/tests/IntegrationTest/tests/RobotsMiddlewareTest.php:7
+</error>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

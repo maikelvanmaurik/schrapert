@@ -1,0 +1,41 @@
+{
+    "event": "suiteStart",
+    "suite": "",
+    "tests": 1
+}{
+    "event": "suiteStart",
+    "suite": "all",
+    "tests": 1
+}{
+    "event": "suiteStart",
+    "suite": "RobotsMiddlewareTest",
+    "tests": 1
+}{
+    "event": "testStart",
+    "suite": "RobotsMiddlewareTest",
+    "test": "RobotsMiddlewareTest::testDoesTakeRobotstxtIntoAccount"
+}{
+    "event": "test",
+    "suite": "RobotsMiddlewareTest",
+    "test": "RobotsMiddlewareTest::testDoesTakeRobotstxtIntoAccount",
+    "status": "error",
+    "time": 0.0036280155181885,
+    "trace": [
+        {
+            "file": "\/vagrant\/src\/Scraper\/RunnerBuilder.php",
+            "line": 17,
+            "function": "handleError",
+            "class": "PHPUnit_Util_ErrorHandler",
+            "type": "::"
+        },
+        {
+            "file": "\/vagrant\/tests\/IntegrationTest\/tests\/RobotsMiddlewareTest.php",
+            "line": 7,
+            "function": "build",
+            "class": "Mvm\\Scraper\\RunnerBuilder",
+            "type": "->"
+        }
+    ],
+    "message": "Argument 1 passed to Mvm\\Scraper\\RunnerBuilder::build() must be an instance of Mvm\\Scraper\\Configuration\\Settings, none given, called in \/vagrant\/tests\/IntegrationTest\/tests\/RobotsMiddlewareTest.php on line 7 and defined",
+    "output": ""
+}

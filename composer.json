@@ -1,0 +1,30 @@
+{
+    "name": "maikelvanmaurik/scrape",
+    "authors": [
+        {
+            "name": "Maikel van Maurik",
+            "email": "maikelvanmaurik@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Schrapert\\": "src/Schrapert/"
+        }
+    },
+    "bin": [
+        "schrapert"
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": ">=5.4.0",
+        "react/event-loop": "^0.4",
+        "react/promise": "~2.0",
+        "react/stream": "~0.4",
+        "react/http-client": "^0.4.10",
+        "react/dns": "^0.4.10",
+        "react/filesystem": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "5.2.*"
+    }
+}

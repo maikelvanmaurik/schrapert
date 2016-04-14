@@ -1,0 +1,43 @@
+{
+  "name": "scraper",
+  "version": "1.0.0-dev",
+  "description": "Scraper",
+  "main": "index.js",
+  "scripts": {
+    "postinstall": "grunt install-git-hooks"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@www.scitogit.com:repositories/scitomedia/cluster.git"
+  },
+  "author": "Cluster",
+  "license": "ISC",
+  "devDependencies": {
+    "async": "^1.5.0",
+    "chromedriver": "^2.10.0-1",
+    "glob": "^5.0.10",
+    "grunt": "^0.4.4",
+    "grunt-contrib-compass": "^1.0.1",
+    "grunt-contrib-concat": "^0.3.0",
+    "grunt-contrib-copy": "^0.8.0",
+    "grunt-contrib-cssmin": "^0.8.0",
+    "grunt-contrib-requirejs": "^0.4.4",
+    "grunt-contrib-uglify": "^0.3.3",
+    "grunt-contrib-watch": "^0.5.3",
+    "grunt-php": "^0.3.3",
+    "grunt-phpclassmap": "~0.0.11",
+    "grunt-phpunit": "^0.3.3",
+    "load-grunt-tasks": "^0.6.0",
+    "phantomjs": "^1.9.12"
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "dependencies": {
+    "async": "^1.5.0",
+    "child-process-promise": "^1.1.0",
+    "load-grunt-tasks": "^0.6.0",
+    "underscore.string": "^3.0.3"
+  }
+}
