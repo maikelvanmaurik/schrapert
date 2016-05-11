@@ -21,7 +21,7 @@
         "react/promise": "~2.0",
         "react/stream": "~0.4",
         "react/http-client": "^0.4.10",
-        "react/dns": "^0.4.10",
+        "react/dns": "^0.4.2",
         "react/filesystem": "dev-master"
     },
     "require-dev": {

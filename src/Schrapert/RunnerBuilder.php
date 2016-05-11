@@ -2,7 +2,9 @@
 namespace Schrapert;
 
 use React\SocketClient\Connector;
+use React\SocketClient\DnsConnector;
 use React\SocketClient\SecureConnector;
+use React\SocketClient\TcpConnector;
 use Schrapert\Configuration\ConfigurationInterface;
 use Schrapert\Configuration\DefaultConfiguration;
 use Schrapert\Core\ExecutionEngineFactory;
@@ -13,8 +15,6 @@ use Schrapert\Core\ScraperInterface;
 use Schrapert\Filter\DuplicateFingerprintRequestFilter;
 use Schrapert\Filter\DuplicateRequestFilterInterface;
 use Schrapert\Http\ClientFactory;
-use Schrapert\Http\Downloader\Decorator\RobotsTxtDownloadDecorator;
-use Schrapert\Http\Downloader\Downloader;
 use Schrapert\Http\Downloader\DownloaderBuilder;
 use Schrapert\Http\Downloader\DownloaderBuilderInterface;
 use Schrapert\Http\Downloader\DownloaderInterface;
@@ -39,8 +39,8 @@ use Schrapert\Crawl\RequestFingerprintGenerator;
 /**
  * The Schrapert project aims to follow a SOLID approach.
  * This builder can be used to generate a runner from
- * settings but you are free to compose the runner say
- * through dependency injection.
+ * configuration, but you are free to compose the runner in a
+ * way that suits your needs.
  */
 class RunnerBuilder
 {
@@ -65,6 +65,11 @@ class RunnerBuilder
     private $requestProcessorFactory;
 
     private $duplicateRequestFilter;
+
+    public function __construct()
+    {
+
+    }
 
     public function getConfiguration()
     {
@@ -117,7 +122,8 @@ class RunnerBuilder
     {
         if(null === $this->dnsResolver) {
             $dnsResolverFactory = new \React\Dns\Resolver\Factory();
-            $this->dnsResolver = $dnsResolverFactory->createCached('8.8.8.8', $this->getEventLoop());
+            $this->dnsResolver = $dnsResolverFactory->create('8.8.8.8', $this->getEventLoop());
+            //$this->dnsResolver = $dnsResolverFactory->createCached('127.0.0.1', $this->getEventLoop());
         }
         return $this->dnsResolver;
     }
@@ -164,7 +170,7 @@ class RunnerBuilder
     {
         if(null == $this->downloaderBuilder) {
             $builder = new DownloaderBuilder();
-            $connector = new Connector($this->getEventLoop(), $this->getDnsResolver());
+            $connector = new DnsConnector(new TcpConnector($this->getEventLoop()), $this->getDnsResolver());
             $secureConnector = new SecureConnector($connector, $this->getEventLoop());
             $builder->setDownloadRequestFactory(new DownloadRequestFactory($connector, $secureConnector));
             $builder->setHttpClientFactory($this->getHttpClientFactory());
@@ -177,7 +183,7 @@ class RunnerBuilder
 
     public function getDownloader()
     {
-        if(null === $this->downloader) {
+        if(null == $this->downloader) {
             $this->downloader = $this->getDownloaderBuilder()->build();
         }
         return $this->downloader;
@@ -208,7 +214,6 @@ class RunnerBuilder
         }
         return $this->duplicateRequestFilter;
     }
-
 
     public function setDuplicateRequestFilter(DuplicateRequestFilterInterface $filter)
     {

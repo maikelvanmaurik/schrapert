@@ -30,8 +30,8 @@ end
 
 Vagrant.configure("2") do |config|
   config.vm.define 'dev', autostart: true do |node|
-    node.vm.box = 'hashicorp/precise64'
-    node.vm.hostname = "scraper.dev"
+    node.vm.box = 'ubuntu/trusty64'
+    node.vm.hostname = "schrapert.dev"
 
     vhosts = []
     Dir.glob("vhosts/*").each do |f|

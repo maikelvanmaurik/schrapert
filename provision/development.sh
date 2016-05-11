@@ -34,18 +34,17 @@ echo -e "\nUpdating packages...\n"
 sudo apt-get update > /dev/null 2>&1
 
 echo -e "\nInstall locales...\n"
-sudo locale-gen nl > /dev/null 2>&1
-
-# To install all locales
 # sudo ln -s /usr/share/i18n/SUPPORTED /var/lib/locales/supported.d/all
 # sudo locale-gen
+apt-get install -y language-pack-en-base
 
 # Stuff we need
-sudo apt-get install -y build-essential python-software-properties curl gem > /dev/null 2>&1
-#sudo add-apt-repository ppa:ondrej/php5 > /dev/null 2>&1
-#add-apt-repository ppa:chris-lea/node.js > /dev/null 2>&1
-sudo add-apt-repository ppa:ondrej/php5-5.6
-sudo apt-get update > /dev/null 2>&1
+sudo apt-get install -y build-essential python-software-properties curl gem
+sudo LC_ALL=C.UTF-8 add-apt-repository ppa:ondrej/php
+sudo add-apt-repository ppa:ondrej/apache2
+sudo apt-get update
+echo -e "\nUpgrade the packages...\n"
+sudo apt-get upgrade
 
 # Install and set up MySQL
 echo -e "\nSetting up MySQL...\n"
@@ -76,7 +75,7 @@ EOF"
 
 echo -e "\nInstalling LAMP stack...\n"
 # Install LAMP stack
-sudo apt-get install -y php5 php5-dev apache2 libapache2-mod-php5 php5-mysql php5-curl php5-gd php5-mcrypt php5-xdebug php5-gmp git-core > /dev/null 2>&1
+sudo apt-get install -y php5.6 php5.6-dev php5.6-xml apache2 libapache2-mod-php5.6 php5.6-mysql php5.6-curl php5.6-gd php5.6-mcrypt php5-xdebug php5.6-gmp git-core
 
 sudo sed -i 's/APACHE_RUN_USER=www-data/APACHE_RUN_USER=vagrant/' /etc/apache2/envvars
 
@@ -94,7 +93,7 @@ source ~/.profile
 echo -e "\nDoing some configuration...\n"
 
 # Enable mod-rewrite and allow overrides
-sudo a2enmod rewrite > /dev/null 2>&1
+sudo a2enmod rewrite
 sudo sed -i "s/AllowOverride None/AllowOverride All/g" /etc/apache2/apache2.conf
 
 
@@ -153,19 +152,19 @@ sudo chmod 0777 $COMPOSER_VENDOR_DIR -R
 sudo ln -s /etc/apache2/mods-available/vhost_alias.load /etc/apache2/mods-enabled/vhost_alias.load
 
 echo -e "\nRestarting Apache...\n"
-sudo service apache2 restart > /dev/null 2>&1
+sudo service apache2 restart
 
 echo -e "\nRestart MySQL...\n"
-sudo service mysql restart > /dev/null 2>&1
+sudo service mysql restart
 
 # Install composer, nodejs, npm
 echo -e "\nInstalling Composer, NodeJS, NPM...\n"
-curl -sS https://getcomposer.org/installer | php > /dev/null 2>&1
-sudo mv composer.phar /usr/local/bin/composer > /dev/null 2>&1
+curl -sS https://getcomposer.org/installer | php
+sudo mv composer.phar /usr/local/bin/composer
 # Allow the non-root vagrant user to execute composer operations
 sudo chmod 0777 /usr/local/bin/composer
 # Update composer
-composer self-update > /dev/null 2>&1
+composer self-update
 
 sudo curl -sS https://deb.nodesource.com/setup_0.12 | sudo bash - > /dev/null 2>&1
 sudo apt-get install -y nodejs > /dev/null 2>&1

@@ -129,9 +129,7 @@ class ExecutionEngine
     private function nextRequestFromScheduler(SpiderInterface $spider)
     {
         return $this->scheduler->nextRequest()->then(function ($request) use ($spider) {
-            return $this->process($request, $spider)->then(function() {
-
-            });
+            return $this->process($request, $spider);
         });
     }
 
@@ -168,13 +166,10 @@ class ExecutionEngine
                 if (false !== $index) {
                     unset($this->processes[$index]);
                 }
-
                 $this->logger->debug("Number of pending processed %s, processing %s", [count($this->processes), count($this->processing)]);
             };
 
-            return $process->run()
-                ->then($removeRequest, $removeRequest)
-                ->then();
+            return $process->run()->always($removeRequest);
         } catch(Exception $e) {
             return new RejectedPromise($e);
         }

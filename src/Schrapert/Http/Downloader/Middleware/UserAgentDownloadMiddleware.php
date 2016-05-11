@@ -1,11 +1,11 @@
 <?php
-namespace Schrapert\Http\Downloader\Decorator;
+namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Http\Downloader\DownloaderInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\SpiderInterface;
 
-class UserAgentDownloadDecorator implements DownloaderInterface
+class UserAgentDownloadMiddleware implements DownloaderInterface
 {
     private $downloader;
 

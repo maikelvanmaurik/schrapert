@@ -58,16 +58,21 @@ class ScrapeProcess implements RequestProcessInterface
             throw new RuntimeException("Request for downloads need to be http requests");
         }
 
+        $this->logger->debug("Scrape process: start %s", [$this->request->getUri()]);
+
         // Download the request
         return $this->downloader->fetch($this->request, $this->spider)->then(function($response) {
+            $this->logger->debug("Scrape process: downloader fetched response of %s", [$this->request->getUri()]);
 
             $reader = new DownloadResponseReader();
             return $reader->readToEnd($response)->then(function($body) use ($response) {
+
+                $this->logger->debug("Scrape process: enqueue to scraper");
+
                 $response = new Response($this->request->getUri(), $body, $response->getProtocol(), $response->getProtocolVersion(), $response->getCode(), $response->getReasonPhrase(), $response->getHeaders());
 
                 // Feed the response to the scraper
                 return $this->scraper->enqueueScrape($this->engine, $this->request, $response, $this->spider);
-
             });
         });
     }

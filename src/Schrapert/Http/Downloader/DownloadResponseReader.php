@@ -26,11 +26,13 @@ class DownloadResponseReader
                 call_user_func($end, $error, $response, $body);
             }
 
+            $result = new DownloadResponseReaderResult($response, $body, $error);
+
             if ($error) {
-                $deferred->reject($error);
+                $deferred->reject($result);
             } else {
                 // Create a response from the data
-                $deferred->resolve($body);
+                $deferred->resolve($result);
             }
         });
 

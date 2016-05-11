@@ -25,7 +25,6 @@ class DownloadRequest implements WritableStreamInterface
     const STATE_END = 3;
 
     private $connector;
-    private $requestData;
 
     private $stream;
     private $buffer;
@@ -53,6 +52,8 @@ class DownloadRequest implements WritableStreamInterface
 
     public function setHeader($name, $value)
     {
+        die("TODO " . __METHOD__);
+
         if (self::STATE_WRITING_HEAD <= $this->state) {
             throw new \LogicException('Headers already written');
         }
@@ -289,6 +290,9 @@ class DownloadRequest implements WritableStreamInterface
         return isset($defaults[$protocol]) ? $defaults[$protocol] : null;
     }
 
+    /**
+     * @return \React\Promise\Promise
+     */
     protected function connect()
     {
         $host = $this->request->getHost();
@@ -298,8 +302,10 @@ class DownloadRequest implements WritableStreamInterface
             $port = $this->getDefaultPort($this->request->getProtocol());
         }
 
-        return $this->connector
+        $result = $this->connector
             ->create($host, $port);
+
+        return $result;
     }
 
     public function setResponseFactory($factory)

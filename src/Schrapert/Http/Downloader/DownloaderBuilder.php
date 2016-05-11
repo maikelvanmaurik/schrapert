@@ -2,11 +2,13 @@
 namespace Schrapert\Http\Downloader;
 
 use Schrapert\Configuration\ConfigurationInterface;
-use Schrapert\Http\Downloader\Decorator\UserAgentDownloadDecorator;
 use Schrapert\Http\ClientFactory;
-use Schrapert\Http\Downloader\Decorator\RobotsTxtDownloadDecorator;
+use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareFactory;
+use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareInterface;
+use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareManager;
+use Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware;
+use Schrapert\Http\RobotsTxt\Parser;
 use Schrapert\Log\LoggerInterface;
-use Schrapert\Http\RobotsTxt\Parser as RobotsTxtParser;
 
 class DownloaderBuilder implements DownloaderBuilderInterface
 {
@@ -18,16 +20,13 @@ class DownloaderBuilder implements DownloaderBuilderInterface
 
     private $config;
 
-    private $decorators = [];
+    private $downloadMiddlewareManager;
+
+    private $downloadMiddlewareFactory;
 
     public function __construct()
     {
-        $this->registerDecorator('Schrapert\Http\Downloader\Decorator\RobotsTxtDownloadDecorator', function(DownloaderInterface $downloader) {
-            return new RobotsTxtDownloadDecorator($downloader, new RobotsTxtParser(), $this->getLogger(), $this->getConfiguration()->getSetting('USER_AGENT'));
-        });
-        $this->registerDecorator('Schrapert\Http\Downloader\Decorator\UserAgentDownloadDecorator', function(DownloaderInterface $downloader) {
-           return new UserAgentDownloadDecorator($downloader, $this->getConfiguration()->getSetting('USER_AGENT'));
-        });
+
     }
 
     /**
@@ -63,27 +62,47 @@ class DownloaderBuilder implements DownloaderBuilderInterface
         $this->logger = $logger;
     }
 
-    public function registerDecorator($type, callable $fn)
+    public function getDownloadMiddlewareFactory()
     {
-        $this->decorators[$type] = $fn;
+        if(null == $this->downloadMiddlewareFactory) {
+
+            $factory = new DownloadMiddlewareFactory();
+
+            $this->downloadMiddlewareFactory = $factory;
+
+            $factory->register('Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware', function(DownloaderInterface $downloader) {
+                return new RobotsTxtDownloadMiddleware($downloader, new Parser(), $this->getLogger(), $this->getConfiguration()->getSetting('USER_AGENT'));
+            });
+        }
+        return $this->downloadMiddlewareFactory;
     }
 
-    private function decorate(DownloaderInterface $downloader)
+    private function getDownloadMiddlewareManager()
     {
-        $decorators = $this->getConfiguration()->getSetting('HTTP_DOWNLOAD_DECORATORS', []);
-        asort($decorators, SORT_NUMERIC);
-
-        foreach(array_keys($decorators) as $type) {
-            if(!empty($this->decorators[$type]) && is_callable($this->decorators[$type])) {
-                $downloader = call_user_func($this->decorators[$type], $downloader);
-            }
+        if(null == $this->downloadMiddlewareManager) {
+            $this->downloadMiddlewareManager = new DownloadMiddlewareManager([], $this->getLogger());
         }
-
-        return $downloader;
+        return $this->downloadMiddlewareManager;
     }
 
     public function build()
     {
-        return $this->decorate(new Downloader($this->logger, $this->clientFactory, $this->downloadRequestFactory));
+        $middlewareManager = $this->getDownloadMiddlewareManager();
+        $downloader = new Downloader($this->getLogger(), $middlewareManager, $this->downloadRequestFactory);
+
+        // Add the middleware
+        $types = $this->getConfiguration()->getSetting('HTTP_DOWNLOAD_DECORATORS', []);
+        asort($types, SORT_NUMERIC);
+        foreach(array_keys($types) as $type) {
+            $middleware = $this->getDownloadMiddlewareFactory()->factory($type, $downloader);
+
+            if(!$middleware instanceof DownloadMiddlewareInterface) {
+                throw new \RuntimeException(sprintf("Invalid middleware returned for type '%s'", $type));
+            }
+
+            $middlewareManager->addMiddleware($middleware);
+        }
+
+        return $downloader;
     }
 }

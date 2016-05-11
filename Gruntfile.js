@@ -160,10 +160,9 @@ module.exports = function (grunt) {
             },
 
             php: {
-                files: ['src/**/*.php', 'tests/**/*.php'],
+                files: ['src/**/*.php', 'tests/**/*.php', 'vendor/**/*.php'],
                 tasks: ['phpunit']
             },
-
             tdd: {
                 files: ['tests/**/*.php', '!tests/phpunit/etc/*.php', '!app/config/classmap.php', 'app/**/*.php', 'core/libraries/**/*.php', '!tests/integration/servers/**/*.*'],
                 tasks: ['phpunit']
@@ -192,6 +191,7 @@ module.exports = function (grunt) {
         });
     }
 
+    /*
     grunt.registerTask('install-git-hooks', function () {
         var done = this.async();
         grunt.log.ok("Installing git hooks");
@@ -216,6 +216,7 @@ module.exports = function (grunt) {
             });
         });
     });
+    */
 
     grunt.registerTask('tdd', ['watch:tdd']);
 
@@ -333,7 +334,7 @@ module.exports = function (grunt) {
         });
     });
 
-    grunt.registerTask('develop', ['install-git-hooks', 'php:develop']);
+    grunt.registerTask('develop', ['php:develop']);
     grunt.registerTask('build', ['phpclassmap', 'copy:cssAsScss', 'compass', 'cssmin', 'requirejs', 'uglify']);
     grunt.registerTask('default', ['build', 'watch']);
     grunt.registerTask('production-update', ['db:migrate', 'build', 'changelog', 'update-package-info']);

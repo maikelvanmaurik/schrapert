@@ -2,6 +2,7 @@
 namespace Schrapert\Http\Downloader;
 
 use React\SocketClient\Connector;
+use React\SocketClient\ConnectorInterface;
 use React\SocketClient\SecureConnector;
 use Schrapert\Http\RequestInterface;
 
@@ -11,7 +12,7 @@ class DownloadRequestFactory
 
     private $secureConnector;
 
-    public function __construct(Connector $connector, SecureConnector $secureConnector)
+    public function __construct(ConnectorInterface $connector, ConnectorInterface $secureConnector)
     {
         $this->connector = $connector;
         $this->secureConnector = $secureConnector;

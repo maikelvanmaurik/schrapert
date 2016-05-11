@@ -1,5 +1,5 @@
 <?php
-class SimpleSpider extends \Schrapert\Spider
+class SimpleCompressedDownloadSpider extends \Schrapert\Spider
 {
     protected $urls;
 
@@ -32,6 +32,7 @@ class SimpleSpider extends \Schrapert\Spider
             //return;
         }
 
+        var_dump((string)$response->getBody());
 
         $doc = new DOMDocument('1.0');
         $doc->loadHTML((string)$response->getBody());
@@ -47,7 +48,7 @@ class SimpleSpider extends \Schrapert\Spider
     }
 }
 
-class RobotsMiddlewareTest extends PHPUnit_Framework_TestCase
+class CompressedDownloadMiddlewareTest extends PHPUnit_Framework_TestCase
 {
     private $workingDir;
 
@@ -58,16 +59,14 @@ class RobotsMiddlewareTest extends PHPUnit_Framework_TestCase
         rmdir_recursive($this->workingDir);
     }
 
-    public function testDoesTakeRobotsTxtIntoAccount()
+    public function _testDoesTakeRobotsTxtIntoAccount()
     {
         $builder = new \Schrapert\RunnerBuilder();
 
-        $spider = new SimpleSpider($builder->getLogger(), new \Schrapert\Http\Util\Uri());
+        $spider = new SimpleCompressedDownloadSpider($builder->getLogger(), new \Schrapert\Http\Util\Uri());
         $config = new \Schrapert\Configuration\DefaultConfiguration();
-        $config->setSetting('USER_AGENT', 'BadBot');
-        $config->setSetting('SCHEDULER_DISK_PATH', $this->workingDir);
         $config->setSetting('HTTP_DOWNLOAD_DECORATORS', [
-            'Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware' => 1
+            'Schrapert\Http\Downloader\Decorator\CompressDownloadDecorator' => 1
         ]);
 
         $builder->setConfiguration($config);
