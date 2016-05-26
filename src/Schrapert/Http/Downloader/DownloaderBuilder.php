@@ -3,10 +3,13 @@ namespace Schrapert\Http\Downloader;
 
 use Schrapert\Configuration\ConfigurationInterface;
 use Schrapert\Http\ClientFactory;
+use Schrapert\Http\Downloader\Middleware\DownloadCompressionMiddleware;
 use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareFactory;
 use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareInterface;
 use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareManager;
 use Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware;
+use Schrapert\Http\ResponseBuilder;
+use Schrapert\Http\ResponseReaderFactory;
 use Schrapert\Http\RobotsTxt\Parser;
 use Schrapert\Log\LoggerInterface;
 
@@ -62,6 +65,16 @@ class DownloaderBuilder implements DownloaderBuilderInterface
         $this->logger = $logger;
     }
 
+    public function getResponseBuilder()
+    {
+        return new ResponseBuilder();
+    }
+
+    public function getResponseReaderFactory()
+    {
+        return new ResponseReaderFactory();
+    }
+
     public function getDownloadMiddlewareFactory()
     {
         if(null == $this->downloadMiddlewareFactory) {
@@ -71,7 +84,10 @@ class DownloaderBuilder implements DownloaderBuilderInterface
             $this->downloadMiddlewareFactory = $factory;
 
             $factory->register('Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware', function(DownloaderInterface $downloader) {
-                return new RobotsTxtDownloadMiddleware($downloader, new Parser(), $this->getLogger(), $this->getConfiguration()->getSetting('USER_AGENT'));
+                return new RobotsTxtDownloadMiddleware($downloader, $this->getResponseReaderFactory(), new Parser(), $this->getLogger(), $this->getConfiguration()->getSetting('USER_AGENT'));
+            });
+            $factory->register('Schrapert\Http\Downloader\Middleware\DownloadCompressionMiddleware', function(DownloaderInterface $downloader) {
+                return new DownloadCompressionMiddleware($this->getLogger(), $this->getResponseBuilder(), $this->getResponseReaderFactory());
             });
         }
         return $this->downloadMiddlewareFactory;
@@ -91,8 +107,9 @@ class DownloaderBuilder implements DownloaderBuilderInterface
         $downloader = new Downloader($this->getLogger(), $middlewareManager, $this->downloadRequestFactory);
 
         // Add the middleware
-        $types = $this->getConfiguration()->getSetting('HTTP_DOWNLOAD_DECORATORS', []);
+        $types = $this->getConfiguration()->getSetting('HTTP_DOWNLOAD_MIDDLEWARE', []);
         asort($types, SORT_NUMERIC);
+
         foreach(array_keys($types) as $type) {
             $middleware = $this->getDownloadMiddlewareFactory()->factory($type, $downloader);
 

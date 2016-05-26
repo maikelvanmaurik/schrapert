@@ -133,6 +133,25 @@ class ExecutionEngine
         });
     }
 
+    private function requestProcessFinished(RequestInterface $request, RequestProcessInterface $process = null)
+    {
+        $this->logger->debug("Process %s finished", [$request->getUri()]);
+
+        // Remove the process & request
+        $index = array_search($request, $this->processing, true);
+        $this->logger->debug("Index of the request %s", [$index]);
+        if (false !== $index) {
+            unset($this->processing[$index]);
+        }
+        if(null !== $process) {
+            $index = array_search($process, $this->processes, true);
+            if (false !== $index) {
+                unset($this->processes[$index]);
+            }
+        }
+        $this->logger->debug("Number of pending processed %s, processing %s", [count($this->processes), count($this->processing)]);
+    }
+
     /**
      * @param RequestInterface $request
      * @param SpiderInterface $spider
@@ -140,11 +159,13 @@ class ExecutionEngine
      */
     private function process(RequestInterface $request, SpiderInterface $spider)
     {
+        $this->logger->debug("Process request %s", [$request->getUri()]);
+
+        $this->processing[] = $request;
+
+        $process = null;
+
         try {
-
-            $this->logger->debug("Process request %s", [$request->getUri()]);
-
-            $this->processing[] = $request;
 
             $processor = $this->requestProcessorFactory->factory($request);
 
@@ -152,25 +173,15 @@ class ExecutionEngine
 
             $this->processes[] = $process;
 
-            $removeRequest = function() use ($request, $process) {
-
-                $this->logger->debug("Process %s finished", [$request->getUri()]);
-
-                // Remove the process & request
-                $index = array_search($request, $this->processing, true);
-                $this->logger->debug("Index of the request %s", [$index]);
-                if (false !== $index) {
-                    unset($this->processing[$index]);
-                }
-                $index = array_search($process, $this->processes, true);
-                if (false !== $index) {
-                    unset($this->processes[$index]);
-                }
-                $this->logger->debug("Number of pending processed %s, processing %s", [count($this->processes), count($this->processing)]);
-            };
-
-            return $process->run()->always($removeRequest);
+            return $process->run()->always(function() use ($request, $process) {
+                $this->requestProcessFinished($request, $process);
+            });
         } catch(Exception $e) {
+
+            die($e->getMessage());
+
+            $this->requestProcessFinished($request, $process);
+
             return new RejectedPromise($e);
         }
     }
@@ -184,8 +195,6 @@ class ExecutionEngine
                 $this->next->schedule();
             }
             return true;
-        }, function () {
-            die('WTF!');
         });
     }
 

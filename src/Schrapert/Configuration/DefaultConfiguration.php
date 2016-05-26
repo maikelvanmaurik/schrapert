@@ -11,7 +11,7 @@ class DefaultConfiguration extends Configuration
             'LOG_PATH' => sys_get_temp_dir().'/spider.log',
             'LOG_LEVEL' => Logger::ALL,
             'SCHEDULER_DISK_PATH' => sys_get_temp_dir().'/requests',
-            'HTTP_DOWNLOAD_DECORATORS' => [
+            'HTTP_DOWNLOAD_MIDDLEWARE' => [
                 'Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware' => 100
             ]
         ]);

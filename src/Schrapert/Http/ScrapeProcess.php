@@ -34,7 +34,7 @@ class ScrapeProcess implements RequestProcessInterface
 
     private $logger;
 
-    public function __construct(LoggerInterface $logger, ExecutionEngine $engine, DownloaderInterface $downloader, ScraperInterface $scraper, RequestInterface $request, SpiderInterface $spider)
+    public function __construct(LoggerInterface $logger, ExecutionEngine $engine, DownloaderInterface $downloader, ScraperInterface $scraper, RequestInterface $request, SpiderInterface $spider, ResponseReaderFactoryInterface $readerFactory)
     {
         $this->logger = $logger;
         $this->engine = $engine;
@@ -42,6 +42,7 @@ class ScrapeProcess implements RequestProcessInterface
         $this->scraper = $scraper;
         $this->request = $request;
         $this->spider = $spider;
+        $this->readerFactory = $readerFactory;
     }
 
     public function needsBackOut()
@@ -62,14 +63,16 @@ class ScrapeProcess implements RequestProcessInterface
 
         // Download the request
         return $this->downloader->fetch($this->request, $this->spider)->then(function($response) {
+
             $this->logger->debug("Scrape process: downloader fetched response of %s", [$this->request->getUri()]);
 
-            $reader = new DownloadResponseReader();
-            return $reader->readToEnd($response)->then(function($body) use ($response) {
+            $reader = $this->readerFactory->factory($response);
+
+            return $reader->readToEnd()->then(function($result) use ($response) {
 
                 $this->logger->debug("Scrape process: enqueue to scraper");
 
-                $response = new Response($this->request->getUri(), $body, $response->getProtocol(), $response->getProtocolVersion(), $response->getCode(), $response->getReasonPhrase(), $response->getHeaders());
+                // $response = new Response($this->request->getUri(), $result->getBody(), $response->getProtocol(), $response->getProtocolVersion(), $response->getCode(), $response->getReasonPhrase(), $response->getHeaders());
 
                 // Feed the response to the scraper
                 return $this->scraper->enqueueScrape($this->engine, $this->request, $response, $this->spider);

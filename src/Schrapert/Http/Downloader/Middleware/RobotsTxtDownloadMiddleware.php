@@ -7,6 +7,8 @@ use Schrapert\Http\Downloader\DownloadResponseReader;
 use Schrapert\Http\Downloader\DownloadResponseReaderResult;
 use Schrapert\Http\Request;
 use Schrapert\Http\RequestInterface;
+use Schrapert\Http\ResponseReaderFactoryInterface;
+use Schrapert\Http\ResponseReaderResultInterface;
 use Schrapert\Http\RobotsTxt\ParserInterface as RobotsTxtParserInterface;
 use Schrapert\Http\RobotsTxt\ParseResultInterface;
 use Schrapert\Log\LoggerInterface;
@@ -23,12 +25,15 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
 
     private $robotsTxtParser;
 
-    public function __construct(DownloaderInterface $downloader, RobotsTxtParserInterface $robotsTxtParser, LoggerInterface $logger, $userAgent = 'Schrapert')
+    private $readerFactory;
+
+    public function __construct(DownloaderInterface $downloader, ResponseReaderFactoryInterface $readerFactory, RobotsTxtParserInterface $robotsTxtParser, LoggerInterface $logger, $userAgent = 'Schrapert')
     {
         $this->logger = $logger;
         $this->robotsTxtParser = $robotsTxtParser;
         $this->userAgent = $userAgent;
         $this->downloader = $downloader;
+        $this->readerFactory = $readerFactory;
     }
 
     public function processRequest(RequestInterface $request, SpiderInterface $spider)
@@ -61,9 +66,8 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
         $robotsRequest->setUri($uri);
 
         return $this->downloader->fetch($robotsRequest, $spider)->then(function ($response) {
-            $reader = new DownloadResponseReader();
-            return $reader->readToEnd($response);
-        })->then(function (DownloadResponseReaderResult $result) {
+            return $this->readerFactory->factory($response)->readToEnd();
+        })->then(function (ResponseReaderResultInterface $result) {
             $txt = (string)$result;
             return $this->robotsTxtParser->parse($txt);
         });

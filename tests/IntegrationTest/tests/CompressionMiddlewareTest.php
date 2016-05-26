@@ -6,7 +6,7 @@ class SimpleCompressedDownloadSpider extends \Schrapert\Spider
     private $logger;
 
     protected $startUris = [
-        'http://robotstxt.schrapert.dev/'
+        'http://compression.schrapert.dev/'
     ];
 
     public $visited;
@@ -26,14 +26,6 @@ class SimpleCompressedDownloadSpider extends \Schrapert\Spider
     public function parse(\Schrapert\Crawl\ResponseInterface $response)
     {
         $this->visited[] = $response;
-
-        $this->logger->debug("Parse simple spider");
-        if(!$response instanceof \Schrapert\Http\ResponseInterface) {
-            //return;
-        }
-
-        var_dump((string)$response->getBody());
-
         $doc = new DOMDocument('1.0');
         $doc->loadHTML((string)$response->getBody());
         $xpath = new DOMXPath($doc);
@@ -55,38 +47,33 @@ class CompressedDownloadMiddlewareTest extends PHPUnit_Framework_TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->workingDir = sys_get_temp_dir().'/robots-middleware-test/';
+        $this->workingDir = sys_get_temp_dir().'/compressed-download-test/';
         rmdir_recursive($this->workingDir);
     }
 
-    public function _testDoesTakeRobotsTxtIntoAccount()
+    public function testCompressionAndDecompressionIsWorking()
     {
         $builder = new \Schrapert\RunnerBuilder();
 
         $spider = new SimpleCompressedDownloadSpider($builder->getLogger(), new \Schrapert\Http\Util\Uri());
         $config = new \Schrapert\Configuration\DefaultConfiguration();
-        $config->setSetting('HTTP_DOWNLOAD_DECORATORS', [
-            'Schrapert\Http\Downloader\Decorator\CompressDownloadDecorator' => 1
+        $config->setSetting('SCHEDULER_DISK_PATH', $this->workingDir);
+        $config->setSetting('HTTP_DOWNLOAD_MIDDLEWARE', [
+            'Schrapert\Http\Downloader\Middleware\DownloadCompressionMiddleware' => 1
         ]);
-
         $builder->setConfiguration($config);
-
         $runner = $builder->build();
         $runner->addSpider($spider);
         $runner->start();
 
-        $notAllowedVisits = [];
 
-        foreach($spider->visited as $visited) {
-            $uri = $visited->getUri();
-            if($uri == 'http://robotstxt.schrapert.dev/disallowed-for-bad-bot/') {
-                $notAllowedVisits[] = $uri;
-            }
-            if(0 === strpos($uri, 'http://robotstxt.schrapert.dev/private/')) {
-                $notAllowedVisits[] = $uri;
-            }
+        foreach($spider->visited as $response) {
+            $reader = new \Schrapert\Http\ResponseReader($response);
+            $reader->readToEnd()->then(function(\Schrapert\Http\ResponseReaderResult $result) {
+                $body = $result->getBody();
+                $this->assertArrayHasKey('Content-Enconding', $result->getResponse()->getHeaders());
+                $this->assertStringStartsWith('This content is compressed using gzip encoding. ', $body);
+            });
         }
-
-        $this->assertEmpty($notAllowedVisits, sprintf('BadBot visited %s which was not allowed for the bot', implode(', ', $notAllowedVisits)));
     }
 }

@@ -6,13 +6,15 @@ use React\Stream\DuplexStreamInterface;
 use React\Stream\ReadableStreamInterface;
 use React\Stream\Util;
 use React\Stream\WritableStreamInterface;
+use Schrapert\Http\ReadableResponseStreamInterface;
+use Schrapert\Http\ResponseInterface;
 
 /**
  * @event data ($bodyChunk, Response $thisResponse)
  * @event error
  * @event end
  */
-class DownloadResponse
+class DownloadResponse implements ResponseInterface, ReadableResponseStreamInterface
 {
     use EventEmitterTrait;
 
@@ -40,6 +42,11 @@ class DownloadResponse
         $stream->on('data', array($this, 'handleData'));
         $stream->on('error', array($this, 'handleError'));
         $stream->on('end', array($this, 'handleEnd'));
+    }
+
+    public function getUri()
+    {
+        return $this->request->getUri();
     }
 
     public function getProtocol()

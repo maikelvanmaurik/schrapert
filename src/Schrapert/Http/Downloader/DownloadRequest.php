@@ -52,8 +52,6 @@ class DownloadRequest implements WritableStreamInterface
 
     public function setHeader($name, $value)
     {
-        die("TODO " . __METHOD__);
-
         if (self::STATE_WRITING_HEAD <= $this->state) {
             throw new \LogicException('Headers already written');
         }

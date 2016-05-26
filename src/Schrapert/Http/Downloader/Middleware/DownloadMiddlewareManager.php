@@ -3,7 +3,6 @@ namespace Schrapert\Http\Downloader\Middleware;
 
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
-use Schrapert\Http\Downloader\Decorator\ProcessResponseMiddlewareInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Log\LoggerInterface;
 use Schrapert\SpiderInterface;

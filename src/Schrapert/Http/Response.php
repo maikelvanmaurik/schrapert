@@ -2,18 +2,8 @@
 
 namespace Schrapert\Http;
 
-use Evenement\EventEmitterTrait;
-use React\Stream\DuplexStreamInterface;
-use React\Stream\ReadableStreamInterface;
-use React\Stream\Util;
-use React\Stream\WritableStreamInterface;
 
-/**
- * @event data ($bodyChunk, Response $thisResponse)
- * @event error
- * @event end
- */
-class Response implements ResponseInterface
+class Response implements ResponseInterface, ResponseProvidingBodyInterface
 {
     public function __construct($uri, $body, $protocol, $version, $code, $reasonPhrase, $headers)
     {

@@ -9,4 +9,6 @@ interface ResponseInterface extends CrawlResponse
      * @return string
      */
     public function getUri();
+
+    public function getHeaders();
 }

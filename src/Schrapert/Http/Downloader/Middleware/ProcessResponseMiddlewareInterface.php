@@ -1,5 +1,5 @@
 <?php
-namespace Schrapert\Http\Downloader\Decorator;
+namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Http\Downloader\DownloadResponse;
 use Schrapert\SpiderInterface;

@@ -11,10 +11,11 @@ class SimpleSpider extends \Schrapert\Spider
 
     public $visited;
 
-    public function __construct(\Schrapert\Log\LoggerInterface $logger, \Schrapert\Http\Util\Uri $uri)
+    public function __construct(\Schrapert\Log\LoggerInterface $logger, \Schrapert\Http\Util\Uri $uri, \Schrapert\Http\ResponseReaderFactory $readerFactory)
     {
         $this->logger = $logger;
         $this->uri = $uri;
+        $this->readerFactory = $readerFactory;
         $this->urls = [];
         $this->visited = [];
     }
@@ -32,18 +33,22 @@ class SimpleSpider extends \Schrapert\Spider
             //return;
         }
 
+        $this->readerFactory->factory($response)->readToEnd()->then(function(\Schrapert\Http\ResponseReaderResultInterface $result) {
 
-        $doc = new DOMDocument('1.0');
-        $doc->loadHTML((string)$response->getBody());
-        $xpath = new DOMXPath($doc);
-        $nodes = $xpath->query('//a');
+            $response = $result->getResponse();
 
-        foreach($nodes as $node) {
-            /* @var $node \DOMElement */
-            $request = new \Schrapert\Http\Request();
-            $request->setUri($this->uri->join($node->getAttribute('href'), $response->getUri()));
-            yield $request;
-        }
+            $doc = new DOMDocument('1.0');
+            $doc->loadHTML((string)$result);
+            $xpath = new DOMXPath($doc);
+            $nodes = $xpath->query('//a');
+
+            foreach($nodes as $node) {
+                /* @var $node \DOMElement */
+                $request = new \Schrapert\Http\Request();
+                $request->setUri($this->uri->join($node->getAttribute('href'), $response->getUri()));
+                yield $request;
+            }
+        });
     }
 }
 
@@ -58,15 +63,23 @@ class RobotsMiddlewareTest extends PHPUnit_Framework_TestCase
         rmdir_recursive($this->workingDir);
     }
 
-    public function testDoesTakeRobotsTxtIntoAccount()
+    public function testDoesTakeDelayIntoAccount()
+    {
+        // build the runner
+        // create a spider
+        // run the spider
+        // check timings
+    }
+
+    public function testDoesTakeRestrictedPagesIntoAccount()
     {
         $builder = new \Schrapert\RunnerBuilder();
 
-        $spider = new SimpleSpider($builder->getLogger(), new \Schrapert\Http\Util\Uri());
+        $spider = new SimpleSpider($builder->getLogger(), new \Schrapert\Http\Util\Uri(), new \Schrapert\Http\ResponseReaderFactory());
         $config = new \Schrapert\Configuration\DefaultConfiguration();
         $config->setSetting('USER_AGENT', 'BadBot');
         $config->setSetting('SCHEDULER_DISK_PATH', $this->workingDir);
-        $config->setSetting('HTTP_DOWNLOAD_DECORATORS', [
+        $config->setSetting('HTTP_DOWNLOAD_MIDDLEWARE', [
             'Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware' => 1
         ]);
 
@@ -76,7 +89,7 @@ class RobotsMiddlewareTest extends PHPUnit_Framework_TestCase
         $runner->addSpider($spider);
         $runner->start();
 
-        $notAllowedVisits = [];
+        $notAllowedVisits = $requiredVisits = [];
 
         foreach($spider->visited as $visited) {
             $uri = $visited->getUri();
@@ -86,8 +99,12 @@ class RobotsMiddlewareTest extends PHPUnit_Framework_TestCase
             if(0 === strpos($uri, 'http://robotstxt.schrapert.dev/private/')) {
                 $notAllowedVisits[] = $uri;
             }
+            if(0 === stripos($uri, 'http://robotstxt.schrapert.dev/public/')) {
+                $requiredVisits[] = $uri;
+            }
         }
 
+        $this->assertNotEmpty($requiredVisits);
         $this->assertEmpty($notAllowedVisits, sprintf('BadBot visited %s which was not allowed for the bot', implode(', ', $notAllowedVisits)));
     }
 }

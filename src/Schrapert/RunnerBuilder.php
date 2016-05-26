@@ -21,6 +21,7 @@ use Schrapert\Http\Downloader\DownloaderInterface;
 use Schrapert\Http\Downloader\DownloadRequestFactory;
 use Schrapert\Http\Request;
 use Schrapert\Http\RequestProcessor;
+use Schrapert\Http\ResponseReaderFactory;
 use Schrapert\Http\ScrapeProcessFactory;
 use Schrapert\IO\FileSystemClientFactory;
 use Schrapert\Log\Logger;
@@ -181,6 +182,11 @@ class RunnerBuilder
         return $this->downloaderBuilder;
     }
 
+    public function getResponseReaderFactory()
+    {
+        return new ResponseReaderFactory();
+    }
+
     public function getDownloader()
     {
         if(null == $this->downloader) {
@@ -194,7 +200,7 @@ class RunnerBuilder
         if(null === $this->requestProcessorFactory) {
             $requestProcessorFactory = new RequestProcessorFactory();
             $requestProcessorFactory->register(Request::class, function() {
-                $downloadProcessFactory = new ScrapeProcessFactory($this->getLogger(), $this->getDownloader(), $this->getScraper());
+                $downloadProcessFactory = new ScrapeProcessFactory($this->getLogger(), $this->getDownloader(), $this->getScraper(), $this->getResponseReaderFactory());
                 return new RequestProcessor($downloadProcessFactory);
             });
             $this->requestProcessorFactory = $requestProcessorFactory;
