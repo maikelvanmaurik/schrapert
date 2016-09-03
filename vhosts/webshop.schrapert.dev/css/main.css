@@ -1,0 +1,9 @@
+html {
+    font-family: sans-serif;
+}
+
+body {
+    width: 960px;
+    margin: 0 auto;
+    padding: 100px;
+}

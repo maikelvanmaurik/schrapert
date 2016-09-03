@@ -11,10 +11,10 @@ class SimpleSpider extends \Schrapert\Spider
 
     public $visited;
 
-    public function __construct(\Schrapert\Log\LoggerInterface $logger, \Schrapert\Http\Util\Uri $uri, \Schrapert\Http\ResponseReaderFactory $readerFactory)
+    public function __construct(\Schrapert\Log\LoggerInterface $logger, \Schrapert\Http\UrlJoinerInterface $urlJoiner, \Schrapert\Http\ResponseReaderFactory $readerFactory)
     {
         $this->logger = $logger;
-        $this->uri = $uri;
+        $this->urlJoiner = $urlJoiner;
         $this->readerFactory = $readerFactory;
         $this->urls = [];
         $this->visited = [];
@@ -45,7 +45,7 @@ class SimpleSpider extends \Schrapert\Spider
             foreach($nodes as $node) {
                 /* @var $node \DOMElement */
                 $request = new \Schrapert\Http\Request();
-                $request->setUri($this->uri->join($node->getAttribute('href'), $response->getUri()));
+                $request->setUri($this->urlJoiner->join($node->getAttribute('href'), $response->getUri()));
                 yield $request;
             }
         });
@@ -75,7 +75,7 @@ class RobotsMiddlewareTest extends PHPUnit_Framework_TestCase
     {
         $builder = new \Schrapert\RunnerBuilder();
 
-        $spider = new SimpleSpider($builder->getLogger(), new \Schrapert\Http\Util\Uri(), new \Schrapert\Http\ResponseReaderFactory());
+        $spider = new SimpleSpider($builder->getLogger(), new \Schrapert\Http\UrlJoiner(), new \Schrapert\Http\ResponseReaderFactory());
         $config = new \Schrapert\Configuration\DefaultConfiguration();
         $config->setSetting('USER_AGENT', 'BadBot');
         $config->setSetting('SCHEDULER_DISK_PATH', $this->workingDir);

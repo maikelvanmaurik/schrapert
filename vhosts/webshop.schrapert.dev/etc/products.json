@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "name": "iPhone 5s Gold",
+        "price": 400.00
+    },
+    {
+        "id": 2,
+        "name": "iPhone 6",
+        "price": 600.00
+    }
+]

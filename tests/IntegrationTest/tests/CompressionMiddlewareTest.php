@@ -11,10 +11,10 @@ class SimpleCompressedDownloadSpider extends \Schrapert\Spider
 
     public $visited;
 
-    public function __construct(\Schrapert\Log\LoggerInterface $logger, \Schrapert\Http\Util\Uri $uri)
+    public function __construct(\Schrapert\Log\LoggerInterface $logger, \Schrapert\Http\UrlJoinerInterface $urlJoiner)
     {
         $this->logger = $logger;
-        $this->uri = $uri;
+        $this->urlJoiner = $urlJoiner;
         $this->urls = [];
         $this->visited = [];
     }
@@ -34,7 +34,7 @@ class SimpleCompressedDownloadSpider extends \Schrapert\Spider
         foreach($nodes as $node) {
             /* @var $node \DOMElement */
             $request = new \Schrapert\Http\Request();
-            $request->setUri($this->uri->join($node->getAttribute('href'), $response->getUri()));
+            $request->setUri($this->urlJoiner->join($node->getAttribute('href'), $response->getUri()));
             yield $request;
         }
     }
@@ -55,7 +55,7 @@ class CompressedDownloadMiddlewareTest extends PHPUnit_Framework_TestCase
     {
         $builder = new \Schrapert\RunnerBuilder();
 
-        $spider = new SimpleCompressedDownloadSpider($builder->getLogger(), new \Schrapert\Http\Util\Uri());
+        $spider = new SimpleCompressedDownloadSpider($builder->getLogger(), new \Schrapert\Http\UrlJoiner());
         $config = new \Schrapert\Configuration\DefaultConfiguration();
         $config->setSetting('SCHEDULER_DISK_PATH', $this->workingDir);
         $config->setSetting('HTTP_DOWNLOAD_MIDDLEWARE', [

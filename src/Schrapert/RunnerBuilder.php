@@ -123,10 +123,16 @@ class RunnerBuilder
     {
         if(null === $this->dnsResolver) {
             $dnsResolverFactory = new \React\Dns\Resolver\Factory();
-            $this->dnsResolver = $dnsResolverFactory->create('8.8.8.8', $this->getEventLoop());
+            $this->dnsResolver = $dnsResolverFactory->create('127.0.0.1', $this->getEventLoop());
+            //$this->dnsResolver = $dnsResolverFactory->create('8.8.8.8', $this->getEventLoop());
             //$this->dnsResolver = $dnsResolverFactory->createCached('127.0.0.1', $this->getEventLoop());
         }
         return $this->dnsResolver;
+    }
+
+    public function setDnsResolver($dnsResolver)
+    {
+        $this->dnsResolver = $dnsResolver;
     }
 
     public function getHttpClientFactory()

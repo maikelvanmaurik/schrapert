@@ -178,8 +178,6 @@ class ExecutionEngine
             });
         } catch(Exception $e) {
 
-            die($e->getMessage());
-
             $this->requestProcessFinished($request, $process);
 
             return new RejectedPromise($e);
