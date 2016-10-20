@@ -3,7 +3,7 @@ namespace Schrapert\Http;
 
 use React\SocketClient\ConnectorInterface;
 
-class Client
+class __Client
 {
     private $connector;
     private $secureConnector;

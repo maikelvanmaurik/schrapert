@@ -123,8 +123,8 @@ class RunnerBuilder
     {
         if(null === $this->dnsResolver) {
             $dnsResolverFactory = new \React\Dns\Resolver\Factory();
-            $this->dnsResolver = $dnsResolverFactory->create('127.0.0.1', $this->getEventLoop());
-            //$this->dnsResolver = $dnsResolverFactory->create('8.8.8.8', $this->getEventLoop());
+            //$this->dnsResolver = $dnsResolverFactory->create('127.0.0.1', $this->getEventLoop());
+            $this->dnsResolver = $dnsResolverFactory->create('8.8.8.8', $this->getEventLoop());
             //$this->dnsResolver = $dnsResolverFactory->createCached('127.0.0.1', $this->getEventLoop());
         }
         return $this->dnsResolver;
@@ -237,6 +237,7 @@ class RunnerBuilder
      */
     public function build()
     {
+        throw new \Exception("USE THE SERVICE CONTAINER!");
         $fsFactory = new FileSystemClientFactory($this->getEventLoop());
 
         $priorityQueue = new PriorityQueue(new MemoryQueue(), new DiskQueue($this->getLogger(), $fsFactory->factory(), $this->getConfiguration()->getSetting('SCHEDULER_DISK_PATH')));

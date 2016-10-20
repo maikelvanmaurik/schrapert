@@ -1,7 +1,7 @@
 <?php
 namespace Schrapert\Http;
 
-interface ClientInterface
+interface __ClientInterface
 {
     /**
      * @param $method

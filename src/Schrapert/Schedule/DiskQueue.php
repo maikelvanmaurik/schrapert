@@ -34,10 +34,13 @@ class DiskQueue implements PriorityQueueInterface
 
     public function setBaseDirectory($dir)
     {
-        $this->baseDir = rtrim($dir, '/\\');
-
-        if(!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+        if(null === $dir) {
+            $this->baseDir = null;
+        } else {
+            $this->baseDir = rtrim($dir, '/\\');
+            if (!is_dir($dir)) {
+                mkdir($dir, 0755, true);
+            }
         }
     }
 

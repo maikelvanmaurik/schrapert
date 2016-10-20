@@ -7,6 +7,11 @@ use Schrapert\Crawl\RequestInterface as CrawlRequest;
 use Schrapert\SpiderInterface;
 use RuntimeException;
 
+/**
+ * Request processor for HTTP requests
+ *
+ * @package Schrapert\Http
+ */
 class RequestProcessor implements RequestProcessorInterface
 {
     private $scrapeProcessFactory;

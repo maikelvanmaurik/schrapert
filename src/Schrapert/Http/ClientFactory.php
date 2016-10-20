@@ -6,7 +6,7 @@ use React\EventLoop\LoopInterface;
 use React\HttpClient\Factory;
 use React\SocketClient\Connector;
 
-class ClientFactory implements ClientFactoryInterface
+class __ClientFactory implements ClientFactoryInterface
 {
     private $loop;
 

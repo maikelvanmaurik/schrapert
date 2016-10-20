@@ -6,15 +6,9 @@ var exec = require('child_process').exec,
     q = require('q'),
     semver = require('semver'),
     glob = require('glob'),
-    s = require('underscore.string'),
     isWin = /^win/.test(process.platform),
-    xpath = require('xpath'),
-    dom = require('xmldom').DOMParser,
     APPLICATION_ENV = process.env.APPLICATION_ENV || 'PRODUCTION',
     COMPOSER_BIN_DIR = process.env.COMPOSER_BIN_DIR || __dirname + '/vendor/bin';
-
-console.log(COMPOSER_BIN_DIR);
-
 
 String.prototype.toCamel = function () {
     return this.replace(/(\-[a-z])/g, function ($1) {
@@ -104,7 +98,7 @@ module.exports = function (grunt) {
                 configuration: firstExistingFile(__dirname + "/phpunit.xml", __dirname + "/phpunit.xml.dist"),
                 staticBackup: false,
                 colors: true,
-                verbose: true,
+                //verbose: true,
                 debug: true,
                 noGlobalsBackup: false
             }
@@ -167,8 +161,12 @@ module.exports = function (grunt) {
                 files: ['tests/**/*.php', '!tests/phpunit/etc/*.php', '!app/config/classmap.php', 'app/**/*.php', 'core/libraries/**/*.php', '!tests/integration/servers/**/*.*'],
                 tasks: ['phpunit']
             },
+            "tdd-unit": {
+                files: ['src/**/*', 'tests/unit/**/*', '!tests/phpunit/etc/*.php', '!app/config/classmap.php'],
+                tasks: ['phpunit:unit']
+            },
             "tdd-integration": {
-                files: ['tests/integration/**/*.php', '!tests/phpunit/etc/*.php', '!app/config/classmap.php', 'app/**/*.php'],
+                files: ['tests/integration/**/*.php', '!tests/phpunit/etc/*.php', '!app/config/classmap.php', './src/**/*.php'],
                 tasks: ['phpunit:integration']
             },
             peg: {
@@ -190,33 +188,6 @@ module.exports = function (grunt) {
             cb(error, stdout, stderr);
         });
     }
-
-    /*
-    grunt.registerTask('install-git-hooks', function () {
-        var done = this.async();
-        grunt.log.ok("Installing git hooks");
-
-        fs.readFile(__dirname + '/git-hooks/validate-commit-message.js', function (err, data) {
-            if (err) {
-                grunt.log.error('Error reading file ' + err);
-                done(false);
-            }
-            fs.writeFile('.git/hooks/commit-msg', '' + data, function (err) {
-                if (err) {
-                    grunt.log.error('Error writing file');
-                    done(false);
-                }
-                fs.chmod('.git/hooks/commit-msg', 0777, function (err) {
-                    if (err) {
-                        grunt.log.error('Error changing permissions ' + err);
-                        done(false);
-                    }
-                    done();
-                })
-            });
-        });
-    });
-    */
 
     grunt.registerTask('tdd', ['watch:tdd']);
 

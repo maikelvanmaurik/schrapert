@@ -7,7 +7,14 @@ spl_autoload_register(function($class) {
     $parts = explode('\\', $class);
 
     if(reset($parts) == 'Schrapert') {
-        $file = SRC_DIR . implode('/', $parts) . '.php';
+
+        if($parts[1] == 'Test') {
+            $baseDir = dirname(__FILE__) . '/' . strtolower($parts[2]) . '/classes/';
+            $parts = array_slice($parts, 3);
+        } else {
+            $baseDir = SRC_DIR;
+        }
+        $file = $baseDir . implode('/', $parts) . '.php';
         if(is_readable($file)) {
             require_once $file;
         }

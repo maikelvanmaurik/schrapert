@@ -1,7 +1,7 @@
 <?php
 namespace Schrapert\Http;
 
-interface ClientFactoryInterface
+interface __ClientFactoryInterface
 {
     /**
      * @return ClientInterface

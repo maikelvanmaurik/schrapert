@@ -7,6 +7,7 @@ use React\Promise\PromiseInterface;
 use Schrapert\Crawl\RequestInterface;
 use Schrapert\Crawl\ResponseInterface;
 use Schrapert\Log\LoggerInterface;
+use Schrapert\Scraping\Item;
 use Schrapert\SpiderInterface;
 use Traversable;
 use Generator;
@@ -105,7 +106,13 @@ class Scraper implements ScraperInterface
             $this->logger->debug("Call spider");
             $this->active[] = $request;
             $result = call_user_func(is_callable($request->getCallback()) ? $request->getCallback() : array($spider, 'parse'), $response);
-            $deferred->resolve($result);
+            if($result instanceof PromiseInterface) {
+                $result->then(function($item) use ($deferred) {
+                    $deferred->resolve($item);
+                });
+            } else {
+                $deferred->resolve($result);
+            }
         });
         return $deferred->promise();
     }
@@ -114,7 +121,7 @@ class Scraper implements ScraperInterface
     {
         if($item instanceof RequestInterface) {
             return $engine->crawl($item, $spider);
-        } elseif(null !== $item) {
+        } elseif($item instanceof Item) {
             return $this->itemProcessor->process($item);
         }
     }

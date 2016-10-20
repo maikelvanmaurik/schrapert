@@ -1,72 +1,33 @@
 <?php
 namespace Schrapert\Http\Downloader;
 
-use Evenement\EventEmitterTrait;
-use React\Stream\DuplexStreamInterface;
-use React\Stream\ReadableStreamInterface;
-use React\Stream\Util;
-use React\Stream\WritableStreamInterface;
-use Schrapert\Http\ReadableResponseStreamInterface;
 use Schrapert\Http\ResponseInterface;
+use Schrapert\Http\ResponseProvidingBodyInterface;
 
-/**
- * @event data ($bodyChunk, Response $thisResponse)
- * @event error
- * @event end
- */
-class DownloadResponse implements ResponseInterface, ReadableResponseStreamInterface
+class DownloadResponse implements ResponseInterface, ResponseProvidingBodyInterface
 {
-    use EventEmitterTrait;
-
-    private $stream;
-
-    private $protocol;
-    private $version;
-    private $code;
-    private $reasonPhrase;
-    private $headers;
-    private $readable = true;
-
-    private $request;
-
-    public function __construct(DownloadRequest $request, DuplexStreamInterface $stream, $protocol, $version, $code, $reasonPhrase, $headers)
+    public function __construct(DownloadRequest $request, $protocol, $version, $code, $reasonPhrase, $headers, $body)
     {
         $this->request = $request;
-        $this->stream = $stream;
         $this->protocol = $protocol;
         $this->version = $version;
         $this->code = $code;
         $this->reasonPhrase = $reasonPhrase;
         $this->headers = $headers;
-
-        $stream->on('data', array($this, 'handleData'));
-        $stream->on('error', array($this, 'handleError'));
-        $stream->on('end', array($this, 'handleEnd'));
+        $this->body = $body;
     }
 
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @return string
+     */
     public function getUri()
     {
         return $this->request->getUri();
-    }
-
-    public function getProtocol()
-    {
-        return $this->protocol;
-    }
-
-    public function getProtocolVersion()
-    {
-        return $this->version;
-    }
-
-    public function getCode()
-    {
-        return $this->code;
-    }
-
-    public function getReasonPhrase()
-    {
-        return $this->reasonPhrase;
     }
 
     public function getHeaders()
@@ -74,61 +35,13 @@ class DownloadResponse implements ResponseInterface, ReadableResponseStreamInter
         return $this->headers;
     }
 
-    public function handleData($data)
+    public function getHeader($name, $default = null)
     {
-        $this->emit('data', array($data, $this));
+        return array_key_exists($name, $this->headers) ? $this->headers[$name] : $default;
     }
 
-    public function handleEnd()
+    public function getBody()
     {
-        $this->close();
-    }
-
-    public function handleError(\Exception $error)
-    {
-        $this->emit('error', array(new \RuntimeException(
-            "An error occurred in the underlying stream",
-            0,
-            $error
-        ), $this));
-
-        $this->close($error);
-    }
-
-    public function close(\Exception $error = null)
-    {
-        if (!$this->readable) {
-            return;
-        }
-
-        $this->readable = false;
-
-        $this->emit('end', array($error, $this));
-
-        $this->removeAllListeners();
-        $this->stream->end();
-    }
-
-    public function isReadable()
-    {
-        return $this->readable;
-    }
-
-    public function pause()
-    {
-        if (!$this->readable) {
-            return;
-        }
-
-        $this->stream->pause();
-    }
-
-    public function resume()
-    {
-        if (!$this->readable) {
-            return;
-        }
-
-        $this->stream->resume();
+        return $this->body;
     }
 }

@@ -2,57 +2,40 @@
 
 namespace Schrapert\Http;
 
-use Evenement\EventEmitterTrait;
-use GuzzleHttp\Psr7 as gPsr;
-use React\SocketClient\ConnectorInterface;
-use React\Stream\WritableStreamInterface;
+use Psr\Http\Message\UriInterface;
 
-/**
- * @event headers-written
- * @event response
- * @event drain
- * @event error
- * @event end
- */
-class Request implements RequestInterface
+class Request extends Message implements RequestInterface
 {
-    use EventEmitterTrait;
 
-    const STATE_INIT = 0;
-    const STATE_WRITING_HEAD = 1;
-    const STATE_HEAD_WRITTEN = 2;
-    const STATE_END = 3;
-    const DEFAULT_PROTOCOL_VERSION = '1.0';
-
-    private $responseFactory;
-    private $response;
-    private $state = self::STATE_INIT;
-    private $meta;
-    private $uri;
-    private $method;
-    private $parsedUri;
-    private $protocolVersion;
-    private $headers;
     private $callback;
 
-    private $pendingWrites = array();
+    private $requestTarget;
 
-
-    public function __construct($uri = null, array $headers = [], array $meta = [])
+    public function __construct($uri, $method = 'GET', array $headers = [], $body = null, $version = '1.1', array $meta = [])
     {
-        $this->setUri($uri);
+        if (!($uri instanceof UriInterface)) {
+            $uri = new Uri($uri);
+        }
+
+        $this->uri = $uri;
+        $this->method = strtoupper($method);
         $this->meta = $meta;
         $this->setHeaders($headers);
     }
 
-    public function getMetaData($key, $default = null)
+    public function getMetaData($key = null, $default = null)
     {
+        if(null === $key) {
+            return $this->meta;
+        }
         return array_key_exists($key, $this->meta) ? $this->meta[$key] : $default;
     }
 
-    public function setMetaData($key, $value)
+    public function withMetaData($key, $value)
     {
-        $this->meta[$key] = $value;
+        $new = clone $this;
+        $new->meta[$key] = $value;
+        return $new;
     }
 
     public function getCallback()
@@ -60,10 +43,11 @@ class Request implements RequestInterface
         return $this->callback;
     }
 
-    public function setCallback(callable $callback)
+    public function withCallback(callable $callback)
     {
-        $this->callback = $callback;
-        return $this;
+        $new = clone $this;
+        $new->callback = $callback;
+        return $new;
     }
 
     public function getMethod()
@@ -71,298 +55,151 @@ class Request implements RequestInterface
         return null === $this->method ? 'GET' : $this->method;
     }
 
-    public function setMethod($method)
-    {
-        $this->method = $method;
-    }
-
-    public function getProtocolVersion()
-    {
-        return $this->protocolVersion ? $this->protocolVersion : self::DEFAULT_PROTOCOL_VERSION;
-    }
-
-    public function setProtocolVersion($version)
-    {
-        $this->protocolVersion = $version;
-    }
-
     public function getUri()
     {
         return $this->uri;
     }
 
-    public function setUri($uri)
+    /**
+     * Retrieves the message's request target.
+     *
+     * Retrieves the message's request-target either as it will appear (for
+     * clients), as it appeared at request (for servers), or as it was
+     * specified for the instance (see withRequestTarget()).
+     *
+     * In most cases, this will be the origin-form of the composed URI,
+     * unless a value was provided to the concrete implementation (see
+     * withRequestTarget() below).
+     *
+     * If no URI is available, and no request-target has been specifically
+     * provided, this method MUST return the string "/".
+     *
+     * @return string
+     */
+    public function getRequestTarget()
     {
-        $this->uri = $uri;
-        $this->parsedUri = parse_url($uri);
-    }
-
-    public function getPort()
-    {
-        return is_array($this->parsedUri) && array_key_exists('port', $this->parsedUri) ? $this->parsedUri['port'] : null;
-    }
-
-    public function getHost()
-    {
-        return is_array($this->parsedUri) ? $this->parsedUri['host'] : null;
-    }
-
-    public function getProtocol()
-    {
-        return is_array($this->parsedUri) ? $this->parsedUri['scheme'] : null;
-    }
-
-    public function getPath()
-    {
-        return isset($this->parsedUri['path']) ? $this->parsedUri['path'] : '/';
-    }
-
-    public function getQueryString()
-    {
-        return isset($this->parsedUri['query']) ? $this->parsedUri['query'] : null;
-    }
-
-    public function setHeaders($headers)
-    {
-        if(null === $headers) {
-            $this->headers = [];
-            return;
+        if ($this->requestTarget !== null) {
+            return $this->requestTarget;
         }
-        if(!is_array($headers) && !$headers instanceof \Traversable) {
-            throw new \InvalidArgumentException("Invalid headers given");
+        $target = $this->uri->getPath();
+        if ($target == '') {
+            $target = '/';
         }
-
-        $this->headers = [];
-        foreach($headers as $k => $v) {
-            $this->headers[$k] = $v;
+        if ('' != ($query = $this->uri->getQuery())) {
+            $target .= '?' . $query;
         }
+        return $target;
     }
 
-    public function setHeader($name, $value)
+    /**
+     * Return an instance with the specific request-target.
+     *
+     * If the request needs a non-origin-form request-target — e.g., for
+     * specifying an absolute-form, authority-form, or asterisk-form —
+     * this method may be used to create an instance with the specified
+     * request-target, verbatim.
+     *
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * changed request target.
+     *
+     * @link http://tools.ietf.org/html/rfc7230#section-5.3 (for the various
+     *     request-target forms allowed in request messages)
+     * @param mixed $requestTarget
+     * @return static
+     */
+    public function withRequestTarget($requestTarget)
     {
-        $this->headers[$name] = $value;
-    }
-
-    public function getHeaders()
-    {
-        return $this->headers;
-    }
-
-    public function writeHead()
-    {
-        if (self::STATE_WRITING_HEAD <= $this->state) {
-            throw new \LogicException('Headers already written');
-        }
-
-        $this->state = self::STATE_WRITING_HEAD;
-
-        $requestData = $this->requestData;
-        $streamRef = &$this->stream;
-        $stateRef = &$this->state;
-
-        $this
-            ->connect()
-            ->done(
-                function ($stream) use ($requestData, &$streamRef, &$stateRef) {
-                    $streamRef = $stream;
-
-                    $stream->on('drain', array($this, 'handleDrain'));
-                    $stream->on('data', array($this, 'handleData'));
-                    $stream->on('end', array($this, 'handleEnd'));
-                    $stream->on('error', array($this, 'handleError'));
-
-                    $headers = (string) $requestData;
-
-                    $stream->write($headers);
-
-                    $stateRef = Request::STATE_HEAD_WRITTEN;
-
-                    $this->emit('headers-written', array($this));
-                },
-                array($this, 'handleError')
+        if (preg_match('#\s#', $requestTarget)) {
+            throw new InvalidArgumentException(
+                'Invalid request target provided; cannot contain whitespace'
             );
+        }
+        $new = clone $this;
+        $new->requestTarget = $requestTarget;
+        return $new;
+
     }
 
-    public function write($data)
+    /**
+     * Return an instance with the provided HTTP method.
+     *
+     * While HTTP method names are typically all uppercase characters, HTTP
+     * method names are case-sensitive and thus implementations SHOULD NOT
+     * modify the given string.
+     *
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * changed request method.
+     *
+     * @param string $method Case-sensitive method.
+     * @return static
+     * @throws \InvalidArgumentException for invalid HTTP methods.
+     */
+    public function withMethod($method)
     {
-        if (!$this->isWritable()) {
+        $request = clone $this;
+        $request->method = $method;
+        return $request;
+    }
+
+    /**
+     * Returns an instance with the provided URI.
+     *
+     * This method MUST update the Host header of the returned request by
+     * default if the URI contains a host component. If the URI does not
+     * contain a host component, any pre-existing Host header MUST be carried
+     * over to the returned request.
+     *
+     * You can opt-in to preserving the original state of the Host header by
+     * setting `$preserveHost` to `true`. When `$preserveHost` is set to
+     * `true`, this method interacts with the Host header in the following ways:
+     *
+     * - If the Host header is missing or empty, and the new URI contains
+     *   a host component, this method MUST update the Host header in the returned
+     *   request.
+     * - If the Host header is missing or empty, and the new URI does not contain a
+     *   host component, this method MUST NOT update the Host header in the returned
+     *   request.
+     * - If a Host header is present and non-empty, this method MUST NOT update
+     *   the Host header in the returned request.
+     *
+     * This method MUST be implemented in such a way as to retain the
+     * immutability of the message, and MUST return an instance that has the
+     * new UriInterface instance.
+     *
+     * @link http://tools.ietf.org/html/rfc3986#section-4.3
+     * @param UriInterface $uri New request URI to use.
+     * @param bool $preserveHost Preserve the original state of the Host header.
+     * @return static
+     */
+    public function withUri(UriInterface $uri, $preserveHost = false)
+    {
+        $new = clone $this;
+        $new->uri = $uri;
+        if (!$preserveHost) {
+            $new->updateHostFromUri();
+        }
+        return $new;
+    }
+
+    private function updateHostFromUri()
+    {
+        $host = $this->uri->getHost();
+        if ($host == '') {
             return;
         }
-
-        if (self::STATE_HEAD_WRITTEN <= $this->state) {
-            return $this->stream->write($data);
+        if (($port = $this->uri->getPort()) !== null) {
+            $host .= ':' . $port;
         }
-
-        if (!count($this->pendingWrites)) {
-            $this->on('headers-written', function ($that) {
-                foreach ($that->pendingWrites as $pw) {
-                    $that->write($pw);
-                }
-                $that->pendingWrites = array();
-                $that->emit('drain', array($that));
-            });
+        if (isset($this->headerNames['host'])) {
+            $header = $this->headerNames['host'];
+        } else {
+            $header = 'Host';
+            $this->headerNames['host'] = 'Host';
         }
-
-        $this->pendingWrites[] = $data;
-
-        if (self::STATE_WRITING_HEAD > $this->state) {
-            $this->writeHead();
-        }
-
-        return false;
-    }
-
-    public function end($data = null)
-    {
-        if (null !== $data && !is_scalar($data)) {
-            throw new \InvalidArgumentException('$data must be null or scalar');
-        }
-
-        if (null !== $data) {
-            $this->write($data);
-        } else if (self::STATE_WRITING_HEAD > $this->state) {
-            $this->writeHead();
-        }
-    }
-
-    public function handleDrain()
-    {
-        $this->emit('drain', array($this));
-    }
-
-    public function handleData($data)
-    {
-        $this->buffer .= $data;
-
-        if (false !== strpos($this->buffer, "\r\n\r\n")) {
-            list($response, $bodyChunk) = $this->parseResponse($this->buffer);
-
-            $this->buffer = null;
-
-            $this->stream->removeListener('drain', array($this, 'handleDrain'));
-            $this->stream->removeListener('data', array($this, 'handleData'));
-            $this->stream->removeListener('end', array($this, 'handleEnd'));
-            $this->stream->removeListener('error', array($this, 'handleError'));
-
-            $this->response = $response;
-
-            $response->on('end', function () {
-                $this->close();
-            });
-            $response->on('error', function (\Exception $error) {
-                $this->closeError(new \RuntimeException(
-                    "An error occured in the response",
-                    0,
-                    $error
-                ));
-            });
-
-            $this->emit('response', array($response, $this));
-
-            $response->emit('data', array($bodyChunk, $response));
-        }
-    }
-
-    public function handleEnd()
-    {
-        $this->closeError(new \RuntimeException(
-            "Connection closed before receiving response"
-        ));
-    }
-
-    public function handleError($error)
-    {
-        $this->closeError(new \RuntimeException(
-            "An error occurred in the underlying stream",
-            0,
-            $error
-        ));
-    }
-
-    public function closeError(\Exception $error)
-    {
-        if (self::STATE_END <= $this->state) {
-            return;
-        }
-        $this->emit('error', array($error, $this));
-        $this->close($error);
-    }
-
-    public function close(\Exception $error = null)
-    {
-        if (self::STATE_END <= $this->state) {
-            return;
-        }
-
-        $this->state = self::STATE_END;
-
-        if ($this->stream) {
-            $this->stream->close();
-        }
-
-        $this->emit('end', array($error, $this->response, $this));
-        $this->removeAllListeners();
-    }
-
-    protected function parseResponse($data)
-    {
-        $psrResponse = gPsr\parse_response($data);
-        $headers = array_map(function($val) {
-            if (1 === count($val)) {
-                $val = $val[0];
-            }
-
-            return $val;
-        }, $psrResponse->getHeaders());
-
-        $factory = $this->getResponseFactory();
-
-        $response = $factory(
-            $this,
-            $this->stream,
-            'HTTP',
-            $psrResponse->getProtocolVersion(),
-            $psrResponse->getStatusCode(),
-            $psrResponse->getReasonPhrase(),
-            $headers
-        );
-
-        return array($response, $psrResponse->getBody());
-    }
-
-    protected function connect()
-    {
-        $host = $this->requestData->getHost();
-        $port = $this->requestData->getPort();
-
-        return $this->connector
-            ->create($host, $port);
-    }
-
-    public function setResponseFactory($factory)
-    {
-        $this->responseFactory = $factory;
-    }
-
-    public function getResponseFactory()
-    {
-        if (null === $factory = $this->responseFactory) {
-
-            $factory = function ($request, $stream, $protocol, $version, $code, $reasonPhrase, $headers) {
-                return new Response(
-                    $request,
-                    $stream,
-                    $protocol,
-                    $version,
-                    $code,
-                    $reasonPhrase,
-                    $headers
-                );
-            };
-
-            $this->responseFactory = $factory;
-        }
-
-        return $factory;
+        // Ensure Host is the first header.
+        // See: http://tools.ietf.org/html/rfc7230#section-5.4
+        $this->headers = [$header => [$host]] + $this->headers;
     }
 }

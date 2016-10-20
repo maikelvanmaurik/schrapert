@@ -8,7 +8,6 @@ interface ProcessRequestMiddlewareInterface
 {
     /**
      * @param RequestInterface $request
-     * @param SpiderInterface $spider
      */
-    public function processRequest(RequestInterface $request, SpiderInterface $spider);
+    public function processRequest(RequestInterface $request);
 }

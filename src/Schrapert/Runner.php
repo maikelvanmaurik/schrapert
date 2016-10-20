@@ -2,7 +2,6 @@
 namespace Schrapert;
 
 use Schrapert\Core\ExecutionEngine;
-use Schrapert\Core\ExecutionEngineFactory;
 use Schrapert\Signal\SignalManager;
 use React\EventLoop\LoopInterface;
 
@@ -18,12 +17,10 @@ class Runner
 
     private $loop;
 
-    private $engineFactory;
-
-    public function __construct(LoopInterface $loop, SignalManager $signals, ExecutionEngineFactory $engineFactory)
+    public function __construct(LoopInterface $loop, SignalManager $signals, ExecutionEngine $engine)
     {
         $this->spiders = array();
-        $this->engineFactory = $engineFactory;
+        $this->engine = $engine;
         $this->signals = $signals;
         $this->loop = $loop;
     }
@@ -35,9 +32,8 @@ class Runner
 
     private function crawl(SpiderInterface $spider)
     {
-        $engine = $this->engineFactory->factory();
-        $engine->openSpider($spider, $spider->startRequests());
-        return $engine->start();
+        $this->engine->openSpider($spider, $spider->startRequests());
+        return $this->engine->start();
     }
 
     public function start($stop=true)

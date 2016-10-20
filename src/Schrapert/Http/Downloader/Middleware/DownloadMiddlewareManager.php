@@ -54,6 +54,7 @@ class DownloadMiddlewareManager implements DownloadMiddlewareManagerInterface
             });
         }
 
+
         // When all the middleware have run call the download method
         $promise = $promise->then(function ($request) use ($download) {
             $this->logger->debug("Invoke request %s", [$request->getUri()]);

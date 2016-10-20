@@ -3,17 +3,13 @@ namespace Schrapert\Crawl;
 
 class Request implements RequestInterface
 {
-    private $uri;
-
     private $callback;
 
-    public function __construct($uri = null, $method = 'GET', callable $callback = null)
-    {
-    }
+    private $meta = [];
 
-    public function getUri()
+    public function __construct(callable $callback = null)
     {
-        return $this->uri;
+        $this->setCallback($callback);
     }
 
     public function getCallback()
@@ -23,7 +19,7 @@ class Request implements RequestInterface
 
     public function setCallback(callable $callback)
     {
-
+        $this->callback = $callback;
     }
 
     public function setMetaData($key, $value)
@@ -31,10 +27,12 @@ class Request implements RequestInterface
         // TODO: Implement setMetaData() method.
     }
 
-    public function getMetaData($key, $default = null)
+    public function getMetaData($key = null, $default = null)
     {
-        // TODO: Implement getMetaData() method.
+        if(null === $key) {
+            return $this->meta;
+        }
+
+        return array_key_exists($key, $this->meta) ? $this->meta[$key] : $default;
     }
-
-
 }
