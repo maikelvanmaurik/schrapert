@@ -70,12 +70,12 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
             return $request;
         }
 
-        if($this->policy->isCachedResponseFresh($cached, $request)) {
-            return $cached;
-        }
-
         if($this->policy instanceof RequestProcessorPolicyInterface) {
             $request = $this->policy->processRequest($cached, $request);
+        }
+
+        if($this->policy->isCachedResponseFresh($cached, $request)) {
+            return $cached->withMetaData('request', $request);
         }
 
         return $request->withMetaData('cached_response', $cached);
