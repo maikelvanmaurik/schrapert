@@ -15,6 +15,10 @@ class Request extends Message implements RequestInterface
         return $this->callback;
     }
 
+    /**
+     * @param callable $callback
+     * @return static
+     */
     public function withCallback(callable $callback)
     {
         $new = clone $this;

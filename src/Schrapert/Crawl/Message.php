@@ -1,7 +1,7 @@
 <?php
 namespace Schrapert\Crawl;
 
-class Message implements MessageInterface
+abstract class Message implements MessageInterface
 {
     private $meta = [];
 
@@ -10,9 +10,16 @@ class Message implements MessageInterface
 
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return static
+     */
     public function withMetaData($key, $value)
     {
-        // TODO: Implement setMetaData() method.
+        $new = clone $this;
+        $new->meta[$key] = $value;
+        return $new;
     }
 
     public function getMetaData($key = null, $default = null)

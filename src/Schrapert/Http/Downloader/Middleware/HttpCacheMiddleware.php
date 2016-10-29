@@ -9,6 +9,12 @@ use Schrapert\Http\Cache\StorageInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Http\ResponseInterface;
 
+/**
+ * Represents a middleware which provides a low-level cache to all HTTP requests and responses. It has to be combined
+ * with a cache storage backend as well as a cache policy.
+ *
+ * @package Schrapert\Http\Downloader\Middleware
+ */
 class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequestMiddlewareInterface, ProcessResponseMiddlewareInterface
 {
     private $storage;
@@ -24,11 +30,18 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
         $this->ignoreMissing = $ignoreMissing;
     }
 
+    /**
+     * @return PolicyInterface
+     */
     public function getPolicy()
     {
         return $this->policy;
     }
 
+    /**
+     * @param PolicyInterface $policy
+     * @return HttpCacheMiddleware
+     */
     public function withPolicy(PolicyInterface $policy)
     {
         $new = clone $this;
@@ -36,11 +49,18 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
         return $new;
     }
 
+    /**
+     * @return StorageInterface
+     */
     public function getStorage()
     {
         return $this->storage;
     }
 
+    /**
+     * @param StorageInterface $storage
+     * @return HttpCacheMiddleware
+     */
     public function withStorage(StorageInterface $storage)
     {
         $new = clone $this;
@@ -51,6 +71,7 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
     /**
      * @param RequestInterface $request
      * @return RequestInterface|ResponseInterface
+     * @throws IgnoreRequestException when {@see ignoreMissing} is true and the response is not cached
      */
     public function processRequest(RequestInterface $request)
     {
@@ -103,6 +124,7 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
             return $response;
         }
 
+        // When the response does not contain a Date header add it
         if(!$response->getHeaderLine('Date')) {
             $response = $response->withHeader('Date', gmdate('r'));
         }

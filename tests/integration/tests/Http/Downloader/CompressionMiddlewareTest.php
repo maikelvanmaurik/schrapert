@@ -19,7 +19,7 @@ class CompressionMiddlewareTest extends TestCase
     {
         $this->eventLoop = $this->getContainer()->get('event_loop');
         $this->downloader = $this->getContainer()->get('downloader');
-        return parent::setUp();
+        parent::setUp();
     }
 
 

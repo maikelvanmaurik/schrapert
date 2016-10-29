@@ -58,10 +58,13 @@ class HttpCacheMiddlewareTest extends TestCase
 
     }
 
-    public function testResponsesOfARequestWithACacheControlNoCacheHeaderAreNotBeingCachedWhenUsingRfc2616Policy()
+    /**
+     * When the Cache-Control header contains a no-store directive the response should not be cached
+     */
+    public function testResponsesOfARequestWithACacheControlNoStoreHeaderAreNotBeingCachedWhenUsingRfc2616Policy()
     {
-        $uri = sprintf('http://caching.schrapert.dev/cache-control-header.php?header-value=%s', urlencode('public,max-age=1'));
-        $request = new Request($uri, 'GET', ['no-cache' => true]);
+        $uri = sprintf('http://caching.schrapert.dev/cache-control-header.php?header-value=%s', urlencode('no-store'));
+        $request = new Request($uri, 'GET');
 
         $fileStorage = $this->fileStorage;
         $fileStorage->clear();
@@ -229,6 +232,7 @@ class HttpCacheMiddlewareTest extends TestCase
             $downloader
                 ->download($request)
                 ->then(function(ResponseInterface $response) {
+                    /* @var $request RequestInterface */
                     $request = $response->getMetaData('request');
                     // First request so it should not have the If-None-Match header
                     $this->assertFalse($request->hasHeader('If-None-Match'));
@@ -243,6 +247,7 @@ class HttpCacheMiddlewareTest extends TestCase
             $downloader
                 ->download($request)
                 ->then(function(ResponseInterface $response) use ($eTag) {
+                    /* @var $request RequestInterface */
                     $request = $response->getMetaData('request');
                     // Second request so it should have the If-None-Match header
                     $this->assertEquals($eTag, $request->getHeaderLine('If-None-Match'));

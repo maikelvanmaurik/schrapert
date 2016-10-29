@@ -10,7 +10,7 @@ interface StorageInterface
     public function clear();
     /**
      * @param RequestInterface $request
-     * @return PromiseInterface
+     * @return ResponseInterface
      */
     public function retrieveResponse(RequestInterface $request);
 
