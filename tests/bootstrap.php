@@ -2,6 +2,7 @@
 require_once rtrim(getenv('COMPOSER_VENDOR_DIR') ?: __DIR__ . '/../vendor', '/\\') . '/autoload.php';
 
 define('SRC_DIR', dirname(__DIR__).'/src/');
+define('ETC_DIR', dirname(__DIR__).'/etc/');
 
 spl_autoload_register(function($class) {
     $parts = explode('\\', $class);

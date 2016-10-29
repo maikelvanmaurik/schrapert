@@ -1,11 +1,15 @@
 <?php
 namespace Schrapert\Http\Downloader;
 
+use Psr\Http\Message\ResponseInterface;
 use React\Promise\Deferred;
+use Schrapert\Http\Downloader\Exception\DownloaderTimeoutException;
+use Schrapert\Http\Downloader\Exception\TransactionTimeoutException;
 use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareInterface;
 use Schrapert\Http\Downloader\Middleware\ProcessRequestMiddlewareInterface;
 use Schrapert\Http\Downloader\Middleware\ProcessResponseMiddlewareInterface;
 use Schrapert\Http\RequestInterface;
+use Schrapert\Http\Response;
 use Schrapert\Log\LoggerInterface;
 use InvalidArgumentException;
 use React\Promise\PromiseInterface;
@@ -56,14 +60,18 @@ class Downloader implements DownloaderInterface
     private function processRequest()
     {
         while(count($this->queue) > 0 && count($this->transferring) < $this->totalConcurrent) {
-            list($request,$deferred) = array_pop($this->queue);
-            $this->logger->debug("Process enqueued download request %s", [$request->getUri()]);
-            $download = $this->fetch($request, $deferred);
-            $download->then(function($response) use ($deferred) {
+            list($request,$deferred) = array_shift($this->queue);
+            $this->logger->debug("Process en-queued download request %s", [(string)$request->getUri()]);
+            $download = $this->fetch($request);
+            $download->then(function($response) use ($deferred, $request) {
+                if($response instanceof \Schrapert\Http\ResponseInterface) {
+                    $response = $response->withMetaData('request', $request);
+                }
                 $deferred->resolve($response);
                 return $response;
             }, function($error) use ($deferred) {
                 $deferred->reject($error);
+                return $error;
             });
             $download->always(function() use ($request) {
                $this->removeTransferred($request);
@@ -71,38 +79,23 @@ class Downloader implements DownloaderInterface
         }
     }
 
-    private function fetch(RequestInterface $request, Deferred $deferred)
+    private function fetch(RequestInterface $request)
     {
-        /*
-        $this->logger->debug("Download {uri}", ['uri' => (string)$request->getUri()]);
         $this->transferring[] = $request;
-        /*
-        $downloadRequest = $this->downloadRequestFactory->factory($request);
-        $downloadRequest->on('response', function($response) use ($deferred, $request) {
-            $this->logger->debug("Got download response for %s", [$request->getUri()]);
-            $deferred->resolve($response);
-        });
-
-        $downloadRequest->on('end', function() use ($request) {
-            $this->logger->debug("End download request %s", [$request->getUri()]);
-        });
-
-        $downloadRequest->on('error', function($e) use ($deferred) {
-            $deferred->reject($e);
-            $this->logger->debug("Download error");
-        });
-
-        $downloadRequest->end();
-
-        return $deferred->promise();
-        */
 
         $transaction = $this
             ->transactionFactory
             ->createTransaction($request)
             ->withOptions($request->getMetaData());
 
-        return $transaction->send($request);
+        return $transaction->send($request)->then(function(ResponseInterface $response) {
+            return $response;
+        }, function(\Exception $e) use ($request) {
+            if($e instanceof TransactionTimeoutException) {
+                $e = new DownloaderTimeoutException($this, $request);
+            }
+            throw $e;
+        });
     }
 
     public function withMiddleware(DownloadMiddlewareInterface $middleware)
@@ -173,16 +166,22 @@ class Downloader implements DownloaderInterface
                         throw $e;
                     });
                 }
+                if($result instanceof ResponseInterface) {
+                    $downloaded->resolve($result);
+                }
                 return $result;
             });
         }
 
 
         // When all the middleware have run call the download method
-        $promise = $promise->then(function ($request) {
-            $this->logger->debug("Invoke request %s", [$request->getUri()]);
-            // Here the request will be processed by all middleware
-            return $this->enqueueRequest($request);
+        $promise = $promise->then(function ($message) {
+            if($message instanceof RequestInterface) {
+                $this->logger->debug("Invoke request %s", [$message->getUri()]);
+                // Here the request will be processed by all middleware
+                return $this->enqueueRequest($message);
+            }
+            return $message;
         });
 
         // With the downloaded response apply the post processing middleware
@@ -200,6 +199,8 @@ class Downloader implements DownloaderInterface
             $this->logger->debug("Middleware manager: downloaded %s", [$request->getUri()]);
             $downloaded->resolve($response);
             return $response;
+        }, function($e) use ($downloaded) {
+            $downloaded->reject($e);
         });
 
         // Start creating the request object

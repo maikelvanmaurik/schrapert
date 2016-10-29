@@ -26,7 +26,7 @@ class DownloaderTest extends TestCase
     public function testCanAddMiddleware()
     {
         $downloader = $this->downloader;
-        $middleware = $this->getContainer()->get('downloader_middleware_robotstxt');
+        $middleware = $this->getContainer()->get('downloader_middleware_robots_txt');
         $this->assertFalse($downloader->hasMiddleware($middleware));
 
         $d2 = $downloader->withMiddleware($middleware);

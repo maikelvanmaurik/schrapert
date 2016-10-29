@@ -23,6 +23,21 @@ class DownloaderTest extends TestCase
         return parent::setUp();
     }
 
+    /**
+     * @expectedException \Schrapert\Http\Downloader\Exception\DownloaderTimeoutException
+     */
+    public function testDownloadTimeouts()
+    {
+        $request = (new Request('http://timeout.schrapert.dev/?delay=100'))
+            ->withMetaData('download_timeout', 2);
+
+        $promise = $this->downloader->download($request)->otherwise(function($e) {
+            throw $e;
+        });
+
+        await($promise, $this->eventLoop, 10);
+    }
+
     public function testBasicStreamingDownloadIsWorking()
     {
         $request = (new Request('http://stream.schrapert.dev/big.php'))
@@ -30,13 +45,10 @@ class DownloaderTest extends TestCase
             ->withMetaData('obey_success_code', false);
 
         $chunks = [];
-        $returnedResponse = null;
 
-        $streamingPromise = null;
         $promise = $this->downloader
             ->download($request)
-            ->then(function($response) use (&$returnedResponse, &$chunks, &$streamingPromise) {
-                $returnedResponse = $response;
+            ->then(function($response) use (&$chunks, &$streamingPromise) {
                 $deferred = new Deferred();
                 if($response->getBody() instanceof ReadableBodyStream) {
                     $response->getBody()->on('data', function($data) use (&$chunks) {
@@ -46,11 +58,10 @@ class DownloaderTest extends TestCase
                         $deferred->resolve();
                     });
                 }
-                $streamingPromise = $deferred->promise();
+                return $deferred->promise();
             });
 
         await($promise, $this->eventLoop, 10);
-        await($streamingPromise, $this->eventLoop, 10);
 
         $html = implode('', $chunks);
 

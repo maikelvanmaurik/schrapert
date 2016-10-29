@@ -11,16 +11,22 @@ use Schrapert\Core\RequestProcessorFactory;
 use Schrapert\Core\Scraper;
 use Schrapert\Crawl\RequestFingerprintGenerator;
 use Schrapert\Filter\DuplicateFingerprintRequestFilter;
+use Schrapert\Http\Cache\DummyPolicy;
+use Schrapert\Http\Cache\FileStorage;
+use Schrapert\Http\Cache\PdoStorage;
+use Schrapert\Http\Cache\Rfc2616Policy;
 use Schrapert\Http\Cookies\CookieJar;
 use Schrapert\Http\Cookies\SetCookieParser;
 use Schrapert\Http\Downloader\Downloader;
 use Schrapert\Http\Downloader\DownloadTransactionFactory;
 use Schrapert\Http\Downloader\Middleware\CookiesMiddleware;
+use Schrapert\Http\Downloader\Middleware\DefaultHeadersMiddleware;
+use Schrapert\Http\Downloader\Middleware\CompressionMiddleware;
+use Schrapert\Http\Downloader\Middleware\HttpCacheMiddleware;
 use Schrapert\Http\PathNormalizer;
 use Schrapert\Http\RequestDispatcher;
 use Schrapert\Http\ResponseFactory;
 use Schrapert\Http\RobotsTxt\Parser as RobotsTxtParser;
-use Schrapert\Http\Downloader\DownloadRequestFactory;
 use Schrapert\Http\Downloader\Middleware\RobotsTxtDownloadMiddleware;
 use Schrapert\Http\Request as HttpRequest;
 use Schrapert\Http\RequestProcessor;
@@ -110,6 +116,27 @@ class DefaultServiceContainer extends ServiceContainer
            );
         });
 
+        $this->set('http_cache_file_storage', function() {
+            return new FileStorage(
+                $this->get('request_fingerprint_generator'),
+                $this->get('http_stream_factory')
+            );
+        });
+
+        $this->set('http_cache_pdo_storage', function() {
+            return new PdoStorage(
+                $this->get('request_fingerprint_generator')
+            );
+        });
+
+        $this->set('http_cache_dummy_policy', function() {
+            return new DummyPolicy();
+        });
+
+        $this->set('http_cache_rfc2616_policy', function() {
+            return new Rfc2616Policy();
+        });
+
         $this->set('http_response_factory', function() {
             return new ResponseFactory(
                 $this->get('http_stream_factory')
@@ -125,6 +152,7 @@ class DefaultServiceContainer extends ServiceContainer
 
         $this->set('download_transaction_factory', function() {
             return new DownloadTransactionFactory(
+                $this->get('event_loop'),
                 $this->get('request_dispatcher'),
                 $this->get('http_uri_resolver'),
                 $this->get('http_stream_factory')
@@ -150,11 +178,32 @@ class DefaultServiceContainer extends ServiceContainer
             );
         });
 
+        $this->set('downloader_middleware_http_cache', function() {
+            return new HttpCacheMiddleware(
+                $this->get('http_cache_file_storage'),
+                $this->get('http_cache_dummy_policy')
+            );
+        });
+
         $this->set('downloader_middleware_cookies', function() {
             return new CookiesMiddleware(
                 $this->get('http_cookie_jar'),
                 $this->get('http_set_cookie_parser')
             );
+        });
+
+        $this->set('downloader_middleware_default_headers', function() {
+            return new DefaultHeadersMiddleware(
+                $this->get('logger'),
+                $this->get('http_stream_factory')
+            );
+        });
+
+        $this->set('downloader_middleware_compression', function() {
+           return new CompressionMiddleware(
+             $this->get('logger'),
+             $this->get('http_stream_factory')
+           );
         });
 
         $this->set('http_cookie_jar', function() {
@@ -164,7 +213,6 @@ class DefaultServiceContainer extends ServiceContainer
         $this->set('http_set_cookie_parser', function() {
            return new SetCookieParser();
         });
-
 
         $this->set('scrape_process_factory', function() {
             return new ScrapeProcessFactory(

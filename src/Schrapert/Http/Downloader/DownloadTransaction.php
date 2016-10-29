@@ -3,14 +3,19 @@ namespace Schrapert\Http\Downloader;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use React\EventLoop\LoopInterface;
+use React\Promise\PromiseInterface;
 use React\Stream\BufferedSink;
 use React\Stream\ReadableStreamInterface;
 use RuntimeException;
+use Schrapert\Http\Downloader\Exception\TransactionTimeoutException;
 use Schrapert\Http\RequestDispatcherInterface;
 use Schrapert\Http\ResponseException;
 use Schrapert\Http\StreamFactoryInterface;
 use Schrapert\Http\UriResolverInterface;
+use React\EventLoop\Timer\TimerInterface;
 use Exception;
+use React\Promise;
 
 /**
  * Represents an HTTP transaction
@@ -26,9 +31,18 @@ class DownloadTransaction implements DownloadTransactionInterface
     private $streamFactory;
 
     private $options;
+    /**
+     * @var Promise\Deferred
+     */
+    private $deferred;
+    /**
+     * @var TimerInterface
+     */
+    private $timeoutTimer;
 
-    public function __construct(RequestDispatcherInterface $dispatcher, UriResolverInterface $uriResolver, StreamFactoryInterface $streamFactory)
+    public function __construct(LoopInterface $loop, RequestDispatcherInterface $dispatcher, UriResolverInterface $uriResolver, StreamFactoryInterface $streamFactory)
     {
+        $this->loop = $loop;
         $this->numRequests = 0;
         $this->dispatcher = $dispatcher;
         $this->uriResolver = $uriResolver;
@@ -56,9 +70,24 @@ class DownloadTransaction implements DownloadTransactionInterface
 
     public function send(RequestInterface $request)
     {
-        return $this->next($request);
+        $this->deferred = new Promise\Deferred();
+        $this->next($request)->then(function($response) {
+            $this->deferred->resolve($response);
+        }, function($e) {
+            $this->deferred->reject($e);
+        });
+        if(null !== ($timeout = $this->getOption('download_timeout'))) {
+            $this->timeoutTimer = $this->loop->addTimer($timeout, function() use ($request) {
+                $this->deferred->reject(new TransactionTimeoutException($this, $request));
+            });
+        }
+        return $this->deferred->promise();
     }
 
+    /**
+     * @param RequestInterface $request
+     * @return PromiseInterface
+     */
     public function next(RequestInterface $request)
     {
         $this->current = $request;
@@ -133,6 +162,10 @@ class DownloadTransaction implements DownloadTransactionInterface
         // only status codes 200-399 are considered to be valid, reject otherwise
         if ($obeySuccessCode && ($response->getStatusCode() < 200 || $response->getStatusCode() >= 400)) {
             throw new ResponseException($response);
+        }
+
+        if($this->timeoutTimer instanceof TimerInterface) {
+            $this->timeoutTimer->cancel();
         }
 
         // resolve our initial promise

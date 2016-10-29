@@ -1,7 +1,10 @@
 <?php
 namespace Schrapert\Test\Unit;
 
+use Schrapert\Http\PathNormalizer;
 use Schrapert\Http\Uri;
+use Schrapert\Http\UriFactory;
+use Schrapert\Http\UriResolver;
 use Schrapert\Http\UriResolverInterface;
 
 class UriResolverTest extends \Schrapert\Test\Unit\TestCase
@@ -13,7 +16,8 @@ class UriResolverTest extends \Schrapert\Test\Unit\TestCase
 
     public function setUp()
     {
-        $this->resolver = $this->getContainer()->get('uri_resolver');
+        $this->resolver = new UriResolver(new UriFactory(), new PathNormalizer());
+        parent::setUp();
     }
 
     public function testResolveRelativeUrls()

@@ -13,9 +13,26 @@ abstract class Message
 
     protected $stream;
 
+    protected $meta = [];
+
     public function getProtocolVersion()
     {
         return $this->protocol;
+    }
+
+    public function getMetaData($key = null, $default = null)
+    {
+        if(null === $key) {
+            return $this->meta;
+        }
+        return array_key_exists($key, $this->meta) ? $this->meta[$key] : $default;
+    }
+
+    public function withMetaData($key, $value)
+    {
+        $new = clone $this;
+        $new->meta[$key] = $value;
+        return $new;
     }
 
     /**

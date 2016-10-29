@@ -1,7 +1,7 @@
 <?php
 namespace Schrapert\Http;
 
-use Psr\Http\Message\UriInterface;
+use Psr\Http\Message\UriInterface as PsrUri;
 
 interface UriResolverInterface
 {
@@ -10,5 +10,5 @@ interface UriResolverInterface
      * @param $rel
      * @return UriInterface
      */
-    public function resolve(UriInterface $uri, $rel);
+    public function resolve(PsrUri $uri, $rel);
 }

@@ -1,6 +1,7 @@
 <?php
 namespace Schrapert\Http\Downloader;
 
+use React\EventLoop\LoopInterface;
 use Schrapert\Http\RequestDispatcherInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Http\StreamFactoryInterface;
@@ -14,8 +15,11 @@ class DownloadTransactionFactory implements DownloadTransactionFactoryInterface
 
     private $streamFactory;
 
-    public function __construct(RequestDispatcherInterface $dispatcher, UriResolverInterface $uriResolver, StreamFactoryInterface $streamFactory)
+    private $loop;
+
+    public function __construct(LoopInterface $loop, RequestDispatcherInterface $dispatcher, UriResolverInterface $uriResolver, StreamFactoryInterface $streamFactory)
     {
+        $this->loop = $loop;
         $this->dispatcher = $dispatcher;
         $this->uriResolver = $uriResolver;
         $this->streamFactory = $streamFactory;
@@ -23,6 +27,6 @@ class DownloadTransactionFactory implements DownloadTransactionFactoryInterface
 
     public function createTransaction(RequestInterface $request)
     {
-        return new DownloadTransaction($this->dispatcher, $this->uriResolver, $this->streamFactory);
+        return new DownloadTransaction($this->loop, $this->dispatcher, $this->uriResolver, $this->streamFactory);
     }
 }

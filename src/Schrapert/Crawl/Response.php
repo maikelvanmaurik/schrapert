@@ -1,15 +1,13 @@
 <?php
 namespace Schrapert\Crawl;
 
-class Response implements ResponseInterface
+class Response extends Message implements ResponseInterface
 {
     private $body;
 
-    private $request;
-
-    public function __construct(RequestInterface $request)
+    public function __construct()
     {
-        $this->request = $request;
+
     }
 
     public function __toString()

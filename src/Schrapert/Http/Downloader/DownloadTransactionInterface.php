@@ -2,9 +2,14 @@
 namespace Schrapert\Http\Downloader;
 
 use Psr\Http\Message\RequestInterface;
+use React\Promise\PromiseInterface;
 
 interface DownloadTransactionInterface
 {
+    /**
+     * @param RequestInterface $request
+     * @return PromiseInterface
+     */
     public function send(RequestInterface $request);
 
     /**

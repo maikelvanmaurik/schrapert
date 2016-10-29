@@ -1,9 +1,9 @@
 <?php
 namespace Schrapert\Http;
 
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\RequestInterface as PsrRequestInterface;
 
 interface RequestDispatcherInterface
 {
-    public function dispatch(RequestInterface $request);
+    public function dispatch(PsrRequestInterface $request);
 }

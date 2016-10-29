@@ -49,7 +49,7 @@ class FileSystemClient implements FileSystemClientInterface
     {
         return $this->fs->file($file)->open('cwt')->then(function (WritableStreamInterface $stream) use ($data) {
             try {
-                $stream->write($data);
+                $stream->write((string)$data);
                 $stream->end();
             } catch (Exception $e) {
                 throw $e;

@@ -1,2 +1,2 @@
 <?php
-print str_repeat('This content is compressed using gzip encoding. ', 100000);
+print str_repeat('This content is compressed using gzip encoding. ', 100);

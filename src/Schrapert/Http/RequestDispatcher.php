@@ -6,7 +6,7 @@ use React\Promise;
 use React\Promise\Deferred;
 use React\HttpClient\Response as ResponseStream;
 use React\Stream\ReadableStreamInterface;
-use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\RequestInterface as PsrRequestInterface;
 
 class RequestDispatcher implements RequestDispatcherInterface
 {
@@ -20,7 +20,7 @@ class RequestDispatcher implements RequestDispatcherInterface
         $this->responseFactory = $responseFactory;
     }
 
-    public function dispatch(RequestInterface $request)
+    public function dispatch(PsrRequestInterface $request)
     {
         $uri = $request->getUri();
         // URIs are required to be absolute for the HttpClient to work
