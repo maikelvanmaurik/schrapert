@@ -77,7 +77,6 @@ class HttpCacheMiddlewareTest extends TestCase
             $downloader
                 ->download($request)
                 ->then(function(ResponseInterface $response) {
-                    die("OK DOET 'T!");
                     return (string)$response->getBody();
                 }), $this->eventLoop, 10);
 
