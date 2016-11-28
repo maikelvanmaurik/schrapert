@@ -1,5 +1,5 @@
 <?php
-namespace Schrapert\Downloader;
+namespace Schrapert\Http\Downloader;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
