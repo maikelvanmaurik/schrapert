@@ -1,7 +1,7 @@
 <?php
 namespace Schrapert\Test\Unit\Http;
 
-use Schrapert\Http\Cache\RFC2616Policy;
+use Schrapert\Http\Cache\Rfc2616Policy;
 use Schrapert\Http\Request;
 use Schrapert\Http\Response;
 use Schrapert\Test\Unit\TestCase;
@@ -17,7 +17,7 @@ class Rfc2616PolicyTest extends TestCase
 
     public function setUp()
     {
-        $this->policy = new RFC2616Policy();
+        $this->policy = new Rfc2616Policy();
         parent::setUp();
     }
 

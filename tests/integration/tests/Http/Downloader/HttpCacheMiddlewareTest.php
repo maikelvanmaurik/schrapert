@@ -8,7 +8,7 @@ use Schrapert\Http\ResponseInterface;
 use Schrapert\Test\Integration\TestCase;
 use Schrapert\Http\Downloader\Middleware\HttpCacheMiddleware;
 use Schrapert\Http\Cache\FileStorage;
-use Schrapert\Http\Cache\RFC2616Policy;
+use Schrapert\Http\Cache\Rfc2616Policy;
 use Schrapert\Http\Cache\DummyPolicy;
 
 class HttpCacheMiddlewareTest extends TestCase
