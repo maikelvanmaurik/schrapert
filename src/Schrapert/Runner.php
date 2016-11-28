@@ -2,13 +2,12 @@
 namespace Schrapert;
 
 use Schrapert\Core\ExecutionEngine;
-use Schrapert\Signal\SignalManager;
+use Schrapert\Event\EventDispatcherInterface;
+use Schrapert\Feature\FeatureInterface;
 use React\EventLoop\LoopInterface;
 
 class Runner
 {
-    private $signals;
-
     private $engine;
     /**
      * @var \Schrapert\SpiderInterface[]
@@ -17,31 +16,54 @@ class Runner
 
     private $loop;
 
-    public function __construct(LoopInterface $loop, SignalManager $signals, ExecutionEngine $engine)
+    private $events;
+
+    private $features;
+
+    public function __construct(LoopInterface $loop, EventDispatcherInterface $events, ExecutionEngine $engine)
     {
-        $this->spiders = array();
+        $this->spiders = [];
+        $this->features = [];
         $this->engine = $engine;
-        $this->signals = $signals;
+        $this->events = $events;
         $this->loop = $loop;
     }
 
-    public function addSpider(SpiderInterface $spider)
+    public function withSpider(SpiderInterface $spider)
     {
-        $this->spiders[] = $spider;
+        $new = clone $this;
+        $new->spiders[] = $spider;
+        return $new;
+    }
+
+    /**
+     * @return FeatureInterface[]
+     */
+    public function getFeatures()
+    {
+        return $this->features;
     }
 
     private function crawl(SpiderInterface $spider)
     {
+        foreach($this->getFeatures() as $feature) {
+            $feature->init();
+        }
         $this->engine->openSpider($spider, $spider->startRequests());
         return $this->engine->start();
+    }
+
+    public function withFeature(FeatureInterface $feature)
+    {
+        $new = clone $this;
+        $new->features[] = $feature;
+        return $new;
     }
 
     public function start($stop=true)
     {
         $finished = 0;
-
         foreach($this->spiders as $spider) {
-
             $this->crawl($spider)->then(function() use (&$finished) {
                 $finished++;
                 if($finished == count($this->spiders)) {

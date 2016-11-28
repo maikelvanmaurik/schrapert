@@ -1,6 +1,7 @@
 <?php
 namespace Schrapert\Test\Integration;
 
+use Schrapert\Crawl\ResponseInterface;
 use Schrapert\Spider;
 
 class TestSpider extends Spider
@@ -13,12 +14,17 @@ class TestSpider extends Spider
         $this->parseCallback = $parseCallback;
     }
 
+    public function getName()
+    {
+        return 'test-spider';
+    }
+
     /**
      * @param \Schrapert\Crawl\ResponseInterface $response
      * @return \Generator|\Iterator
      */
-    public function parse(\Schrapert\Crawl\ResponseInterface $response)
+    public function parse(ResponseInterface $response)
     {
-        return call_user_func($this->parse);
+        return call_user_func($this->parseCallback, $response);
     }
 }

@@ -6,8 +6,12 @@ use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use Schrapert\Crawl\RequestInterface;
 use Schrapert\Crawl\ResponseInterface;
+use Schrapert\Event\EventDispatcherInterface;
 use Schrapert\Log\LoggerInterface;
 use Schrapert\Scraping\Item;
+use Schrapert\Scraping\ItemInterface;
+use Schrapert\Scraping\ItemPipelineInterface;
+use Schrapert\Scraping\ItemScrapedEvent;
 use Schrapert\SpiderInterface;
 use Traversable;
 use Generator;
@@ -25,11 +29,17 @@ class Scraper implements ScraperInterface
 
     private $timer;
 
-    public function __construct(LoggerInterface $logger, LoopInterface $loop)
+    private $itemPipeline;
+
+    private $events;
+
+    public function __construct(LoggerInterface $logger, LoopInterface $loop, EventDispatcherInterface $events, ItemPipelineInterface $itemPipeline)
     {
         $this->queue = [];
         $this->active = [];
+        $this->events = $events;
         $this->logger = $logger;
+        $this->itemPipeline = $itemPipeline;
         $this->loop = $loop;
     }
 
@@ -56,7 +66,7 @@ class Scraper implements ScraperInterface
      */
     public function enqueueScrape(ExecutionEngine $engine, RequestInterface $request, ResponseInterface $response, SpiderInterface $spider)
     {
-        $this->logger->debug("Enqueue scrape %s", [$request->getUri()]);
+        $this->logger->debug("Enqueue scrape {uri}", ['uri' => $request->getUri()]);
         $deferred = new Deferred();
         $this->queue[] = [$engine, $request, $response, $deferred];
 
@@ -77,7 +87,11 @@ class Scraper implements ScraperInterface
     {
         $isIdle = empty($this->queue) && empty($this->active);
 
-        $this->logger->debug("Scraper is%sidle", [$isIdle ? ' ' : ' not ']);
+        if($isIdle) {
+            $this->logger->debug('Scraper is idle');
+        } else {
+            $this->logger->debug('Scraper is not idle');
+        }
 
         return $isIdle;
     }
@@ -121,9 +135,23 @@ class Scraper implements ScraperInterface
     {
         if($item instanceof RequestInterface) {
             return $engine->crawl($item, $spider);
-        } elseif($item instanceof Item) {
-            return $this->itemProcessor->process($item);
+        } elseif($item instanceof ItemInterface) {
+            $next = function($result) use ($spider) {
+                return $this->itemPipelineFinished($spider, $result);
+            };
+
+            return $this->itemPipeline->processItem($item)->then($next, $next);
         }
+    }
+
+    public function itemPipelineFinished(SpiderInterface $spider, $result)
+    {
+        if($result instanceof Exception) {
+            die("TODO: Exception during pipeline");
+        } elseif($result instanceof ItemInterface) {
+            $this->events->dispatch(new ItemScrapedEvent($spider, $result));
+        }
+        return true;
     }
 
     private function handleSpiderOutput($output, ExecutionEngine $engine, SpiderInterface $spider)
@@ -131,7 +159,7 @@ class Scraper implements ScraperInterface
         $deferred = new Deferred();
         $this->loop->futureTick(function() use ($output, $engine, $spider, $deferred) {
 
-            if($output instanceof Generator || $output instanceof Traversable) {
+            if($output instanceof Generator || $output instanceof Traversable || is_array($output)) {
                 foreach($output as $item) {
                     try {
                         $this->handleItem($item, $engine, $spider);
@@ -161,7 +189,7 @@ class Scraper implements ScraperInterface
         if(null !== ($data = array_pop($this->queue))) {
             list($engine, $request, $response, $deferred) = $data;
 
-            $this->logger->debug("Scrape %s", [$request->getUri()]);
+            $this->logger->debug("Scrape {uri}", ['uri' => $request->getUri()]);
 
             return $this->callSpider($spider, $request, $response)
                 ->then(

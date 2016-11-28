@@ -3,9 +3,11 @@ namespace Schrapert\Test\Integration\Http;
 
 use Clue\React\Block;
 use React\Promise\Deferred;
+use Schrapert\Http\Downloader\Event\DownloadCompleteEvent;
 use Schrapert\Http\ReadableBodyStream;
 use Schrapert\Http\Request;
 use Schrapert\Test\Integration\TestCase;
+use Schrapert\Event\EventDispatcherInterface;
 
 class DownloaderTest extends TestCase
 {
@@ -15,11 +17,16 @@ class DownloaderTest extends TestCase
     private $downloader;
 
     private $eventLoop;
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     public function setUp()
     {
         $this->downloader = $this->getContainer()->get('downloader');
         $this->eventLoop = $this->getContainer()->get('event_loop');
+        $this->eventDispatcher = $this->getContainer()->get('event_dispatcher');
         return parent::setUp();
     }
 
@@ -67,6 +74,21 @@ class DownloaderTest extends TestCase
 
         $this->assertGreaterThan(1, count($chunks));
         $this->assertEquals(1000000, strlen($html));
+    }
+
+    public function testDownloaderDispatchesEvents()
+    {
+        $request = new Request('http://blog.schrapert.dev');
+
+        $complete = false;
+
+        $this->eventDispatcher->addListener('downloader.download_complete', function(DownloadCompleteEvent $e) use (&$complete) {
+            $complete = true;
+        });
+
+        await($this->downloader->download($request), $this->eventLoop, 10);
+
+        $this->assertTrue($complete);
     }
 
     public function testBasicNonStreamingDownloadIsWorking()

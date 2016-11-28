@@ -3,13 +3,16 @@ namespace Schrapert\Http\Downloader;
 
 use Psr\Http\Message\ResponseInterface;
 use React\Promise\Deferred;
+use Schrapert\Event\EventDispatcherInterface;
+use Schrapert\Http\Downloader\Event\DownloadCompleteEvent;
+use Schrapert\Http\Downloader\Event\DownloadRequestEvent;
+use Schrapert\Http\Downloader\Event\ResponseDownloadedEvent;
 use Schrapert\Http\Downloader\Exception\DownloaderTimeoutException;
 use Schrapert\Http\Downloader\Exception\TransactionTimeoutException;
 use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareInterface;
 use Schrapert\Http\Downloader\Middleware\ProcessRequestMiddlewareInterface;
 use Schrapert\Http\Downloader\Middleware\ProcessResponseMiddlewareInterface;
 use Schrapert\Http\RequestInterface;
-use Schrapert\Http\Response;
 use Schrapert\Log\LoggerInterface;
 use InvalidArgumentException;
 use React\Promise\PromiseInterface;
@@ -28,8 +31,11 @@ class Downloader implements DownloaderInterface
 
     private $transactionFactory;
 
-    public function __construct(LoggerInterface $logger, DownloadTransactionFactoryInterface $transactionFactory, array $middleware = [])
+    private $events;
+
+    public function __construct(EventDispatcherInterface $events, LoggerInterface $logger, DownloadTransactionFactoryInterface $transactionFactory, array $middleware = [])
     {
+        $this->events = $events;
         $this->logger = $logger;
         $this->middleware = [];
         $this->setMiddleware($middleware);
@@ -47,7 +53,7 @@ class Downloader implements DownloaderInterface
 
     private function enqueueRequest(RequestInterface $request)
     {
-        $this->logger->debug("Enqueue download request %s", [$request->getUri()]);
+        $this->logger->debug("Enqueue download request {uri}", ['uri' => $request->getUri()]);
         $deferred = new Deferred();
 
         $this->queue[] = [$request, $deferred];
@@ -61,7 +67,7 @@ class Downloader implements DownloaderInterface
     {
         while(count($this->queue) > 0 && count($this->transferring) < $this->totalConcurrent) {
             list($request,$deferred) = array_shift($this->queue);
-            $this->logger->debug("Process en-queued download request %s", [(string)$request->getUri()]);
+            $this->logger->debug("Process en-queued download request {uri}", ['uri' => (string)$request->getUri()]);
             $download = $this->fetch($request);
             $download->then(function($response) use ($deferred, $request) {
                 if($response instanceof \Schrapert\Http\ResponseInterface) {
@@ -82,6 +88,8 @@ class Downloader implements DownloaderInterface
     private function fetch(RequestInterface $request)
     {
         $this->transferring[] = $request;
+
+        $this->events->dispatch(new DownloadRequestEvent($request, date_create()));
 
         $transaction = $this
             ->transactionFactory
@@ -144,7 +152,7 @@ class Downloader implements DownloaderInterface
 
     public function download(RequestInterface $request)
     {
-        $this->logger->debug("Fetch %s", [$request->getUri()]);
+        $this->logger->debug("Downloader: download {uri}", ['uri' => $request->getUri()]);
 
         /*
          * Create 2 deferred objects 1 for creating the request object and 1 to pass back to
@@ -177,7 +185,7 @@ class Downloader implements DownloaderInterface
         // When all the middleware have run call the download method
         $promise = $promise->then(function ($message) {
             if($message instanceof RequestInterface) {
-                $this->logger->debug("Invoke request %s", [$message->getUri()]);
+                $this->logger->debug("Downloader: invoke request {uri}", ['uri' => $message->getUri()]);
                 // Here the request will be processed by all middleware
                 return $this->enqueueRequest($message);
             }
@@ -189,16 +197,23 @@ class Downloader implements DownloaderInterface
             if(!$middleware instanceof ProcessResponseMiddlewareInterface) {
                 continue;
             }
-            $promise = $promise->then(function($response) use ($middleware, $request) {
-                $this->logger->debug("Middleware manager: let the %s middleware process the response", [get_class($middleware)]);
-                return $middleware->processResponse($response, $request);
+            $promise = $promise->then(function($message) use ($middleware, $request) {
+                $this->logger->debug("Middleware manager: let the {middleware} middleware process the response", ['middleware' => get_class($middleware)]);
+                $message = $middleware->processResponse($message, $request);
+                if($message instanceof RequestInterface) {
+                    return $this->download($message);
+                }
+                return $message;
             });
         }
 
-        $promise->then(function ($response) use (&$downloaded, $request) {
-            $this->logger->debug("Middleware manager: downloaded %s", [$request->getUri()]);
-            $downloaded->resolve($response);
-            return $response;
+        $promise->then(function ($message) use (&$downloaded, $request) {
+            if($message instanceof ResponseInterface) {
+                $this->logger->debug("Middleware manager: downloaded {uri}", ['uri' => $request->getUri()]);
+                $this->events->dispatch(new ResponseDownloadedEvent($this, $message, $request));
+                $downloaded->resolve($message);
+            }
+            return $message;
         }, function($e) use ($downloaded) {
             $downloaded->reject($e);
         });

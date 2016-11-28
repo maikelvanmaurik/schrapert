@@ -60,7 +60,7 @@ class DiskQueue implements PriorityQueueInterface
      */
     public function push(RequestInterface $request)
     {
-        $this->logger->debug("Add %s to the disk queue", [$request->getUri()]);
+        $this->logger->debug("Add {uri} to the disk queue", ['uri' => $request->getUri()]);
         $this->count++;
 
         if($this->count < $this->memorySize) {
@@ -91,7 +91,7 @@ class DiskQueue implements PriorityQueueInterface
 
         return $this->fs->readFile($file)->then(function($content) {
 
-            $this->logger->debug("File contents %s", [var_export($content, true)]);
+            $this->logger->debug("File contents {content}", ['content' => var_export($content, true)]);
 
             $requests = json_decode($content, true);
 

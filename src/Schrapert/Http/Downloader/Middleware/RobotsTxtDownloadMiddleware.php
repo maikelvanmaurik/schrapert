@@ -39,7 +39,10 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
             if ($result->isAllowed($ua, $request->getUri()->getPath())) {
                 return $request;
             } else {
-                $this->logger->debug("Resource '%s' not allowed for user-agent '%s' when obeying robots.txt, drop request", [$request->getUri()->getPath(), $ua]);
+                $this->logger->debug("Resource '{path}' not allowed for user-agent '{ua}' when obeying robots.txt, drop request", [
+                    'path' => $request->getUri()->getPath(),
+                    'ua' => $ua
+                ]);
                 throw new IgnoreRequestException("Not allowed");
             }
         });

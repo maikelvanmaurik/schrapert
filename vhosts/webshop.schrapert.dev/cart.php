@@ -1,4 +1,5 @@
 <?php
+include_once 'bootstrap.php';
 $items = $_SESSION['cart'];
 if(count($items)): ?>
 <h2>No items in your shopping cart!</h2>

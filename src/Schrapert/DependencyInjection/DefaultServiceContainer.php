@@ -10,6 +10,10 @@ use Schrapert\Core\ExecutionEngine;
 use Schrapert\Core\RequestProcessorFactory;
 use Schrapert\Core\Scraper;
 use Schrapert\Crawl\RequestFingerprintGenerator;
+use Schrapert\Event\EventDispatcher;
+use Schrapert\Feature\AutoThrottleFeature;
+use Schrapert\Feature\FeedExportFeature;
+use Schrapert\Feed\StorageFactory;
 use Schrapert\Filter\DuplicateFingerprintRequestFilter;
 use Schrapert\Http\Cache\DummyPolicy;
 use Schrapert\Http\Cache\FileStorage;
@@ -23,6 +27,7 @@ use Schrapert\Http\Downloader\Middleware\CookiesMiddleware;
 use Schrapert\Http\Downloader\Middleware\DefaultHeadersMiddleware;
 use Schrapert\Http\Downloader\Middleware\CompressionMiddleware;
 use Schrapert\Http\Downloader\Middleware\HttpCacheMiddleware;
+use Schrapert\Http\Downloader\Middleware\RetryMiddleware;
 use Schrapert\Http\PathNormalizer;
 use Schrapert\Http\RequestDispatcher;
 use Schrapert\Http\ResponseFactory;
@@ -42,9 +47,10 @@ use Schrapert\Schedule\DiskQueue;
 use Schrapert\Schedule\MemoryQueue;
 use Schrapert\Schedule\PriorityQueue;
 use Schrapert\Schedule\Scheduler;
-use Schrapert\Signal\SignalManager;
+use Schrapert\Scraping\ItemPipeline;
 use Schrapert\Util\DelayedCallbackFactory;
 use Schrapert\Util\IntervalCallbackFactory;
+use Schrapert\Feed\ExporterFactory;
 
 class DefaultServiceContainer extends ServiceContainer
 {
@@ -60,27 +66,50 @@ class DefaultServiceContainer extends ServiceContainer
             return LoopFactory::create();
         });
 
-        $this->set('signal_manager', function() {
-            return new SignalManager();
+        $this->set('event_dispatcher', function() {
+            return new EventDispatcher();
         });
 
         $this->set('logger', function() {
             return new Logger();
         });
 
+        $this->set('item_pipeline', function() {
+            return new ItemPipeline();
+        });
 
         $this->set('scraper', function() {
-            return new Scraper($this->get('logger'), $this->get('event_loop'));
+            return new Scraper(
+                $this->get('logger'),
+                $this->get('event_loop'),
+                $this->get('event_dispatcher'),
+                $this->get('item_pipeline'));
         });
 
         $this->set('request_fingerprint_generator', function() {
             return new RequestFingerprintGenerator();
         });
 
-
         $this->set('duplicate_request_filter', function() {
             return new DuplicateFingerprintRequestFilter(
                 $this->get('request_fingerprint_generator')
+            );
+        });
+
+        $this->set('feed_exporter_factory', function() {
+           return new ExporterFactory(new StorageFactory());
+        });
+
+        $this->set('feed_export_feature', function() {
+            return new FeedExportFeature(
+                $this->get('event_dispatcher')
+            );
+        });
+
+        $this->set('auto_throttle_feature', function() {
+            return new AutoThrottleFeature(
+                $this->get('event_dispatcher'),
+                $this->get('logger')
             );
         });
 
@@ -161,6 +190,7 @@ class DefaultServiceContainer extends ServiceContainer
 
         $this->set('downloader', function() {
             return new Downloader(
+                $this->get('event_dispatcher'),
                 $this->get('logger'),
                 $this->get('download_transaction_factory')
             );
@@ -174,6 +204,12 @@ class DefaultServiceContainer extends ServiceContainer
             return new RobotsTxtDownloadMiddleware(
                 $this->get('downloader'),
                 $this->get('robots_txt_parser'),
+                $this->get('logger')
+            );
+        });
+
+        $this->set('downloader_retry_middleware', function() {
+            return new RetryMiddleware(
                 $this->get('logger')
             );
         });
@@ -218,8 +254,7 @@ class DefaultServiceContainer extends ServiceContainer
             return new ScrapeProcessFactory(
                 $this->get('logger'),
                 $this->get('downloader'),
-                $this->get('scraper'),
-                $this->get('response_reader_factory')
+                $this->get('scraper')
             );
         });
 
@@ -291,7 +326,7 @@ class DefaultServiceContainer extends ServiceContainer
         $this->set('engine', function() {
             return new ExecutionEngine(
                 $this->get('logger'),
-                $this->get('signal_manager'),
+                $this->get('event_dispatcher'),
                 $this->get('scraper'),
                 $this->get('duplicate_request_filter'),
                 $this->get('request_processor_factory'),
@@ -304,7 +339,7 @@ class DefaultServiceContainer extends ServiceContainer
         $this->set('crawler_runner', function() {
             return new Runner(
                 $this->get('event_loop'),
-                $this->get('signal_manager'),
+                $this->get('event_dispatcher'),
                 $this->get('engine'));
             }
         );

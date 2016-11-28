@@ -1,5 +1,5 @@
 <?php
-namespace Schrapert\Http\Downloader;
+namespace Schrapert\Downloader;
 
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -139,35 +139,11 @@ class DownloadTransaction implements DownloadTransactionInterface
         });
     }
 
-    private function onResponseRedirect(ResponseInterface $response, RequestInterface $request)
-    {
-        $maxRedirects = $this->getOption('max_redirects', 10);
-        // resolve location relative to last request URI
-        $nextUri = $this->uriResolver->resolve($request->getUri(), $response->getHeaderLine('Location'));
-        $method = ($request->getMethod() === 'HEAD') ? 'HEAD' : 'GET';
-        if ($this->numRequests >= $maxRedirects) {
-            throw new RuntimeException('Maximum number of redirects (' . $this->maxRedirects . ') exceeded');
-        }
-        return $this->next($request->withUri($nextUri)->withMethod($method));
-    }
-
-
     private function onResponse(ResponseInterface $response, RequestInterface $request)
     {
-        $followRedirects = $this->getOption('follow_redirects', true);
-        $obeySuccessCode = $this->getOption('obey_success_code', true);
-        if ($followRedirects && ($response->getStatusCode() >= 300 && $response->getStatusCode() < 400)) {
-            return $this->onResponseRedirect($response, $request);
-        }
-        // only status codes 200-399 are considered to be valid, reject otherwise
-        if ($obeySuccessCode && ($response->getStatusCode() < 200 || $response->getStatusCode() >= 400)) {
-            throw new ResponseException($response);
-        }
-
         if($this->timeoutTimer instanceof TimerInterface) {
             $this->timeoutTimer->cancel();
         }
-
         // resolve our initial promise
         return $response;
     }

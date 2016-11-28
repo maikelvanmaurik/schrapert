@@ -1,5 +1,6 @@
 <?php
-require_once rtrim(getenv('COMPOSER_VENDOR_DIR') ?: __DIR__ . '/../vendor', '/\\') . '/autoload.php';
+//require_once rtrim(getenv('COMPOSER_VENDOR_DIR') ?: __DIR__ . '/../vendor', '/\\') . '/autoload.php';
+require_once __DIR__.'/../vendor/autoload.php';
 
 define('SRC_DIR', dirname(__DIR__).'/src/');
 define('ETC_DIR', dirname(__DIR__).'/etc/');
@@ -16,10 +17,12 @@ spl_autoload_register(function($class) {
             $baseDir = SRC_DIR;
         }
         $file = $baseDir . implode('/', $parts) . '.php';
-        if(is_readable($file)) {
+
+        if(is_file($file)) {
             require_once $file;
         }
     }
+
     return class_exists($class, false) || interface_exists($class, false) || trait_exists($class, false);
 });
 

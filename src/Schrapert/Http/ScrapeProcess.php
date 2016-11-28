@@ -58,7 +58,7 @@ class ScrapeProcess implements RequestProcessInterface
             throw new RuntimeException("Request for downloads need to be http requests");
         }
 
-        $this->logger->debug("Scrape process: start %s", [$this->request->getUri()]);
+        $this->logger->debug("Scrape process: start {uri}", ['uri' => $this->request->getUri()]);
 
         // Download the request
         return $this->downloader->download($this->request)->then(function($response) {

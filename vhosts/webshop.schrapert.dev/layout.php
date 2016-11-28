@@ -3,7 +3,7 @@
         <link rel="stylesheet" type="text/css" href="/css/main.css" />
     </head>
     <body>
-        <nav>Awesome Webshop</nav>
+        <h2>Awesome Webshop</h2>
         <?php print $content ?>
     </body>
 </html>

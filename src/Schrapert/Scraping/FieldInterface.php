@@ -1,7 +1,7 @@
 <?php
 namespace Schrapert\Scraping;
 
-class Item
+interface FieldInterface
 {
 
 }
