@@ -1,10 +1,10 @@
 {% if page.excerpt %}
 {% assign type = 'article' %}
-{% assign sectionTitle = 'React Blog' %}
+{% assign sectionTitle = 'Schrapert Blog' %}
 {% assign description = page.excerpt | remove: '<p>' | remove: '</p>' %}
 {% else %}
 {% assign type = 'website' %}
-{% assign sectionTitle = 'React' %}
+{% assign sectionTitle = 'Schrapert' %}
 {% assign description = 'A JavaScript library for building user interfaces' %}
 {% endif %}
 {% assign title = page.title | append: ' - ' | append: sectionTitle %}
@@ -18,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta property="og:title" content="{{ title }}">
     <meta property="og:type" content="{{ type }}">
-    <meta property="og:url" content="https://facebook.github.io/react{{ page.url }}">
+    <meta property="og:url" content="https://maikelvanmaurik.github.io/schrapert{{ page.url }}">
     <meta property="og:image" content="{{ site.url }}/{{ site.baseurl }}/img/logo_og.png">
     <meta property="og:description" content="{{ description }}">
     <link rel="shortcut icon" href="{{ site.baseurl }}/favicon.ico">
