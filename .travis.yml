@@ -1,30 +1,34 @@
 language: php
 php:
-  - "5.6"
-  - "7.0"
+- '5.6'
+- '7.0'
 addons:
   hosts:
-    - auth.schrapert.dev
-    - blog.schrapert.dev
-    - caching.schrapert.dev
-    - compression.schrapert.dev
-    - cookies.schrapert.dev
-    - headers.schrapert.dev
-    - stream.schrapert.dev
-    - throttle.schrapert.dev
-    - robotstxt.schrapert.dev
-    - timeout.schrapert.dev
-    - webshop.schrapert.dev
+  - auth.schrapert.dev
+  - blog.schrapert.dev
+  - caching.schrapert.dev
+  - compression.schrapert.dev
+  - cookies.schrapert.dev
+  - headers.schrapert.dev
+  - stream.schrapert.dev
+  - throttle.schrapert.dev
+  - robotstxt.schrapert.dev
+  - timeout.schrapert.dev
+  - webshop.schrapert.dev
 before_script:
-  - sudo apt-get update
-  - sudo apt-get install apache2 libapache2-mod-fastcgi
-  # enable php-fpm
-  - sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf
-  - sudo a2enmod rewrite actions fastcgi alias vhost_alias
-  - echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - ~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm
-  # configure apache virtual hosts
-  - sudo cp -f provision/travis-ci-apache /etc/apache2/sites-available/default
-  - sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/default
-  - sudo service apache2 restart
+- sudo apt-get update
+- sudo apt-get install apache2 libapache2-mod-fastcgi
+- sudo cp ~/.phpenv/versions/$(phpenv version-name)/etc/php-fpm.conf.default ~/.phpenv/versions/$(phpenv
+  version-name)/etc/php-fpm.conf
+- sudo a2enmod rewrite actions fastcgi alias vhost_alias
+- echo "cgi.fix_pathinfo = 1" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+- "~/.phpenv/versions/$(phpenv version-name)/sbin/php-fpm"
+- sudo cp -f provision/travis-ci-apache /etc/apache2/sites-available/default
+- sudo sed -e "s?%TRAVIS_BUILD_DIR%?$(pwd)?g" --in-place /etc/apache2/sites-available/default
+- sudo service apache2 restart
 install: composer install
+env:
+  global:
+  - secure: QFynaQlcWtprF8RyHEDgY3mtPQWHPUv5XvwmIrQGW06iVDeywvnG08wV9J5Zbb9kBoaseZu2A+mUwVwll5oBV38bolYrZCEqKIoSADLtTUJ5Yb2H0RYcN3ielSvgR0BEQi+MmSLPRUX7ZDuz9XK58M/o9I/WIh9ph8FW2DtHytMkVPPRCURgqDGxX4eTRtrdQnPGJq0DmQ9ecF8GCDdJE/xVrf9yvEKUaboS+y0TLmk5DIw4CMNs96E4xnygdLiIl1WC2Pg7jmhuszt5q/LFPpcp8vONt4X5mRIzT7zXalIAiddtlY0MuEI2WA1y0ZPoEomcidPWXEBdYUTUbbK50j+qHLkckJD3ZtQX8XgL0y9pO8Bcb3eFHzadaqIoq9G8ycs8utx7fRxPqOcuxX9g8GCpJ0VurohqIp0YY4GS/U3QqGYpk61AVM2dYYvzOtIdrWky/bDoB5fp0caNXY8fpYEpEQBeHoX7qbjxNSI/A1uV0t5SxCnxWZ9bTvNVxwyIIJ3OOolK9sm72PnDFU7tGK1e3734qtNJISd4W2IQpnwrnPFTX0ZCIwavX38qM/5wH6E2kQu2QM1zAVudfX29uhx17IgnDFs3e+cUz8/2O60Y6M1YFovPdvMwWTwYZTvL63OX1blgRR7YMQlSPtz0Xt2c8Mu/ir3glJ/W7P5gb6c=
+after_success:
+  - if  [ $TRAVIS_PHP_VERSION = '5.6' ] && [ $TRAVIS_PULL_REQUEST = 'false' ]; then cd build && sh generate-api.sh; fi
