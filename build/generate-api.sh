@@ -2,7 +2,7 @@
 wget http://www.apigen.org/apigen.phar
 
 # Generate Api
-php apigen.phar generate -s ../src -d ../api
+php apigen.phar generate -s ../src -d ../api --google-analytics="UA-25896402-2"
 mkdir ../gh-pages
 cd ../gh-pages
 
