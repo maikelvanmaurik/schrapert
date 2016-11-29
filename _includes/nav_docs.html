@@ -22,18 +22,4 @@
     </div>
     {% endfor %}
 
-    <!-- Contributing Nav -->
-    {% for section in site.data.nav_contributing %}
-    <div class="nav-docs-section">
-        <h3>{{ section.title }}</h3>
-        <ul>
-            {% for item in section.items %}
-            <li>
-                <a href="/react/contributing/{{ item.id }}.html"{% if page.id == item.id %} class="active"{% endif %}>{{ item.title }}</a>
-            </li>
-            {% endfor %}
-        </ul>
-    </div>
-    {% endfor %}
-
 </div>
