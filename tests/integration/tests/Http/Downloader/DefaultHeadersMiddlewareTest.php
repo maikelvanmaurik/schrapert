@@ -45,6 +45,8 @@ class DefaultHeadersMiddlewareTest extends TestCase
                     return (string)$response->getBody();
             }), $this->eventLoop, 10);
 
+        var_dump($content);
+
         $returnedHeaders = json_decode($content, true);
 
         $this->assertArrayHasKey('foo', $returnedHeaders);

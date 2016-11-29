@@ -40,7 +40,7 @@ class CookiesMiddlewareTest extends TestCase
 
         $request = new Request('http://cookies.schrapert.dev');
 
-        await($downloader->download($request), $this->eventLoop, 5);
+        await($downloader->download($request), $this->eventLoop, 10);
 
         // When done we should have a PHPSESSID cookie
         $this->assertCount(1, array_filter(iterator_to_array($cookies->getIterator()), function(SetCookie $cookie) {
