@@ -1,0 +1,21 @@
+<div class="nav-main">
+    <div class="wrap">
+        <a class="nav-home" href="{{ site.baseurl }}/">
+            <img class="nav-logo" src="{{ site.baseurl }}/img/logo.svg" height="32">
+            Schrapert
+        </a>
+        <div class="nav-lists">
+            <ul class="nav-site nav-site-internal">
+                <li><a href="{{ site.baseurl }}/docs/"{% if page.sectionid == 'docs' or page.sectionid == 'tips' or page.sectionid == 'contributing' %} class="active"{% endif %}>Docs</a></li>
+                <li><a href="{{ site.baseurl }}/tutorial/"{% if page.sectionid == 'tutorial' %} class="active"{% endif %}>Tutorial</a></li>
+                <li class="nav-site-search">
+                    <input id="algolia-doc-search" type="text" placeholder="Search docs..." />
+                </li>
+            </ul>
+            <ul class="nav-site nav-site-external">
+                <li><a href="https://github.com/facebook/react">GitHub</a></li>
+                <li><a href="https://github.com/facebook/react/releases">v{{site.schrapert.version}}</a></li>
+            </ul>
+        </div>
+    </div>
+</div>

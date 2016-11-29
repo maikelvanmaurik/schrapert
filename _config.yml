@@ -1,0 +1,66 @@
+---
+name: Schrapert
+description: A non blocking php scraper
+url: https://maikelvanmaurik.github.io
+baseurl: /schrapert
+permalink: /blog/:year/:month/:day/:title.html
+paginate_path: /blog/page:num/
+paginate: 5
+timezone: America/Los_Angeles
+highlighter: pygments
+project:
+  version: 1.0
+defaults:
+- scope:
+    path: ''
+    type: posts
+  values:
+    layout: post
+    sectionid: blog
+- scope:
+    path: blog
+    type: pages
+  values:
+    sectionid: blog
+- scope:
+    path: tutorial
+    type: pages
+  values:
+    layout: tutorial
+    sectionid: tutorial
+- scope:
+    path: docs
+    type: pages
+  values:
+    layout: docs
+    sectionid: docs
+- scope:
+    path: contributing
+    type: pages
+  values:
+    sectionid: docs
+- scope:
+    path: community
+    type: pages
+  values:
+    layout: community
+    sectionid: community
+exclude:
+- Gemfile
+- Gemfile.lock
+- README.md
+- Rakefile
+- vendor/bundle
+markdown: redcarpet
+redcarpet:
+  extensions:
+  - fenced_code_blocks
+  - footnotes
+sass:
+  style: :compressed
+  sass_dir: _css
+gems:
+- bourbon
+- neat
+- jekyll-redirect-from
+- jekyll-paginate

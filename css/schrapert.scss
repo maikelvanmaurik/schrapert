@@ -1,0 +1,114 @@
+---
+---
+@import "bourbon";
+@import "neat";
+@import '_variables';
+@import "_code";
+
+* {
+  box-sizing: border-box;
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+html {
+  font-family: 'Source Sans Pro', sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: $pageBg;
+  padding: 0;
+  margin: 0;
+  line-height: 24px;
+}
+
+a {
+  text-decoration: none;
+}
+
+.container {
+  padding-top: 60px;
+  width: 100%;
+}
+
+.nav-docs {
+  float: left;
+  width: 200px;
+}
+
+.inner-content {
+  float: right;
+  width: 100%;
+  max-width: 650px;
+}
+
+.nav-main {
+  position: fixed;
+  width: 100%;
+  top: 0;
+  background-color: $primary;
+  height: 60px;
+
+  ul {
+    display: inline-block;
+
+    li {
+      display: inline;
+    }
+  }
+}
+
+code {
+  font-family: 'Inconsolata', monospace;
+  color: #fff;
+  background: black;
+  padding: 2px 4px;
+  border-radius: 10px;
+}
+.highlight {
+  pre {
+    margin-top: 10px;
+    padding: 20px;
+    overflow: scroll;
+  }
+}
+
+.nav-lists {
+  display: inline-block;
+}
+
+.hero {
+  text-align: center;
+  padding: 40px 0px;
+  background-color: $lightColor;
+}
+
+.wrap {
+  max-width: 960px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0px 20px;
+}
+
+.documentationContent:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+@media (max-width: 960px) {
+  .inner-content {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .inner-content {
+    width: 100%;
+  }
+  .nav-docs {
+    width: 100%;
+  }
+}
