@@ -32,8 +32,8 @@ class DefaultHeadersMiddlewareTest extends TestCase
     {
         $downloader = $this->downloader->withMiddleware(
             $this->middleware->withHeaders([
-                'foo' => 'bar',
-                'bar' => 'baz'
+                'FOO' => 'bar',
+                'BAR' => 'baz'
             ]));
 
         $request = new Request('http://headers.schrapert.dev/request.php');
@@ -45,14 +45,12 @@ class DefaultHeadersMiddlewareTest extends TestCase
                     return (string)$response->getBody();
             }), $this->eventLoop, 10);
 
-        var_dump($content);
-
         $returnedHeaders = json_decode($content, true);
 
-        $this->assertArrayHasKey('foo', $returnedHeaders);
-        $this->assertArrayHasKey('bar', $returnedHeaders);
-        $this->assertEquals('bar', $returnedHeaders['foo']);
-        $this->assertEquals('baz', $returnedHeaders['bar']);
+        $this->assertArrayHasKey('FOO', $returnedHeaders);
+        $this->assertArrayHasKey('BAR', $returnedHeaders);
+        $this->assertEquals('bar', $returnedHeaders['FOO']);
+        $this->assertEquals('baz', $returnedHeaders['BAR']);
     }
 
     public function testExistingHeadersAreNotOverwritten()
