@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+
+	<title>Class Schrapert\Http\Cache\Rfc2616Policy</title>
+
+	<link rel="stylesheet" href="resources/style.css?e99947befd7bf673c6b43ff75e9e0f170c88a60e">
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+				<h3>Namespaces</h3>
+			<ul>
+				<li class="active">
+					<a href="namespace-Schrapert.html">
+						Schrapert<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Schrapert.Configuration.html">
+						Configuration					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Console.html">
+						Console					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Core.html">
+						Core<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Schrapert.Core.Event.html">
+						Event					</a>
+
+						</li>
+							</ul></li>
+				<li>
+					<a href="namespace-Schrapert.Crawl.html">
+						Crawl<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Schrapert.Crawl.Exception.html">
+						Exception					</a>
+
+						</li>
+							</ul></li>
+				<li>
+					<a href="namespace-Schrapert.DependencyInjection.html">
+						DependencyInjection					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Event.html">
+						Event					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Feature.html">
+						Feature					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Feed.html">
+						Feed					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Filter.html">
+						Filter					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Ftp.html">
+						Ftp					</a>
+
+						</li>
+				<li class="active">
+					<a href="namespace-Schrapert.Http.html">
+						Http<span></span>
+					</a>
+
+						<ul>
+				<li class="active">
+					<a href="namespace-Schrapert.Http.Cache.html">
+						Cache					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Http.Cookies.html">
+						Cookies					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Http.Downloader.html">
+						Downloader<span></span>
+					</a>
+
+						<ul>
+				<li>
+					<a href="namespace-Schrapert.Http.Downloader.Event.html">
+						Event					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Http.Downloader.Exception.html">
+						Exception					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Http.Downloader.Middleware.html">
+						Middleware					</a>
+
+						</li>
+							</ul></li>
+				<li>
+					<a href="namespace-Schrapert.Http.RobotsTxt.html">
+						RobotsTxt					</a>
+
+						</li>
+							</ul></li>
+				<li>
+					<a href="namespace-Schrapert.IO.html">
+						IO					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Log.html">
+						Log					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Schedule.html">
+						Schedule					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Scraping.html">
+						Scraping					</a>
+
+						</li>
+				<li>
+					<a href="namespace-Schrapert.Util.html">
+						Util					</a>
+
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr>
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Schrapert.Http.Cache.DummyPolicy.html">DummyPolicy</a></li>
+				<li><a href="class-Schrapert.Http.Cache.FileStorage.html">FileStorage</a></li>
+				<li><a href="class-Schrapert.Http.Cache.PdoStorage.html">PdoStorage</a></li>
+				<li class="active"><a href="class-Schrapert.Http.Cache.Rfc2616Policy.html">Rfc2616Policy</a></li>
+			</ul>
+
+			<h3>Interfaces</h3>
+			<ul>
+				<li><a href="class-Schrapert.Http.Cache.PolicyInterface.html">PolicyInterface</a></li>
+				<li><a href="class-Schrapert.Http.Cache.RequestProcessorPolicyInterface.html">RequestProcessorPolicyInterface</a></li>
+				<li><a href="class-Schrapert.Http.Cache.StorageInterface.html">StorageInterface</a></li>
+			</ul>
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="">
+		<input type="hidden" name="ie" value="UTF-8">
+		<input type="text" name="q" class="text" placeholder="Search">
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Schrapert.Http.Cache.html" title="Summary of Schrapert\Http\Cache"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Rfc2616Policy</h1>
+
+
+	<div class="description">
+	<p>Class Rfc2616Policy</p>
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>Schrapert\Http\Cache\Rfc2616Policy</span></b>			
+			 implements 
+				<a href="class-Schrapert.Http.Cache.PolicyInterface.html"><span>Schrapert\Http\Cache\PolicyInterface</span></a>, 
+			
+				<a href="class-Schrapert.Http.Cache.RequestProcessorPolicyInterface.html"><span>Schrapert\Http\Cache\RequestProcessorPolicyInterface</span></a>
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Schrapert.html">Schrapert</a>\<a href="namespace-Schrapert.Http.html">Http</a>\<a href="namespace-Schrapert.Http.Cache.html">Cache</a><br>
+		<b>Package:</b> Schrapert\Http\Cache<br>
+
+				<b>See:</b>
+				https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching<br>
+			<b>Located at</b> <a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#9-313" title="Go to source code">Schrapert/Http/Cache/Rfc2616Policy.php</a>
+		<br>
+	</div>
+
+
+
+	<table class="summary methods" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#30-35" title="Go to source code">__construct</a>( <span> <var>$alwaysStore</var> = <span class="php-keyword1">false</span></span>, <span>array <var>$ignoreResponseCacheControls</var> = []</span>, <span>array <var>$ignoreSchemes</var> = [<span class="php-quote">'file'</span>]</span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getIgnoreSchemes" id="_getIgnoreSchemes">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getIgnoreSchemes">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#53-56" title="Go to source code">getIgnoreSchemes</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="withIgnoreSchemes" id="_withIgnoreSchemes">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_withIgnoreSchemes">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#58-63" title="Go to source code">withIgnoreSchemes</a>( <span>array <var>$schemes</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="withoutIgnoreSchemes" id="_withoutIgnoreSchemes">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_withoutIgnoreSchemes">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#65-70" title="Go to source code">withoutIgnoreSchemes</a>( <span>array <var>$schemes</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="withAlwaysStore" id="_withAlwaysStore">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_withAlwaysStore">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#72-77" title="Go to source code">withAlwaysStore</a>( <span> <var>$store</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="withIgnoreResponseCacheControls" id="_withIgnoreResponseCacheControls">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_withIgnoreResponseCacheControls">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#79-84" title="Go to source code">withIgnoreResponseCacheControls</a>( <span>array <var>$cacheControls</var> = []</span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="isCachedResponseValid" id="_isCachedResponseValid">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_isCachedResponseValid">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#86-98" title="Go to source code">isCachedResponseValid</a>( <span><code><a href="class-Schrapert.Http.ResponseInterface.html">Schrapert\Http\ResponseInterface</a></code> <var>$cached</var></span>, <span><code><a href="class-Schrapert.Http.ResponseInterface.html">Schrapert\Http\ResponseInterface</a></code> <var>$response</var></span>, <span><code><a href="class-Schrapert.Http.RequestInterface.html">Schrapert\Http\RequestInterface</a></code> <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Schrapert.Http.Cache.PolicyInterface.html#_isCachedResponseValid">Schrapert\Http\Cache\PolicyInterface::isCachedResponseValid()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="shouldCacheRequest" id="_shouldCacheRequest">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_shouldCacheRequest">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#100-110" title="Go to source code">shouldCacheRequest</a>( <span><code><a href="class-Schrapert.Http.RequestInterface.html">Schrapert\Http\RequestInterface</a></code> <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Schrapert.Http.Cache.PolicyInterface.html#_shouldCacheRequest">Schrapert\Http\Cache\PolicyInterface::shouldCacheRequest()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="shouldCacheResponse" id="_shouldCacheResponse">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_shouldCacheResponse">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#112-143" title="Go to source code">shouldCacheResponse</a>( <span><code><a href="class-Schrapert.Http.ResponseInterface.html">Schrapert\Http\ResponseInterface</a></code> <var>$response</var></span>, <span><code><a href="class-Schrapert.Http.RequestInterface.html">Schrapert\Http\RequestInterface</a></code> <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Schrapert.Http.Cache.PolicyInterface.html#_shouldCacheResponse">Schrapert\Http\Cache\PolicyInterface::shouldCacheResponse()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getCurrentTime" id="_getCurrentTime">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getCurrentTime">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#208-214" title="Go to source code">getCurrentTime</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="withCurrentTime" id="_withCurrentTime">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_withCurrentTime">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#216-221" title="Go to source code">withCurrentTime</a>( <span> <var>$time</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="isCachedResponseFresh" id="_isCachedResponseFresh">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_isCachedResponseFresh">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#223-275" title="Go to source code">isCachedResponseFresh</a>( <span><code><a href="class-Schrapert.Http.ResponseInterface.html">Schrapert\Http\ResponseInterface</a></code> <var>$cachedResponse</var></span>, <span><code><a href="class-Schrapert.Http.RequestInterface.html">Schrapert\Http\RequestInterface</a></code> <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Schrapert.Http.Cache.PolicyInterface.html#_isCachedResponseFresh">Schrapert\Http\Cache\PolicyInterface::isCachedResponseFresh()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="processRequest" id="_processRequest">
+
+		<td class="attributes"><code>
+			 public 
+
+			<code><a href="class-Schrapert.Http.RequestInterface.html">Schrapert\Http\RequestInterface</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_processRequest">#</a>
+		<code><a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#277-294" title="Go to source code">processRequest</a>( <span><code><a href="class-Schrapert.Http.ResponseInterface.html">Schrapert\Http\ResponseInterface</a></code> <var>$cachedResponse</var></span>, <span><code><a href="class-Schrapert.Http.RequestInterface.html">Schrapert\Http\RequestInterface</a></code> <var>$request</var></span> )</code>
+
+		<div class="description short">
+			<p>Processes the request allowing a policy to add additional headers etc. before
+dispatching the request</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Processes the request allowing a policy to add additional headers etc. before
+dispatching the request</p>
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$cachedResponse</var></dt>
+					<dd></dd>
+					<dt><var>$request</var></dt>
+					<dd></dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><a href="class-Schrapert.Http.RequestInterface.html">Schrapert\Http\RequestInterface</a></code>
+				</div>
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Schrapert.Http.Cache.RequestProcessorPolicyInterface.html#_processRequest">Schrapert\Http\Cache\RequestProcessorPolicyInterface::processRequest()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+	<table class="summary constants" id="constants">
+	<caption>Constants summary</caption>
+	<tr data-order="MAX_AGE" id="MAX_AGE">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name">
+			<code>
+				<a href="source-class-Schrapert.Http.Cache.Rfc2616Policy.html#16-20" title="Go to source code"><b>MAX_AGE</b></a>
+			</code>
+
+			<div class="description short">
+				<p>One year</p>
+			</div>
+
+			<div class="description detailed hidden">
+				<p>One year</p>
+
+			</div>
+		</td>
+		<td class="value">
+			<div>
+				<a href="#MAX_AGE" class="anchor">#</a>
+				<code><span class="php-num">31536000</span></code>
+			</div>
+		</td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		 API documentation generated by <a href="http://apigen.org">ApiGen</a>
+	</div>
+</div>
+</div>
+<script src="resources/combined.js"></script>
+<script src="elementlist.js"></script>
+</body>
+</html>
