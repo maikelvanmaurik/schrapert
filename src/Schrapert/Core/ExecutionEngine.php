@@ -3,6 +3,7 @@ namespace Schrapert\Core;
 
 use React\Promise\Deferred;
 use React\Promise\RejectedPromise;
+use Schrapert\Core\Event\EngineStartedEvent;
 use Schrapert\Core\Event\RequestDroppedEvent;
 use Schrapert\Core\Event\ScheduleRequestEvent;
 use Schrapert\Core\Event\SpiderClosedEvent;
@@ -18,48 +19,81 @@ use Schrapert\Util\DelayedCallbackFactory;
 use Schrapert\Util\IntervalCallback;
 use Schrapert\Util\IntervalCallbackFactory;
 use Exception;
+use DateTime;
 use React\Promise\PromiseInterface;
 
+/**
+ * The execution engine is responsible for handling requests created by the spiders.
+ *
+ * Class ExecutionEngine
+ * @package Schrapert\Core
+ */
 class ExecutionEngine
 {
+    /**
+     * @var SchedulerInterface
+     */
     private $scheduler;
     /**
      * @var RequestProcessInterface[]
      */
     private $processes;
-
+    /**
+     * @var DateTime
+     */
     private $startTime;
-
+    /**
+     * @var SpiderInterface
+     */
     private $spider;
-
+    /**
+     * @var EventDispatcherInterface
+     */
     private $events;
-
+    /**
+     * @var array
+     */
     private $processing;
-
+    /**
+     * @var bool
+     */
     private $closing;
-
+    /**
+     * @var bool
+     */
     private $paused;
-
+    /**
+     * @var bool
+     */
     private $running;
-
+    /**
+     * @var DelayedCallbackFactory
+     */
     private $delayedCallbackFactory;
-
+    /**
+     * @var IntervalCallbackFactory
+     */
     private $intervalCallbackFactory;
-
+    /**
+     * @var RequestInterface[]
+     */
     private $startRequests;
     /**
      * @var Deferred
      */
     private $closeWait;
-
+    /**
+     * @var DuplicateRequestFilterInterface
+     */
     private $dupeFilter;
-
+    /**
+     * @var int
+     */
     private $startRequestIndex;
     /**
      * @var IntervalCallback
      */
     private $heartbeat;
-
     /**
      * @var \Schrapert\Util\DelayedCallback
      */
@@ -100,6 +134,11 @@ class ExecutionEngine
         });
     }
 
+    /**
+     * @param SpiderInterface $spider
+     * @param $requests
+     * @internal
+     */
     public function openSpider(SpiderInterface $spider, $requests)
     {
         $this->startRequests = iterator_to_array($requests);
@@ -344,6 +383,7 @@ class ExecutionEngine
                 throw new \Exception("Already running");
             }
             $this->startTime = date_create();
+            $this->events->dispatch(new EngineStartedEvent($this));
             $this->logger->info("Started");
             $this->running = true;
             $this->closeWait = new Deferred();

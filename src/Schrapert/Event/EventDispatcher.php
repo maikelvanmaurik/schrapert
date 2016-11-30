@@ -3,6 +3,12 @@ namespace Schrapert\Event;
 
 use RuntimeException;
 
+/**
+ * The event dispatcher allows event listeners to be registered and is responsible for dispatching
+ * the events.
+ * 
+ * @package Schrapert\Event
+ */
 class EventDispatcher implements EventDispatcherInterface
 {
     private $listeners = array();
