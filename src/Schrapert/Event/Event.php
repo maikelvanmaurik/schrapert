@@ -7,7 +7,7 @@ namespace Schrapert\Event;
  * This class does not contain event data. It is used by events that do not pass
  * state information to an event handler when an event is raised.
  *
- * Further event handling can be aborted by calling the {@see Schrapert\Event::stopPropagation()}
+ * Further event handling can be aborted by calling the {@see stopPropagation()}
  *
  * @package Schrapert\Event
  */
@@ -47,6 +47,11 @@ class Event implements EventInterface
         $this->propagationStopped = true;
     }
 
+    /**
+     * Gets the name of the event
+     *
+     * @return string
+     */
     public function getName()
     {
         return $this->name;

@@ -6,18 +6,29 @@ use Schrapert\Event\EventDispatcherInterface;
 use Schrapert\Feature\FeatureInterface;
 use React\EventLoop\LoopInterface;
 
+/**
+ * The runner provides the functionality to start running given spiders.
+ *
+ * @package Schrapert
+ */
 class Runner
 {
     private $engine;
     /**
-     * @var \Schrapert\SpiderInterface[]
+     * @var SpiderInterface[]
      */
     private $spiders;
-
+    /**
+     * @var LoopInterface
+     */
     private $loop;
-
+    /**
+     * @var EventDispatcherInterface
+     */
     private $events;
-
+    /**
+     * @var FeatureInterface[]
+     */
     private $features;
 
     public function __construct(LoopInterface $loop, EventDispatcherInterface $events, ExecutionEngine $engine)
@@ -37,6 +48,8 @@ class Runner
     }
 
     /**
+     * Gets the features which were assigned to the runner.
+     *
      * @return FeatureInterface[]
      */
     public function getFeatures()
@@ -44,6 +57,12 @@ class Runner
         return $this->features;
     }
 
+    /**
+     * Starts the crawling process for a given spider.
+     *
+     * @param SpiderInterface $spider
+     * @return \React\Promise\PromiseInterface
+     */
     private function crawl(SpiderInterface $spider)
     {
         foreach($this->getFeatures() as $feature) {
