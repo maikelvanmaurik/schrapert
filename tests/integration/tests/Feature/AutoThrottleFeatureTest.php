@@ -36,14 +36,11 @@ class AutoThrottleFeatureTest extends TestCase
 
     public function testAutoThrottle()
     {
-        return;
         $feature = $this->autoThrottleFeature;
         $this->runner
             ->withFeature($feature)
             ->withSpider(new TestSpider(['http://throttle.schrapert.dev/delay.php'], function(ResponseInterface $response) {
-                $html = (string)$response->getBody();
-                $products = $this->parseProducts($html);
-                return $products;
+                // TODO
             }))
             ->start();
     }

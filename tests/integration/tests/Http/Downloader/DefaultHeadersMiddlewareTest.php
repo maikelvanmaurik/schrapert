@@ -55,7 +55,6 @@ class DefaultHeadersMiddlewareTest extends TestCase
 
     public function testExistingHeadersAreNotOverwritten()
     {
-        return;
         $downloader = $this->downloader->withMiddleware(
             $this->middleware->withHeaders([
                 'User-Agent' => 'Middleware'

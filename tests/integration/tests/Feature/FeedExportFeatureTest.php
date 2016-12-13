@@ -40,6 +40,7 @@ class FeedExportFeatureTest extends TestCase
 
     private function parseProducts($html)
     {
+        return false;
         $products = [];
         $doc = new DOMDocument();
         $doc->loadHTML($html);
@@ -54,7 +55,6 @@ class FeedExportFeatureTest extends TestCase
 
     public function testDoesSupportMultipleExporters()
     {
-        return;
         $feature = $this->feedExportFeature
             ->withExporter($this->exporterFactory->createExporter('json', 'file://' . ETC_DIR . 'feed.json'))
             ->withExporter($this->exporterFactory->createExporter('csv', 'file://' . ETC_DIR . 'feed.csv'))

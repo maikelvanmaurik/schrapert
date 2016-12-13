@@ -23,6 +23,7 @@ use Schrapert\Http\Cookies\CookieJar;
 use Schrapert\Http\Cookies\SetCookieParser;
 use Schrapert\Http\Downloader\Downloader;
 use Schrapert\Http\Downloader\DownloadTransactionFactory;
+use Schrapert\Http\Downloader\Middleware\ConcurrentRequestLimitMiddleware;
 use Schrapert\Http\Downloader\Middleware\CookiesMiddleware;
 use Schrapert\Http\Downloader\Middleware\DefaultHeadersMiddleware;
 use Schrapert\Http\Downloader\Middleware\CompressionMiddleware;
@@ -121,7 +122,7 @@ class DefaultServiceContainer extends ServiceContainer
 
         $this->set('dns_resolver', function() {
             $factory = new \React\Dns\Resolver\Factory();
-            return $factory->create('8.8.8.8', $this->get('event_loop'));
+            return $factory->createCached('8.8.8.8', $this->get('event_loop'));
         });
 
         $this->set('download_request_factory', function() {
@@ -205,6 +206,15 @@ class DefaultServiceContainer extends ServiceContainer
                 $this->get('downloader'),
                 $this->get('robots_txt_parser'),
                 $this->get('logger')
+            );
+        });
+
+        $this->set('downloader_middleware_concurrent_request_limit', function() {
+            return new ConcurrentRequestLimitMiddleware(
+                $this->get('event_dispatcher'),
+                $this->get('logger'),
+                $this->get('delayed_callback_factory'),
+                $this->get('dns_resolver')
             );
         });
 

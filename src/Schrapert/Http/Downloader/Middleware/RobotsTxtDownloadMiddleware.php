@@ -63,9 +63,4 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
             return $this->robotsTxtParser->parse($txt);
         });
     }
-
-    public function needsBackOut()
-    {
-        return $this->downloader->needsBackOut();
-    }
 }

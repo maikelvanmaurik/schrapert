@@ -7,18 +7,36 @@ use Schrapert\Http\Downloader\Event\DownloadRequestEvent;
 use Schrapert\Http\Downloader\Event\ResponseDownloadedEvent;
 use Schrapert\Log\LoggerInterface;
 
+/**
+ * Feature which throttles the downloads.
+ *
+ * @package Schrapert\Feature
+ */
 class AutoThrottleFeature implements FeatureInterface
 {
+    /**
+     * @var EventDispatcherInterface
+     */
     private $events;
-
+    /**
+     * @var float
+     */
     private $targetConcurrency;
-
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
-
+    /**
+     * @var float
+     */
     private $minDelay;
-
+    /**
+     * @var float
+     */
     private $maxDelay;
-
+    /**
+     * @var float
+     */
     private $startDelay;
 
     private $fingerprinter;

@@ -20,6 +20,9 @@ class DelayedCallback
         $this->args = $args;
     }
 
+    /**
+     * @param int|float $delay
+     */
     public function schedule($delay = 0)
     {
         $this->timer = $this->loop->addTimer($delay, function() {

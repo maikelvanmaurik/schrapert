@@ -46,7 +46,7 @@ class Scraper implements ScraperInterface
     private function finishScraping(RequestInterface $request)
     {
         $index = array_search($request, $this->active, true);
-        $this->logger->debug("Finished scraping of request %s, index: %s", [$request->getUri(), $index]);
+        $this->logger->debug("Finished scraping of request {uri}, index: {index}", ['uri' => $request->getUri(), 'index' => $index]);
         if(false !== $index) {
             unset($this->active[$index]);
         }

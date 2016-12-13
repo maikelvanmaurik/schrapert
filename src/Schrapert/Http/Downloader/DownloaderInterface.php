@@ -12,6 +12,4 @@ interface DownloaderInterface
      * @return PromiseInterface
      */
     public function download(RequestInterface $request);
-
-    public function needsBackOut();
 }

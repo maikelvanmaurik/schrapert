@@ -63,7 +63,6 @@ class HttpCacheMiddlewareTest extends TestCase
      */
     public function testResponsesOfARequestWithACacheControlNoStoreHeaderAreNotBeingCachedWhenUsingRfc2616Policy()
     {
-        return;
         $uri = sprintf('http://caching.schrapert.dev/cache-control-header.php?header-value=%s', urlencode('no-store'));
         $request = new Request($uri, 'GET');
 
@@ -176,7 +175,6 @@ class HttpCacheMiddlewareTest extends TestCase
 
     public function testContentCacheIsBeingCheckedOnFreshnessWhenUsingFileStorageIcwRfc2616Policy()
     {
-        return;
         $uri = sprintf('http://caching.schrapert.dev/cache-control-header.php?header-value=%s', urlencode('public,max-age=1'));
         $request = new Request($uri);
 

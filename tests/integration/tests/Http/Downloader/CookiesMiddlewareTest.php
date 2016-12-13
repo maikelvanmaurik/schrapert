@@ -29,7 +29,6 @@ class CookiesMiddlewareTest extends TestCase
 
     public function testCookiesAreSet()
     {
-        return;
         $cookieMiddleware = $this->getContainer()->get('downloader_middleware_cookies');
 
         $downloader = $this->downloader->withMiddleware($cookieMiddleware);

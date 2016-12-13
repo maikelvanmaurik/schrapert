@@ -25,8 +25,6 @@ class Downloader implements DownloaderInterface
 
     private $logger;
 
-    private $totalConcurrent = 10;
-
     private $middleware;
 
     private $transactionFactory;
@@ -40,7 +38,6 @@ class Downloader implements DownloaderInterface
         $this->middleware = [];
         $this->setMiddleware($middleware);
         $this->transactionFactory = $transactionFactory;
-        //$this->downloadRequestFactory = $downloadRequestFactory;
         $this->queue = [];
         $this->transferring = [];
     }
@@ -58,15 +55,16 @@ class Downloader implements DownloaderInterface
 
         $this->queue[] = [$request, $deferred];
 
-        $this->processRequest();
+        $this->processQueue();
 
         return $deferred->promise();
     }
 
-    private function processRequest()
+    private function processQueue()
     {
-        while(count($this->queue) > 0 && count($this->transferring) < $this->totalConcurrent) {
+        while(count($this->queue) > 0) {
             list($request,$deferred) = array_shift($this->queue);
+
             $this->logger->debug("Process en-queued download request {uri}", ['uri' => (string)$request->getUri()]);
             $download = $this->fetch($request);
             $download->then(function($response) use ($deferred, $request) {
@@ -122,7 +120,6 @@ class Downloader implements DownloaderInterface
                 $new->middleware[] = $item;
             }
         }
-
     }
 
     public function hasMiddleware(DownloadMiddlewareInterface $middleware)
@@ -171,7 +168,7 @@ class Downloader implements DownloaderInterface
                 if($result instanceof PromiseInterface) {
                     return $result->otherwise(function($e) use ($downloaded) {
                         $downloaded->reject($e);
-                        throw $e;
+                        //throw $e;
                     });
                 }
                 if($result instanceof ResponseInterface) {
@@ -181,12 +178,10 @@ class Downloader implements DownloaderInterface
             });
         }
 
-
         // When all the middleware have run call the download method
         $promise = $promise->then(function ($message) {
             if($message instanceof RequestInterface) {
-                $this->logger->debug("Downloader: invoke request {uri}", ['uri' => $message->getUri()]);
-                // Here the request will be processed by all middleware
+                // Here the request is finished being processed by all middleware
                 return $this->enqueueRequest($message);
             }
             return $message;
@@ -222,10 +217,5 @@ class Downloader implements DownloaderInterface
         $deferred->resolve($request);
 
         return $downloaded->promise();
-    }
-
-    public function needsBackOut()
-    {
-        return count($this->transferring) >= $this->totalConcurrent;
     }
 }

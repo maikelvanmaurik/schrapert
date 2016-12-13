@@ -14,7 +14,8 @@
     "grunt-php": "^0.3.3",
     "grunt-phpclassmap": "~0.0.11",
     "grunt-phpunit": "^0.3.3",
-    "load-grunt-tasks": "^0.6.0"
+    "load-grunt-tasks": "^0.6.0",
+    "q": "^1.4.1"
   },
   "optionalDependencies": {},
   "engines": {
