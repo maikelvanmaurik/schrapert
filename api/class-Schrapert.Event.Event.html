@@ -36,11 +36,6 @@
 
 						<ul>
 				<li>
-					<a href="namespace-Schrapert.Configuration.html">
-						Configuration					</a>
-
-						</li>
-				<li>
 					<a href="namespace-Schrapert.Console.html">
 						Console					</a>
 
@@ -227,6 +222,14 @@
 	<h1>Class Event</h1>
 
 
+	<div class="description">
+	<p>Represents an event which occurred during the schrapert lifecycle.</p>
+
+<p>This class does not contain event data. It is used by events that do not pass
+state information to an event handler when an event is raised.</p>
+
+<p>Further event handling can be aborted by calling the <code><a href="class-Schrapert.Event.Event.html#_stopPropagation">Schrapert\Event\Event::stopPropagation()</a></code></p>
+	</div>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
@@ -260,9 +263,9 @@
 		
 		
 		<b>Namespace:</b> <a href="namespace-Schrapert.html">Schrapert</a>\<a href="namespace-Schrapert.Event.html">Event</a><br>
-		
+		<b>Package:</b> Schrapert\Event<br>
 
-			<b>Located at</b> <a href="source-class-Schrapert.Event.Event.html#4-44" title="Go to source code">Schrapert/Event/Event.php</a>
+			<b>Located at</b> <a href="source-class-Schrapert.Event.Event.html#4-59" title="Go to source code">Schrapert/Event/Event.php</a>
 		<br>
 	</div>
 
@@ -282,7 +285,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Schrapert.Event.Event.html#8-11" title="Go to source code">__construct</a>( <span> <var>$name</var></span> )</code>
+		<code><a href="source-class-Schrapert.Event.Event.html#18-21" title="Go to source code">__construct</a>( <span> <var>$name</var></span> )</code>
 
 		<div class="description short">
 			
@@ -312,7 +315,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_isPropagationStopped">#</a>
-		<code><a href="source-class-Schrapert.Event.Event.html#17-27" title="Go to source code">isPropagationStopped</a>( )</code>
+		<code><a href="source-class-Schrapert.Event.Event.html#27-37" title="Go to source code">isPropagationStopped</a>( )</code>
 
 		<div class="description short">
 			<p>Returns whether further event listeners should be triggered.</p>
@@ -352,7 +355,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_stopPropagation">#</a>
-		<code><a href="source-class-Schrapert.Event.Event.html#28-38" title="Go to source code">stopPropagation</a>( )</code>
+		<code><a href="source-class-Schrapert.Event.Event.html#38-48" title="Go to source code">stopPropagation</a>( )</code>
 
 		<div class="description short">
 			<p>Stops the propagation of the event to further event listeners.</p>
@@ -381,24 +384,28 @@ stopPropagation().</p>
 		<td class="attributes"><code>
 			 public 
 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getName">#</a>
-		<code><a href="source-class-Schrapert.Event.Event.html#40-43" title="Go to source code">getName</a>( )</code>
+		<code><a href="source-class-Schrapert.Event.Event.html#50-58" title="Go to source code">getName</a>( )</code>
 
 		<div class="description short">
-			
+			<p>Gets the name of the event</p>
 		</div>
 
 		<div class="description detailed hidden">
-			
+			<p>Gets the name of the event</p>
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					string
+				</div>
 
 
 
@@ -430,7 +437,7 @@ stopPropagation().</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Schrapert.Event.Event.html#6" title="Go to source code"><var>$name</var></a>
+				<a href="source-class-Schrapert.Event.Event.html#16" title="Go to source code"><var>$name</var></a>
 
 			<div class="description short">
 				

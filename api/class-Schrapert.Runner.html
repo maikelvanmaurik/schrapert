@@ -36,11 +36,6 @@
 
 						<ul>
 				<li>
-					<a href="namespace-Schrapert.Configuration.html">
-						Configuration					</a>
-
-						</li>
-				<li>
 					<a href="namespace-Schrapert.Console.html">
 						Console					</a>
 
@@ -225,6 +220,9 @@
 	<h1>Class Runner</h1>
 
 
+	<div class="description">
+	<p>The runner provides the functionality to start running given spiders.</p>
+	</div>
 
 
 
@@ -238,9 +236,9 @@
 		
 		
 		<b>Namespace:</b> <a href="namespace-Schrapert.html">Schrapert</a><br>
-		
+		<b>Package:</b> Schrapert<br>
 
-			<b>Located at</b> <a href="source-class-Schrapert.Runner.html#9-83" title="Go to source code">Schrapert/Runner.php</a>
+			<b>Located at</b> <a href="source-class-Schrapert.Runner.html#9-102" title="Go to source code">Schrapert/Runner.php</a>
 		<br>
 	</div>
 
@@ -260,7 +258,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Schrapert.Runner.html#23-30" title="Go to source code">__construct</a>( <span>React\EventLoop\LoopInterface <var>$loop</var></span>, <span><code><a href="class-Schrapert.Event.EventDispatcherInterface.html">Schrapert\Event\EventDispatcherInterface</a></code> <var>$events</var></span>, <span><code><a href="class-Schrapert.Core.ExecutionEngine.html">Schrapert\Core\ExecutionEngine</a></code> <var>$engine</var></span> )</code>
+		<code><a href="source-class-Schrapert.Runner.html#34-41" title="Go to source code">__construct</a>( <span>React\EventLoop\LoopInterface <var>$loop</var></span>, <span><code><a href="class-Schrapert.Event.EventDispatcherInterface.html">Schrapert\Event\EventDispatcherInterface</a></code> <var>$events</var></span>, <span><code><a href="class-Schrapert.Core.ExecutionEngine.html">Schrapert\Core\ExecutionEngine</a></code> <var>$engine</var></span> )</code>
 
 		<div class="description short">
 			
@@ -290,7 +288,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_withSpider">#</a>
-		<code><a href="source-class-Schrapert.Runner.html#32-37" title="Go to source code">withSpider</a>( <span><code><a href="class-Schrapert.SpiderInterface.html">Schrapert\SpiderInterface</a></code> <var>$spider</var></span> )</code>
+		<code><a href="source-class-Schrapert.Runner.html#43-48" title="Go to source code">withSpider</a>( <span><code><a href="class-Schrapert.SpiderInterface.html">Schrapert\SpiderInterface</a></code> <var>$spider</var></span> )</code>
 
 		<div class="description short">
 			
@@ -320,14 +318,14 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getFeatures">#</a>
-		<code><a href="source-class-Schrapert.Runner.html#39-45" title="Go to source code">getFeatures</a>( )</code>
+		<code><a href="source-class-Schrapert.Runner.html#50-58" title="Go to source code">getFeatures</a>( )</code>
 
 		<div class="description short">
-			
+			<p>Gets the features which were assigned to the runner.</p>
 		</div>
 
 		<div class="description detailed hidden">
-			
+			<p>Gets the features which were assigned to the runner.</p>
 
 
 
@@ -354,7 +352,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_withFeature">#</a>
-		<code><a href="source-class-Schrapert.Runner.html#56-61" title="Go to source code">withFeature</a>( <span><code><a href="class-Schrapert.Feature.FeatureInterface.html">Schrapert\Feature\FeatureInterface</a></code> <var>$feature</var></span> )</code>
+		<code><a href="source-class-Schrapert.Runner.html#75-80" title="Go to source code">withFeature</a>( <span><code><a href="class-Schrapert.Feature.FeatureInterface.html">Schrapert\Feature\FeatureInterface</a></code> <var>$feature</var></span> )</code>
 
 		<div class="description short">
 			
@@ -384,7 +382,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_start">#</a>
-		<code><a href="source-class-Schrapert.Runner.html#63-77" title="Go to source code">start</a>( <span> <var>$stop</var> = <span class="php-keyword1">true</span></span> )</code>
+		<code><a href="source-class-Schrapert.Runner.html#82-96" title="Go to source code">start</a>( <span> <var>$stop</var> = <span class="php-keyword1">true</span></span> )</code>
 
 		<div class="description short">
 			
@@ -414,7 +412,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_stop">#</a>
-		<code><a href="source-class-Schrapert.Runner.html#79-82" title="Go to source code">stop</a>( )</code>
+		<code><a href="source-class-Schrapert.Runner.html#98-101" title="Go to source code">stop</a>( )</code>
 
 		<div class="description short">
 			

@@ -36,11 +36,6 @@
 
 						<ul>
 				<li>
-					<a href="namespace-Schrapert.Configuration.html">
-						Configuration					</a>
-
-						</li>
-				<li>
 					<a href="namespace-Schrapert.Console.html">
 						Console					</a>
 
@@ -229,6 +224,11 @@
 	<h1>Class ExecutionEngine</h1>
 
 
+	<div class="description">
+	<p>The execution engine is responsible for handling requests created by the spiders.</p>
+
+<p>Class ExecutionEngine</p>
+	</div>
 
 
 
@@ -242,9 +242,9 @@
 		
 		
 		<b>Namespace:</b> <a href="namespace-Schrapert.html">Schrapert</a>\<a href="namespace-Schrapert.Core.html">Core</a><br>
-		
+		<b>Package:</b> Schrapert\Core<br>
 
-			<b>Located at</b> <a href="source-class-Schrapert.Core.ExecutionEngine.html#23-363" title="Go to source code">Schrapert/Core/ExecutionEngine.php</a>
+			<b>Located at</b> <a href="source-class-Schrapert.Core.ExecutionEngine.html#25-403" title="Go to source code">Schrapert/Core/ExecutionEngine.php</a>
 		<br>
 	</div>
 
@@ -264,7 +264,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#68-81" title="Go to source code">__construct</a>( <span><code><a href="class-Schrapert.Log.LoggerInterface.html">Schrapert\Log\LoggerInterface</a></code> <var>$logger</var></span>, <span><code><a href="class-Schrapert.Event.EventDispatcherInterface.html">Schrapert\Event\EventDispatcherInterface</a></code> <var>$events</var></span>, <span><code><a href="class-Schrapert.Core.ScraperInterface.html">Schrapert\Core\ScraperInterface</a></code> <var>$scraper</var></span>, <span><code><a href="class-Schrapert.Filter.DuplicateRequestFilterInterface.html">Schrapert\Filter\DuplicateRequestFilterInterface</a></code> <var>$dupeFilter</var></span>, <span><code><a href="class-Schrapert.Core.RequestProcessorFactoryInterface.html">Schrapert\Core\RequestProcessorFactoryInterface</a></code> <var>$requestProcessorFactory</var></span>, <span><code><a href="class-Schrapert.Schedule.SchedulerInterface.html">Schrapert\Schedule\SchedulerInterface</a></code> <var>$scheduler</var></span>, <span><code><a href="class-Schrapert.Util.IntervalCallbackFactory.html">Schrapert\Util\IntervalCallbackFactory</a></code> <var>$intervalCallbackFactory</var></span>, <span><code><a href="class-Schrapert.Util.DelayedCallbackFactory.html">Schrapert\Util\DelayedCallbackFactory</a></code> <var>$delayedCallbackFactory</var></span> )</code>
+		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#102-115" title="Go to source code">__construct</a>( <span><code><a href="class-Schrapert.Log.LoggerInterface.html">Schrapert\Log\LoggerInterface</a></code> <var>$logger</var></span>, <span><code><a href="class-Schrapert.Event.EventDispatcherInterface.html">Schrapert\Event\EventDispatcherInterface</a></code> <var>$events</var></span>, <span><code><a href="class-Schrapert.Core.ScraperInterface.html">Schrapert\Core\ScraperInterface</a></code> <var>$scraper</var></span>, <span><code><a href="class-Schrapert.Filter.DuplicateRequestFilterInterface.html">Schrapert\Filter\DuplicateRequestFilterInterface</a></code> <var>$dupeFilter</var></span>, <span><code><a href="class-Schrapert.Core.RequestProcessorFactoryInterface.html">Schrapert\Core\RequestProcessorFactoryInterface</a></code> <var>$requestProcessorFactory</var></span>, <span><code><a href="class-Schrapert.Schedule.SchedulerInterface.html">Schrapert\Schedule\SchedulerInterface</a></code> <var>$scheduler</var></span>, <span><code><a href="class-Schrapert.Util.IntervalCallbackFactory.html">Schrapert\Util\IntervalCallbackFactory</a></code> <var>$intervalCallbackFactory</var></span>, <span><code><a href="class-Schrapert.Util.DelayedCallbackFactory.html">Schrapert\Util\DelayedCallbackFactory</a></code> <var>$delayedCallbackFactory</var></span> )</code>
 
 		<div class="description short">
 			
@@ -294,7 +294,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_schedule">#</a>
-		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#83-101" title="Go to source code">schedule</a>( <span><code><a href="class-Schrapert.Crawl.RequestInterface.html">Schrapert\Crawl\RequestInterface</a></code> <var>$request</var></span>, <span><code><a href="class-Schrapert.SpiderInterface.html">Schrapert\SpiderInterface</a></code> <var>$spider</var></span> )</code>
+		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#117-135" title="Go to source code">schedule</a>( <span><code><a href="class-Schrapert.Crawl.RequestInterface.html">Schrapert\Crawl\RequestInterface</a></code> <var>$request</var></span>, <span><code><a href="class-Schrapert.SpiderInterface.html">Schrapert\SpiderInterface</a></code> <var>$spider</var></span> )</code>
 
 		<div class="description short">
 			
@@ -323,36 +323,6 @@
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="openSpider" id="_openSpider">
-
-		<td class="attributes"><code>
-			 public 
-
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_openSpider">#</a>
-		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#103-120" title="Go to source code">openSpider</a>( <span><code><a href="class-Schrapert.SpiderInterface.html">Schrapert\SpiderInterface</a></code> <var>$spider</var></span>, <span> <var>$requests</var></span> )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	<tr data-order="crawl" id="_crawl">
 
 		<td class="attributes"><code>
@@ -365,7 +335,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_crawl">#</a>
-		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#208-222" title="Go to source code">crawl</a>( <span><code><a href="class-Schrapert.Crawl.RequestInterface.html">Schrapert\Crawl\RequestInterface</a></code> <var>$request</var></span>, <span><code><a href="class-Schrapert.SpiderInterface.html">Schrapert\SpiderInterface</a></code> <var>$spider</var></span> )</code>
+		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#247-261" title="Go to source code">crawl</a>( <span><code><a href="class-Schrapert.Crawl.RequestInterface.html">Schrapert\Crawl\RequestInterface</a></code> <var>$request</var></span>, <span><code><a href="class-Schrapert.SpiderInterface.html">Schrapert\SpiderInterface</a></code> <var>$spider</var></span> )</code>
 
 		<div class="description short">
 			
@@ -395,7 +365,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_start">#</a>
-		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#340-354" title="Go to source code">start</a>( )</code>
+		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#379-394" title="Go to source code">start</a>( )</code>
 
 		<div class="description short">
 			
@@ -425,7 +395,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_stop">#</a>
-		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#356-362" title="Go to source code">stop</a>( )</code>
+		<code><a href="source-class-Schrapert.Core.ExecutionEngine.html#396-402" title="Go to source code">stop</a>( )</code>
 
 		<div class="description short">
 			

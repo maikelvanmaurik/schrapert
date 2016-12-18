@@ -36,11 +36,6 @@
 
 						<ul>
 				<li>
-					<a href="namespace-Schrapert.Configuration.html">
-						Configuration					</a>
-
-						</li>
-				<li>
 					<a href="namespace-Schrapert.Console.html">
 						Console					</a>
 
@@ -246,7 +241,7 @@
 		<b>Namespace:</b> <a href="namespace-Schrapert.html">Schrapert</a>\<a href="namespace-Schrapert.Event.html">Event</a><br>
 		
 
-			<b>Located at</b> <a href="source-class-Schrapert.Event.EventDispatcherInterface.html#4-76" title="Go to source code">Schrapert/Event/EventDispatcherInterface.php</a>
+			<b>Located at</b> <a href="source-class-Schrapert.Event.EventDispatcherInterface.html#4-72" title="Go to source code">Schrapert/Event/EventDispatcherInterface.php</a>
 		<br>
 	</div>
 
@@ -266,7 +261,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_dispatch">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#6-17" title="Go to source code">dispatch</a>( <span>string <var>$event</var></span>, <span><code><a href="class-Schrapert.Event.EventInterface.html">Schrapert\Event\EventInterface</a></code> <var>$event</var>,…</span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#6-12" title="Go to source code">dispatch</a>( <span><code><a href="class-Schrapert.Event.EventInterface.html">Schrapert\Event\EventInterface</a></code>|string <var>$event</var></span> )</code>
 
 		<div class="description short">
 			<p>Dispatches an event to all registered listeners.</p>
@@ -279,12 +274,7 @@
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$event</var></dt>
-					<dd><p>$eventName The name of the event to dispatch. The name of
-                         the event is the name of the method that is
-                         invoked on listeners.</p></dd>
-					<dt><var>$event</var>,…</dt>
-					<dd><p>The event to pass to the event handlers/listeners
-                         If not supplied, an empty Event instance is created.</p></dd>
+					<dd>The name of the event to dispatch or the event instance to dispatch</dd>
 				</dl></div>
 
 				<h4>Returns</h4>
@@ -310,7 +300,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_addListener">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#18-26" title="Go to source code">addListener</a>( <span>string <var>$eventName</var></span>, <span>callable <var>$listener</var></span>, <span>integer <var>$priority</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#14-22" title="Go to source code">addListener</a>( <span>string <var>$eventName</var></span>, <span>callable <var>$listener</var></span>, <span>integer <var>$priority</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			<p>Adds an event listener that listens on the specified events.</p>
@@ -350,7 +340,7 @@
 
 		<td class="name"><div>
 		<a class="anchor" href="#_addSubscriber">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#27-35" title="Go to source code">addSubscriber</a>( <span><code><a href="class-Schrapert.Event.EventSubscriberInterface.html">Schrapert\Event\EventSubscriberInterface</a></code> <var>$subscriber</var></span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#23-31" title="Go to source code">addSubscriber</a>( <span><code><a href="class-Schrapert.Event.EventSubscriberInterface.html">Schrapert\Event\EventSubscriberInterface</a></code> <var>$subscriber</var></span> )</code>
 
 		<div class="description short">
 			<p>Adds an event subscriber.</p>
@@ -388,7 +378,7 @@ interested in and added as a listener for these events.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_removeListener">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#36-42" title="Go to source code">removeListener</a>( <span>string <var>$eventName</var></span>, <span>callable <var>$listener</var></span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#32-38" title="Go to source code">removeListener</a>( <span>string <var>$eventName</var></span>, <span>callable <var>$listener</var></span> )</code>
 
 		<div class="description short">
 			<p>Removes an event listener from the specified events.</p>
@@ -425,7 +415,7 @@ interested in and added as a listener for these events.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_removeSubscriber">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#43-48" title="Go to source code">removeSubscriber</a>( <span><code><a href="class-Schrapert.Event.EventSubscriberInterface.html">Schrapert\Event\EventSubscriberInterface</a></code> <var>$subscriber</var></span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#39-44" title="Go to source code">removeSubscriber</a>( <span><code><a href="class-Schrapert.Event.EventSubscriberInterface.html">Schrapert\Event\EventSubscriberInterface</a></code> <var>$subscriber</var></span> )</code>
 
 		<div class="description short">
 			<p>Removes an event subscriber.</p>
@@ -460,7 +450,7 @@ interested in and added as a listener for these events.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getListeners">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#49-56" title="Go to source code">getListeners</a>( <span>string <var>$eventName</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#45-52" title="Go to source code">getListeners</a>( <span>string <var>$eventName</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			<p>Gets the listeners of a specific event or all listeners sorted by descending priority.</p>
@@ -499,7 +489,7 @@ interested in and added as a listener for these events.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getListenerPriority">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#57-67" title="Go to source code">getListenerPriority</a>( <span>string <var>$eventName</var></span>, <span>callable <var>$listener</var></span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#53-63" title="Go to source code">getListenerPriority</a>( <span>string <var>$eventName</var></span>, <span>callable <var>$listener</var></span> )</code>
 
 		<div class="description short">
 			<p>Gets the listener priority for a specific event.</p>
@@ -542,7 +532,7 @@ interested in and added as a listener for these events.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_hasListeners">#</a>
-		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#68-75" title="Go to source code">hasListeners</a>( <span>string <var>$eventName</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Schrapert.Event.EventDispatcherInterface.html#64-71" title="Go to source code">hasListeners</a>( <span>string <var>$eventName</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			<p>Checks whether an event has any registered listeners.</p>

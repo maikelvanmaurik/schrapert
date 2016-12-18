@@ -36,11 +36,6 @@
 
 						<ul>
 				<li>
-					<a href="namespace-Schrapert.Configuration.html">
-						Configuration					</a>
-
-						</li>
-				<li>
 					<a href="namespace-Schrapert.Console.html">
 						Console					</a>
 
@@ -224,6 +219,9 @@
 	<h1>Class EngineStartedEvent</h1>
 
 
+	<div class="description">
+	<p>Represents an event which is dispatched when the execution engine starts.</p>
+	</div>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
@@ -253,20 +251,88 @@
 		
 		
 		<b>Namespace:</b> <a href="namespace-Schrapert.html">Schrapert</a>\<a href="namespace-Schrapert.Core.html">Core</a>\<a href="namespace-Schrapert.Core.Event.html">Event</a><br>
-		
+		<b>Package:</b> Schrapert\Core\Event<br>
 
-			<b>Located at</b> <a href="source-class-Schrapert.Core.Event.EngineStartedEvent.html#6-9" title="Go to source code">Schrapert/Core/Event/EngineStartedEvent.php</a>
+			<b>Located at</b> <a href="source-class-Schrapert.Core.Event.EngineStartedEvent.html#7-31" title="Go to source code">Schrapert/Core/Event/EngineStartedEvent.php</a>
 		<br>
 	</div>
 
 
 
+	<table class="summary methods" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Schrapert.Core.Event.EngineStartedEvent.html#16-20" title="Go to source code">__construct</a>( <span><code><a href="class-Schrapert.Core.ExecutionEngine.html">Schrapert\Core\ExecutionEngine</a></code> <var>$engine</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+				<h4>Overrides</h4>
+				<div class="list"><code><a href="class-Schrapert.Event.Event.html#___construct">Schrapert\Event\Event::__construct()</a></code></div>
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getEngine" id="_getEngine">
+
+		<td class="attributes"><code>
+			 public 
+
+			<code><a href="class-Schrapert.Core.ExecutionEngine.html">Schrapert\Core\ExecutionEngine</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getEngine">#</a>
+		<code><a href="source-class-Schrapert.Core.Event.EngineStartedEvent.html#22-30" title="Go to source code">getEngine</a>( )</code>
+
+		<div class="description short">
+			<p>Gets the execution engine associated with this event.</p>
+		</div>
+
+		<div class="description detailed hidden">
+			<p>Gets the execution engine associated with this event.</p>
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><a href="class-Schrapert.Core.ExecutionEngine.html">Schrapert\Core\ExecutionEngine</a></code>
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
 
 	<table class="summary inherited">
 	<caption>Methods inherited from <a href="class-Schrapert.Event.Event.html#methods">Schrapert\Event\Event</a></caption>
 	<tr>
 		<td><code>
-			<a href="class-Schrapert.Event.Event.html#___construct">__construct()</a>, 
 			<a href="class-Schrapert.Event.Event.html#_getName">getName()</a>, 
 			<a href="class-Schrapert.Event.Event.html#_isPropagationStopped">isPropagationStopped()</a>, 
 			<a href="class-Schrapert.Event.Event.html#_stopPropagation">stopPropagation()</a>
