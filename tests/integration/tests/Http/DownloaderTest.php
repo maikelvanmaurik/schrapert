@@ -82,7 +82,7 @@ class DownloaderTest extends TestCase
 
         $complete = false;
 
-        $this->eventDispatcher->addListener('downloader.download_complete', function(DownloadCompleteEvent $e) use (&$complete) {
+        $this->eventDispatcher->addListener('response-downloaded', function(DownloadCompleteEvent $e) use (&$complete) {
             $complete = true;
         });
 

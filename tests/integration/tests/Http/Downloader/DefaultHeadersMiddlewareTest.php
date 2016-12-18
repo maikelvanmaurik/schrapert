@@ -72,6 +72,6 @@ class DefaultHeadersMiddlewareTest extends TestCase
 
         $returnedHeaders = json_decode($content, true);
 
-        $this->assertEquals('Request', $returnedHeaders['User-Agent']);
+        $this->assertEquals('Request', @$returnedHeaders['User-Agent']);
     }
 }

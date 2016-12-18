@@ -21,4 +21,4 @@ cp -Rf ../api api
 # Push generated files
 git add .
 git commit -m "API updated"
-git push origin gh-pages -fq > /dev/null
+git push origin gh-pages -q > /dev/null

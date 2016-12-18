@@ -119,6 +119,12 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
         return $this->delay;
     }
 
+    /**
+     * @param $key
+     * @param RequestInterface $request
+     * @param Deferred $deferred
+     * @triggers $event
+     */
     public function awaitPossible($key, RequestInterface $request, Deferred $deferred)
     {
         if($this->numActive >= $this->totalConcurrentRequests) {

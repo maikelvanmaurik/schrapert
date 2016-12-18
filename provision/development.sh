@@ -75,7 +75,7 @@ EOF"
 
 echo -e "\nInstalling LAMP stack...\n"
 # Install LAMP stack
-sudo apt-get install -y php5.6 php5.6-dev php5.6-xml apache2 libapache2-mod-php5.6 php5.6-mysql php5.6-curl php5.6-gd php5.6-mcrypt php5-xdebug php5.6-gmp git-core
+sudo apt-get install -y php5.6 php5.6-dev php5.6-xml php5.6-mbstring apache2 libapache2-mod-php5.6 php5.6-mysql php5.6-curl php5.6-gd php5.6-mcrypt php5-xdebug php5.6-gmp git-core
 
 sudo sed -i 's/APACHE_RUN_USER=www-data/APACHE_RUN_USER=vagrant/' /etc/apache2/envvars
 

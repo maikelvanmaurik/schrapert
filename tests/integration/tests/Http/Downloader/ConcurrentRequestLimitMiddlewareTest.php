@@ -35,7 +35,7 @@ class ConcurrentRequestLimitMiddlewareTest extends TestCase
         parent::setUp();
     }
 
-    public function testConcurrentRequestsPerDomainAreLimited()
+    public function testConcurrentRequestsPerSlotAreLimitedByDomain()
     {
         $events = clone $this->events;
 
@@ -79,25 +79,47 @@ class ConcurrentRequestLimitMiddlewareTest extends TestCase
         $this->assertGreaterThanOrEqual(1, $responses[1] - $responses[0], 'There should be at least a second between the responses, since they were delayed 1 second');
     }
 
-    public function testGzipIsWorkingWithNonStreamingRequests()
+    public function testConcurrentRequestsAreDelayedWhenUsingTheTotalConcurrentRequestSetting()
     {
-        $compressionMiddleware = $this->getContainer()->get('downloader_middleware_compression');
+        $events = clone $this->events;
 
-        $downloader = $this->downloader->withMiddleware($compressionMiddleware);
+        $secondRequestIsDeferred = false;
+        $usedDelay = null;
 
-        $request = new Request('http://compression.schrapert.dev');
+        $events->addListener('concurrent-request-limit-slots-exceeded', function(ConcurrentRequestLimitSlotsExceededEvent $e) use (&$secondRequestIsDeferred, &$usedDelay) {
+            $request = $e->getRequest();
+            if('http://webshop.schrapert.dev' == (string)$request->getUri()) {
+                $secondRequestIsDeferred = true;
+            }
+            $usedDelay = $e->getDelay();
+        });
 
-        $headers = [];
+        $middleware = $this->middleware
+            ->withEventDispatcher($events)
+            ->withPerSlotConcurrentRequests(1)
+            ->withDelay(1)
+            ->withTotalConcurrentRequests(1);
 
-        $promise = $downloader->download($request)
-            ->then(function(ResponseInterface $response) use (&$headers) {
-                $headers = $response->getHeaders();
-                return (string)$response->getBody();
+        $downloader = $this->downloader->withMiddleware($middleware);
+
+        $requestA = (new Request('http://webshop.schrapert.dev/products.php'));
+
+        $requestB = (new Request('http://webshop.schrapert.dev'));
+
+        $promiseA = $downloader->download($requestA)
+            ->then(function(ResponseInterface $response) {
+                return time();
             });
 
-        $content = await($promise, $this->eventLoop, 10);
-        $this->assertContains('This content is compressed using gzip encoding.', $content);
-        $this->assertArrayHasKey('Content-Encoding', $headers);
-        $this->assertEquals('gzip', reset($headers['Content-Encoding']));
+        $promiseB = $downloader->download($requestB)
+            ->then(function(ResponseInterface $response) {
+                return time();
+            });
+
+        $responses = await(\React\Promise\all([$promiseA, $promiseB]), $this->eventLoop, 10);
+
+        $this->assertEquals(1, $usedDelay);
+        $this->assertTrue($secondRequestIsDeferred);
+        $this->assertGreaterThanOrEqual(1, $responses[1] - $responses[0], 'There should be at least a second between the responses, since they were delayed 1 second');
     }
 }
