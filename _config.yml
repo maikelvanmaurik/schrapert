@@ -50,7 +50,8 @@ exclude:
 - Gemfile.lock
 - README.md
 - Rakefile
-- vendor/bundle
+- vendor
+- node_modules
 markdown: redcarpet
 redcarpet:
   extensions:
@@ -60,7 +61,5 @@ sass:
   style: :compressed
   sass_dir: _css
 gems:
-- bourbon
-- neat
 - jekyll-redirect-from
 - jekyll-paginate

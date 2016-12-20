@@ -2,3 +2,6 @@
 .vagrant
 _site
 .idea
+node_modules
+vendor
+etc/export-test

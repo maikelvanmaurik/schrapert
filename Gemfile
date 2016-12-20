@@ -1,14 +1,10 @@
 source 'https://rubygems.org'
 
-gem 'rake'
-
-gem 'bourbon'
-
-gem 'neat'
-
 # jekyll, which builds it all
 # 3.0 includes sass processing
-gem 'jekyll', '~>3.2'
+# gem 'jekyll', '~>3.2'
+
+gem 'github-pages'
 
 # Jekyll extensions
 gem 'jekyll-redirect-from'
