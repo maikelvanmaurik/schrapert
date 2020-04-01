@@ -1,10 +1,10 @@
 <?php
 namespace Schrapert\Http\Downloader\Middleware;
 
-use Schrapert\Http\Downloader\DownloadResponse;
-use Schrapert\SpiderInterface;
+use Schrapert\Http\RequestInterface;
+use Schrapert\Http\ResponseInterface;
 
 interface ProcessResponseMiddlewareInterface
 {
-    public function processResponse(DownloadResponse $response, SpiderInterface $spider);
+    public function processResponse(ResponseInterface $response, RequestInterface $request);
 }

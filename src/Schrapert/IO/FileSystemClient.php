@@ -1,7 +1,7 @@
 <?php
 namespace Schrapert\IO;
 
-use React\Filesystem\Filesystem;
+use React\Filesystem\FilesystemInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stream\BufferedSink;
@@ -12,7 +12,7 @@ class FileSystemClient implements FileSystemClientInterface
 {
     private $fs;
 
-    public function __construct(Filesystem $fs)
+    public function __construct(FilesystemInterface $fs)
     {
         $this->fs = $fs;
     }
@@ -27,7 +27,7 @@ class FileSystemClient implements FileSystemClientInterface
 
         $f->exists()->then(function() use ($f, $deferred) {
             $f->open('r')->then(function ($stream) use ($f, $deferred) {
-                $deferred->resolve(BufferedSink::createPromise($stream)->always(function () use ($handle) {
+                $deferred->resolve(BufferedSink::createPromise($stream)->always(function () {
                     $handle->close();
                 }));
             }, function() use ($deferred) {
@@ -49,7 +49,7 @@ class FileSystemClient implements FileSystemClientInterface
     {
         return $this->fs->file($file)->open('cwt')->then(function (WritableStreamInterface $stream) use ($data) {
             try {
-                $stream->write($data);
+                $stream->write((string)$data);
                 $stream->end();
             } catch (Exception $e) {
                 throw $e;
@@ -99,6 +99,4 @@ class FileSystemClient implements FileSystemClientInterface
     {
         // TODO: Implement createDirectory() method.
     }
-
-
 }

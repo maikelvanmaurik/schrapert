@@ -3,12 +3,9 @@ namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Crawl\Exception\IgnoreRequestException;
 use Schrapert\Http\Downloader\DownloaderInterface;
-use Schrapert\Http\Downloader\DownloadResponseReader;
-use Schrapert\Http\Downloader\DownloadResponseReaderResult;
 use Schrapert\Http\Request;
 use Schrapert\Http\RequestInterface;
-use Schrapert\Http\ResponseReaderFactoryInterface;
-use Schrapert\Http\ResponseReaderResultInterface;
+use Schrapert\Http\ResponseInterface;
 use Schrapert\Http\RobotsTxt\ParserInterface as RobotsTxtParserInterface;
 use Schrapert\Http\RobotsTxt\ParseResultInterface;
 use Schrapert\Log\LoggerInterface;
@@ -19,34 +16,33 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
 {
     private $downloader;
 
-    private $userAgent;
-
     private $logger;
 
     private $robotsTxtParser;
 
-    private $readerFactory;
-
-    public function __construct(DownloaderInterface $downloader, ResponseReaderFactoryInterface $readerFactory, RobotsTxtParserInterface $robotsTxtParser, LoggerInterface $logger, $userAgent = 'Schrapert')
+    public function __construct(DownloaderInterface $downloader, RobotsTxtParserInterface $robotsTxtParser, LoggerInterface $logger)
     {
         $this->logger = $logger;
         $this->robotsTxtParser = $robotsTxtParser;
-        $this->userAgent = $userAgent;
         $this->downloader = $downloader;
-        $this->readerFactory = $readerFactory;
     }
 
-    public function processRequest(RequestInterface $request, SpiderInterface $spider)
+    public function processRequest(RequestInterface $request)
     {
-        if ($request->getMetaData('ignore_robots.txt') || !$request instanceof RequestInterface || $request->getPath() == '/robots.txt') {
+        if ($request->getMetaData('ignore_robots.txt') || !$request instanceof RequestInterface || $request->getUri()->getPath() == '/robots.txt') {
             return $request;
         }
 
-        return $this->parseRobotsTxt($request, $spider)->then(function (ParseResultInterface $result) use ($request, $spider) {
-            if ($result->isAllowed($this->userAgent, $request->getPath())) {
+        $ua = $request->getHeaderLine('User-Agent');
+
+        return $this->parseRobotsTxt($request)->then(function (ParseResultInterface $result) use ($request, $ua) {
+            if ($result->isAllowed($ua, $request->getUri()->getPath())) {
                 return $request;
             } else {
-                $this->logger->debug("Resource %s not allowed for user-agent %s when obeying robots.txt, drop request", [$request->getPath(), $this->userAgent]);
+                $this->logger->debug("Resource '{path}' not allowed for user-agent '{ua}' when obeying robots.txt, drop request", [
+                    'path' => $request->getUri()->getPath(),
+                    'ua' => $ua
+                ]);
                 throw new IgnoreRequestException("Not allowed");
             }
         });
@@ -54,27 +50,17 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
 
     /**
      * @param RequestInterface $request
-     * @param SpiderInterface $spider
      * @return PromiseInterface
      */
-    public function parseRobotsTxt(RequestInterface $request, SpiderInterface $spider)
+    public function parseRobotsTxt(RequestInterface $request)
     {
-        $robotsRequest = new Request();
-        $robotsRequest->setMetaData('ignore_robots.txt', true);
-        $parsed = parse_url($request->getUri());
-        $uri = $parsed['scheme'] . '://' . $parsed['host'] . (!empty($parsed['port']) ? ':' . $parsed['port'] : '') . '/robots.txt';
-        $robotsRequest->setUri($uri);
+        $robotsRequest = $request
+            ->withUri($request->getUri()->withPath('/robots.txt'))
+            ->withMetaData('ignore_robots.txt', true);
 
-        return $this->downloader->fetch($robotsRequest, $spider)->then(function ($response) {
-            return $this->readerFactory->factory($response)->readToEnd();
-        })->then(function (ResponseReaderResultInterface $result) {
-            $txt = (string)$result;
+        return $this->downloader->download($robotsRequest)->then(function (ResponseInterface $response) {
+            $txt = (string)$response->getBody();
             return $this->robotsTxtParser->parse($txt);
         });
-    }
-
-    public function needsBackOut()
-    {
-        return $this->downloader->needsBackOut();
     }
 }

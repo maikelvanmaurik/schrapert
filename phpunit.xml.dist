@@ -14,11 +14,10 @@
 
     <testsuites>
         <testsuite name="unit">
-            <directory>./tests/UnitTest/</directory>
+            <directory>./tests/unit/</directory>
         </testsuite>
         <testsuite name="integration">
-            <directory>./tests/IntegrationTest/</directory>
-            <bootstrap>./tests/IntegrationTest/bla.php</bootstrap>
+            <directory>./tests/integration/</directory>
         </testsuite>
     </testsuites>
 

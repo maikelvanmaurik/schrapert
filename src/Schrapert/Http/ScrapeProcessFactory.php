@@ -15,18 +15,15 @@ class ScrapeProcessFactory
 
     private $logger;
 
-    private $responseReaderFactory;
-
-    public function __construct(LoggerInterface $logger, DownloaderInterface $downloader, ScraperInterface $scraper, ResponseReaderFactoryInterface $readerFactory)
+    public function __construct(LoggerInterface $logger, DownloaderInterface $downloader, ScraperInterface $scraper)
     {
         $this->logger = $logger;
         $this->scraper = $scraper;
         $this->downloader = $downloader;
-        $this->responseReaderFactory = $readerFactory;
     }
 
     public function factory(ExecutionEngine $engine, RequestInterface $request, SpiderInterface $spider)
     {
-        return new ScrapeProcess($this->logger, $engine, $this->downloader, $this->scraper, $request, $spider, $this->responseReaderFactory);
+        return new ScrapeProcess($this->logger, $engine, $this->downloader, $this->scraper, $request, $spider);
     }
 }

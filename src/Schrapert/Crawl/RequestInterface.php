@@ -1,15 +1,15 @@
 <?php
 namespace Schrapert\Crawl;
 
-interface RequestInterface
+interface RequestInterface extends MessageInterface
 {
-    public function setMetaData($key, $value);
-
-    public function getMetaData($key, $default = null);
-
-    public function getUri();
-
+    /**
+     * @return callable
+     */
     public function getCallback();
-
-    public function setCallback(callable $callback);
+    /**
+     * @param callable $callback
+     * @return static
+     */
+    public function withCallback(callable $callback);
 }

@@ -1,13 +1,8 @@
 <?php
 namespace Schrapert\Log;
 
-interface LoggerInterface
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
+
+interface LoggerInterface extends PsrLoggerInterface
 {
-    public function info($message, array $args = []);
-
-    public function warning($message, array $args = []);
-
-    public function error($message, array $args = []);
-
-    public function debug($message, array $args = []);
 }

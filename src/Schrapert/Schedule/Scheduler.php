@@ -40,7 +40,7 @@ class Scheduler implements SchedulerInterface
      */
     public function enqueueRequest(RequestInterface $req)
     {
-        $this->logger->debug("Scheduler enqueue request %s", [$req->getUri()]);
+        $this->logger->debug("Scheduler enqueue request {uri}", ['uri' => $req->getUri()]);
         return $this->priorityQueue->push($req)->then(function() {
            return true;
         });

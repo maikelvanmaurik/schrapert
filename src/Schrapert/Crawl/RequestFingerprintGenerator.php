@@ -21,7 +21,7 @@ class RequestFingerprintGenerator implements RequestFingerprintGeneratorInterfac
 
     public function fingerprint(RequestInterface $request)
     {
-        $uri = $request->getUri();
+        $uri = (string)$request->getUri();
         $info = parse_url($uri);
         $query = [];
         if(!empty($info['query'])) {

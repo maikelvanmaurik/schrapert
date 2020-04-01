@@ -18,12 +18,19 @@ class IntervalCallback
         $this->timer = null;
     }
 
-    public function start($interval)
+    public function stop()
     {
         if($this->timer) {
+            $this->loop->cancelTimer($this->timer);
+        }
+    }
+
+    public function start($interval)
+    {
+        if ($this->timer) {
             return;
         }
-        $this->timer = $this->loop->addPeriodicTimer($interval, function() {
+        $this->timer = $this->loop->addPeriodicTimer($interval, function () {
             call_user_func($this->callback);
         });
     }

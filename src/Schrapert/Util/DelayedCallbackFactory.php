@@ -12,7 +12,7 @@ class DelayedCallbackFactory
         $this->loop = $loop;
     }
 
-    public function factory(callable $callback, array $args = null)
+    public function factory(callable $callback, array $args = [])
     {
         return new DelayedCallback($this->loop, $callback, $args);
     }

@@ -3,12 +3,7 @@ namespace Schrapert\Http;
 
 use Schrapert\Crawl\ResponseInterface as CrawlResponse;
 
-interface ResponseInterface extends CrawlResponse
+interface ResponseInterface extends CrawlResponse, \Psr\Http\Message\ResponseInterface
 {
-    /**
-     * @return string
-     */
-    public function getUri();
 
-    public function getHeaders();
 }

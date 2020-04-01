@@ -1,7 +1,6 @@
 <?php
 namespace Schrapert\Crawl;
 
-interface ResponseInterface
+interface ResponseInterface extends MessageInterface
 {
-
 }

@@ -9,10 +9,7 @@ interface DownloaderInterface
 {
     /**
      * @param RequestInterface $request
-     * @param SpiderInterface $spider
      * @return PromiseInterface
      */
-    public function fetch(RequestInterface $request, SpiderInterface $spider);
-
-    public function needsBackOut();
+    public function download(RequestInterface $request);
 }

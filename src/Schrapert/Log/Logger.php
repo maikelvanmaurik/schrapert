@@ -1,97 +1,53 @@
 <?php
 namespace Schrapert\Log;
 
-class Logger implements LoggerInterface
+use Psr\Log\AbstractLogger;
+
+class Logger extends AbstractLogger implements LoggerInterface
 {
-    const INFO = 1;
+    private $uri;
 
-    const WARNING = 2;
+    private $stream;
 
-    const ERROR = 4;
-
-    const CRITICAL = 8;
-
-    const DEBUG = 16;
-
-    const ALL = 31;
-
-    public function __construct($path, $level)
+    public function __construct($uri = 'php://stdout')
     {
-        $this->path = $path;
-        $this->level = $level;
+        $this->uri = $uri;
     }
 
-    public function isEnabledFor($level)
+    private function getStream()
     {
-
-        return $level === ($this->level & $level);
-    }
-
-    private function formatMessage($level, $message, array $args = [])
-    {
-        if(!empty($args)) {
-            $message = vsprintf($message, $args);
+        if(!$this->stream) {
+            $this->stream = fopen($this->uri, 'w+');
         }
-        $strLevel = '';
-        switch($level) {
-            case self::INFO:
-                $strLevel = 'INFO';
-                break;
-            case self::WARNING:
-                $strLevel = 'WARNING';
-                break;
-            case self::ERROR:
-                $strLevel = 'ERROR';
-                break;
-            case self::DEBUG:
-                $strLevel = 'DEBUG';
-                break;
-        }
-        return sprintf('%s [%s] %s', date('Y-m-d H:i:s'), $strLevel, $message);
+        return $this->stream;
     }
 
-    private function _log($level, $message, array $args = [])
+    private function interpolate($message, array $context = array()) {
+        // build a replacement array with braces around the context keys
+        $replace = array();
+        foreach ($context as $key => $val) {
+            // check that the value can be casted to string
+            if (!is_array($val) && (!is_object($val) || method_exists($val, '__toString'))) {
+                $replace['{' . $key . '}'] = $val;
+            }
+        }
+
+        // interpolate replacement values into the message and return
+        return strtr($message, $replace);
+    }
+
+
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed $level
+     * @param string $message
+     * @param array $context
+     *
+     * @return void
+     */
+    public function log($level, $message, array $context = array())
     {
-        $fp = fopen($this->path, 'a+');
-        if(flock($fp, LOCK_EX)) {
-            fwrite($fp, $this->formatMessage($level, $message, $args) . "\n");
-            flock($fp, LOCK_UN);
-        }
+        fwrite($this->getStream(), sprintf("[%s] %s - %s\n", strtoupper($level), date('Y-m-d H:i:s'), $this->interpolate($message, $context)));
     }
-
-    public function log($level, $message, array $args = [])
-    {
-        if($this->isEnabledFor($level)) {
-            $this->_log($level, $message, $args);
-        }
-    }
-
-    public function info($message, array $args = [])
-    {
-        if($this->isEnabledFor(self::INFO)) {
-            $this->log(self::INFO, $message, $args);
-        }
-    }
-
-    public function warning($message, array $args = [])
-    {
-        if ($this->isEnabledFor(self::INFO)) {
-            $this->log(self::WARNING, $message, $args);
-        }
-    }
-
-    public function error($message, array $args = [])
-    {
-        if($this->isEnabledFor(self::ERROR)) {
-            $this->log(self::INFO, $message, $args);
-        }
-    }
-
-    public function debug($message, array $args = [])
-    {
-        if($this->isEnabledFor(self::DEBUG)) {
-            $this->log(self::DEBUG, $message, $args);
-        }
-    }
-
 }

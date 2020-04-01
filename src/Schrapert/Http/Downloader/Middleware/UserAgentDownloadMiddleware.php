@@ -1,33 +1,24 @@
 <?php
 namespace Schrapert\Http\Downloader\Middleware;
 
-use Schrapert\Http\Downloader\DownloaderInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\SpiderInterface;
 
-class UserAgentDownloadMiddleware implements DownloaderInterface
+class UserAgentDownloadMiddleware implements DownloadMiddlewareInterface, ProcessRequestMiddlewareInterface
 {
-    private $downloader;
-
     private $userAgent;
 
-    public function __construct(DownloaderInterface $downloader, $userAgent = 'Schrapert')
+    public function __construct($userAgent = 'Schrapert')
     {
-        $this->downloader = $downloader;
         $this->userAgent = $userAgent;
     }
 
-    public function fetch(RequestInterface $request, SpiderInterface $spider)
+    public function processRequest(RequestInterface $request)
     {
-        if($request instanceof RequestInterface) {
-            $request->setHeader('User-Agent', $this->userAgent);
+        if($request instanceof RequestInterface && null === $request->getHeader('User-Agent')) {
+            return $request->withHeader('User-Agent', $this->userAgent);
         }
 
-        return $this->downloader->fetch($request, $spider);
-    }
-
-    public function needsBackOut()
-    {
-        return $this->downloader->needsBackOut();
+        return $request;
     }
 }

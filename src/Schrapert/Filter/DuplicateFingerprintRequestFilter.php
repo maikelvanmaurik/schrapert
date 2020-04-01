@@ -26,17 +26,10 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
 
     private function push($fp)
     {
-        if(null !== $this->maxMemorySize && count($this->fingerprints) + 1 > $this->maxMemorySize) {
-            ksort($this->fingerprints);
-            foreach($this->fingerprints as $k => $v) {
-                if(count($this->fingerprints) + 1 < $this->maxMemorySize) {
-                    break;
-                }
-                unset($this->fingerprints[$k]);
-            }
+        $this->fingerprints[] = $fp;
+        if(null !== $this->maxMemorySize && count($this->fingerprints) >= $this->maxMemorySize) {
+            $this->fingerprints = array_slice($this->fingerprints, max(1000, ceil($this->maxMemorySize, 4)));
         }
-        list($usec, $sec) = explode(" ", microtime());
-        $this->fingerprints[$sec . ' ' . $usec] = $fp;
     }
 
     public function isDuplicateRequest(RequestInterface $request)
@@ -46,7 +39,7 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
         $fingerprint = $this->fingerprintGenerator->fingerprint($request);
 
         // Check the memory first
-        if(isset($this->fingerprints[$fingerprint])) {
+        if(in_array($fingerprint, $this->fingerprints)) {
             $deferred->resolve(true);
         } else {
             // We need to read the fingerprint file
