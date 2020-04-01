@@ -141,7 +141,7 @@ class ExecutionEngine
      */
     public function openSpider(SpiderInterface $spider, $requests)
     {
-        $this->startRequests = iterator_to_array($requests);
+        $this->startRequests = is_array($requests) ? $requests : iterator_to_array($requests);
         $this->spider = $spider;
 
         $this->scheduler->open($spider);
@@ -322,6 +322,8 @@ class ExecutionEngine
                 if($this->spiderIsIdle($spider)) {
                     $this->maybeShutdownIdleSpider($spider);
                 }
+            }, function($e) {
+                $this->logger->error($e->getMessage());
             });
         }
     }
@@ -339,7 +341,7 @@ class ExecutionEngine
 
 
         $promise->then(function() {
-           // Cancel the next call
+            // Cancel the next call
             $this->next->cancel();
             return true;
         });
@@ -353,7 +355,7 @@ class ExecutionEngine
         });
 
         $promise->then(function() use ($spider, $reason) {
-           return $this->scheduler->close($spider, $reason);
+            return $this->scheduler->close($spider, $reason);
         });
 
         $promise->then(function($result) use ($spider) {
@@ -362,7 +364,7 @@ class ExecutionEngine
         });
 
         $promise->then(function() {
-           $this->closeWait->resolve(true);
+            $this->closeWait->resolve(true);
         });
 
         $deferred->resolve(true);
@@ -389,6 +391,7 @@ class ExecutionEngine
             $this->closeWait = new Deferred();
             return $this->closeWait->promise();
         } catch(Exception $e) {
+            $this->logger->error($e->getMessage());
             return new RejectedPromise($e);
         }
     }

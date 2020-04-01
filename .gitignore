@@ -4,3 +4,4 @@ node_modules
 vendor
 npm-debug.log
 etc/export-test
+.sass-cache
