@@ -1,12 +1,12 @@
 <?php
+
 namespace Schrapert\Schedule;
 
-use Exception;
 use Schrapert\Crawl\RequestInterface;
 use Schrapert\SpiderInterface;
 
 /**
- * Default implementation of the priority queue which is a composite of a memory and disk queue
+ * Default implementation of the priority queue which is a composite of a memory and disk queue.
  */
 class PriorityQueue implements PriorityQueueInterface
 {
@@ -34,9 +34,9 @@ class PriorityQueue implements PriorityQueueInterface
 
     public function push(RequestInterface $request)
     {
-        return $this->dq->push($request)->then(function() {
+        return $this->dq->push($request)->then(function () {
             return true;
-        }, function() use ($request) {
+        }, function () use ($request) {
             // When failed use the memory queue
             return $this->mq->push($request);
         });
@@ -44,18 +44,16 @@ class PriorityQueue implements PriorityQueueInterface
 
     public function pop()
     {
-        return $this->dq->pop()->then(function(RequestInterface $request) {
-
+        return $this->dq->pop()->then(function (RequestInterface $request) {
             return $request;
-
-        }, function() {
+        }, function () {
             return $this->mq->pop();
         });
     }
 
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
-     * Count elements of an object
+     * Count elements of an object.
      * @link http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      * </p>

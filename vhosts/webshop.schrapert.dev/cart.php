@@ -1,7 +1,7 @@
 <?php
 include_once 'bootstrap.php';
 $items = $_SESSION['cart'];
-if(count($items)): ?>
+if (count($items)): ?>
 <h2>No items in your shopping cart!</h2>
 <?php else: ?>
     <table>
@@ -13,11 +13,11 @@ if(count($items)): ?>
             </tr>
         </thead>
         <tbody>
-            <?php foreach($items as $item): ?>
+            <?php foreach ($items as $item): ?>
             <tr>
-                <td><?php print $item['name'] ?></td>
-                <td><?php print $item['quantity']; ?></td>
-                <td><?php print $item['price'] ?></td>
+                <td><?php echo $item['name'] ?></td>
+                <td><?php echo $item['quantity']; ?></td>
+                <td><?php echo $item['price'] ?></td>
             </tr>
             <?php endforeach ?>
         </tbody>

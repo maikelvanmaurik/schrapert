@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Schrapert\Http\Downloader\Middleware\DownloadMiddlewareInterface;

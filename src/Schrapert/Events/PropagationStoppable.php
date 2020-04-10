@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Events;
 
 trait PropagationStoppable

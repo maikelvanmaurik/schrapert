@@ -1,7 +1,6 @@
 <?php
-namespace Schrapert\Http;
 
-use InvalidArgumentException;
+namespace Schrapert\Http;
 
 class Uri implements UriInterface
 {
@@ -43,7 +42,6 @@ class Uri implements UriInterface
     /** @var string Uri fragment. */
     private $fragment = '';
 
-
     public function __construct($uri = '')
     {
         if ($uri != '') {
@@ -77,7 +75,7 @@ class Uri implements UriInterface
             ? $this->filterQueryAndFragment($parts['fragment'])
             : '';
         if (isset($parts['pass'])) {
-            $this->userInfo .= ':' . $parts['pass'];
+            $this->userInfo .= ':'.$parts['pass'];
         }
         $this->removeDefaultPort();
     }
@@ -91,7 +89,7 @@ class Uri implements UriInterface
 
     public function isDefaultPort()
     {
-        return (isset(self::$defaultPorts[$this->getScheme()]) && $this->getPort() === self::$defaultPorts[$this->getScheme()]);
+        return isset(self::$defaultPorts[$this->getScheme()]) && $this->getPort() === self::$defaultPorts[$this->getScheme()];
     }
 
     public function __toString()
@@ -99,18 +97,19 @@ class Uri implements UriInterface
         $uri = '';
         // weak type checks to also accept null until we can add scalar type hints
         if ('' != ($scheme = $this->getScheme())) {
-            $uri .= $scheme . ':';
+            $uri .= $scheme.':';
         }
         if ('' != ($authority = $this->getAuthority()) || $this->getScheme() === 'file') {
-            $uri .= '//' . $authority;
+            $uri .= '//'.$authority;
         }
         $uri .= $this->getPath();
         if (($query = $this->getQuery()) != '') {
-            $uri .= '?' . $query;
+            $uri .= '?'.$query;
         }
         if ('' != ($fragment = $this->getFragment())) {
-            $uri .= '#' . $fragment;
+            $uri .= '#'.$fragment;
         }
+
         return $uri;
     }
 
@@ -155,11 +154,12 @@ class Uri implements UriInterface
     {
         $authority = $this->host;
         if ($this->userInfo !== '') {
-            $authority = $this->userInfo . '@' . $authority;
+            $authority = $this->userInfo.'@'.$authority;
         }
         if ($this->port !== null) {
-            $authority .= ':' . $this->port;
+            $authority .= ':'.$this->port;
         }
+
         return $authority;
     }
 
@@ -316,6 +316,7 @@ class Uri implements UriInterface
         $new->scheme = $this->filterScheme($scheme);
         $new->removeDefaultPort();
         $new->validateState();
+
         return $new;
     }
 
@@ -337,11 +338,12 @@ class Uri implements UriInterface
     {
         $info = $user;
         if ($password != '') {
-            $info .= ':' . $password;
+            $info .= ':'.$password;
         }
         $new = clone $this;
         $new->userInfo = $info;
         $new->validateState();
+
         return $new;
     }
 
@@ -366,6 +368,7 @@ class Uri implements UriInterface
         $new = clone $this;
         $new->host = $host;
         $new->validateState();
+
         return $new;
     }
 
@@ -393,6 +396,7 @@ class Uri implements UriInterface
         $new->port = $port;
         $new->removeDefaultPort();
         $new->validateState();
+
         return $new;
     }
 
@@ -424,6 +428,7 @@ class Uri implements UriInterface
         $new = clone $this;
         $new->path = $path;
         $new->validateState();
+
         return $new;
     }
 
@@ -447,6 +452,7 @@ class Uri implements UriInterface
         $query = $this->filterQueryAndFragment($query);
         $new = clone $this;
         $new->query = $query;
+
         return $new;
     }
 
@@ -469,6 +475,7 @@ class Uri implements UriInterface
         $fragment = $this->filterQueryAndFragment($fragment);
         $new = clone $this;
         $new->fragment = $fragment;
+
         return $new;
     }
 
@@ -481,11 +488,13 @@ class Uri implements UriInterface
      */
     private function filterScheme($scheme)
     {
-        if (!is_string($scheme)) {
+        if (! is_string($scheme)) {
             throw new \InvalidArgumentException('Scheme must be a string');
         }
+
         return strtolower($scheme);
     }
+
     /**
      * @param string $host
      *
@@ -495,11 +504,13 @@ class Uri implements UriInterface
      */
     private function filterHost($host)
     {
-        if (!is_string($host)) {
+        if (! is_string($host)) {
             throw new \InvalidArgumentException('Host must be a string');
         }
+
         return strtolower($host);
     }
+
     /**
      * @param int|null $port
      *
@@ -510,7 +521,7 @@ class Uri implements UriInterface
     private function filterPort($port)
     {
         if ($port === null) {
-            return null;
+            return;
         }
         $port = (int) $port;
         if (1 > $port || 0xffff < $port) {
@@ -518,16 +529,18 @@ class Uri implements UriInterface
                 sprintf('Invalid port: %d. Must be between 1 and 65535', $port)
             );
         }
+
         return $port;
     }
 
     private function filterPath($path)
     {
-        if (!is_string($path)) {
+        if (! is_string($path)) {
             throw new \InvalidArgumentException('Path must be a string');
         }
+
         return preg_replace_callback(
-            '/(?:[^' . self::$charUnreserved . self::$charSubDelims . '%:@\/]++|%(?![A-Fa-f0-9]{2}))/',
+            '/(?:[^'.self::$charUnreserved.self::$charSubDelims.'%:@\/]++|%(?![A-Fa-f0-9]{2}))/',
             [$this, 'rawUrlEncodeMatchZero'],
             $path
         );
@@ -535,11 +548,12 @@ class Uri implements UriInterface
 
     private function filterQueryAndFragment($str)
     {
-        if (!is_string($str)) {
+        if (! is_string($str)) {
             throw new \InvalidArgumentException('Query and fragment must be a string');
         }
+
         return preg_replace_callback(
-            '/(?:[^' . self::$charUnreserved . self::$charSubDelims . '%:@\/\?]++|%(?![A-Fa-f0-9]{2}))/',
+            '/(?:[^'.self::$charUnreserved.self::$charSubDelims.'%:@\/\?]++|%(?![A-Fa-f0-9]{2}))/',
             [$this, 'rawUrlEncodeMatchZero'],
             $str
         );

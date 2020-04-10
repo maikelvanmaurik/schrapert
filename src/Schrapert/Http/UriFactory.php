@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 class UriFactory implements UriFactoryInterface
@@ -7,7 +8,7 @@ class UriFactory implements UriFactoryInterface
     {
         $uri = (new Uri())
             ->withScheme(isset($parts['scheme']) ? $parts['scheme'] : '')
-            ->withUserInfo(isset($parts['user']) ? $parts['user'] . (isset($parts['pass']) ? (':' . $parts['pass']) : '') : '')
+            ->withUserInfo(isset($parts['user']) ? $parts['user'].(isset($parts['pass']) ? (':'.$parts['pass']) : '') : '')
             ->withPort(isset($parts['port']) ? $parts['port'] : null)
             ->withPath(isset($parts['path']) ? $parts['path'] : '')
             ->withQuery(isset($parts['query']) ? $parts['query'] : '');
@@ -26,10 +27,10 @@ class UriFactory implements UriFactoryInterface
     public function createFromComponents($scheme, $authority, $path, $query, $fragment)
     {
         $uri = '';
-        if (!empty($scheme)) {
-            $uri .= $scheme . '://';
+        if (! empty($scheme)) {
+            $uri .= $scheme.'://';
         }
-        if (!empty($authority)) {
+        if (! empty($authority)) {
             $uri .= $authority;
         }
         if ($path != null) {
@@ -40,11 +41,12 @@ class UriFactory implements UriFactoryInterface
             $uri .= $path;
         }
         if ($query != null) {
-            $uri .= '?' . $query;
+            $uri .= '?'.$query;
         }
         if ($fragment != null) {
-            $uri .= '#' . $fragment;
+            $uri .= '#'.$fragment;
         }
+
         return $uri;
     }
 }

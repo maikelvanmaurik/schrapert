@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
 use Schrapert\Http\Cache\DummyPolicy;
@@ -45,7 +46,7 @@ class HttpCacheMiddlewareTest extends TestCase
         $this->downloader = $this->getContainer()->get('downloader');
         $this->middleware = $this->getContainer()->get('downloader_middleware_http_cache');
         $this->fileStorage = $this->getContainer()->get('http_cache_file_storage');
-        $cacheDir = str_replace('\\', '/', ETC_DIR.'cache/httpcache/' . __CLASS__);
+        $cacheDir = str_replace('\\', '/', ETC_DIR.'cache/httpcache/'.__CLASS__);
         $this->fileStorage = $this->fileStorage->withCacheDirectory($cacheDir);
         $this->databaseStorage = $this->getContainer()->get('http_cache_database_storage');
         $this->rfc2616Policy = $this->getContainer()->get('http_cache_rfc2616_policy');
@@ -55,11 +56,10 @@ class HttpCacheMiddlewareTest extends TestCase
 
     public function testResponsesWithCacheControlMaxAgeHeaderAreBeingCachedWhenUsingDatabaseStorageIcwRfc2616Policy()
     {
-
     }
 
     /**
-     * When the Cache-Control header contains a no-store directive the response should not be cached
+     * When the Cache-Control header contains a no-store directive the response should not be cached.
      */
     public function testResponsesOfARequestWithACacheControlNoStoreHeaderAreNotBeingCachedWhenUsingRfc2616Policy()
     {
@@ -79,19 +79,19 @@ class HttpCacheMiddlewareTest extends TestCase
         $a = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 10);
 
-        if(time() == $current) {
+        if (time() == $current) {
             sleep(1);
         }
 
         $b = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 10);
 
         $this->assertNotEquals($a, $b);
@@ -116,19 +116,19 @@ class HttpCacheMiddlewareTest extends TestCase
         $a = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 10);
 
-        if(time() == $current) {
+        if (time() == $current) {
             sleep(1);
         }
 
         $b = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 10);
 
         $this->assertNotEquals($a, $b);
@@ -153,19 +153,19 @@ class HttpCacheMiddlewareTest extends TestCase
         $a = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 3);
 
-        if(time() == $current) {
+        if (time() == $current) {
             sleep(1);
         }
 
         $b = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 3);
 
         $this->assertEquals($a, $b);
@@ -193,26 +193,25 @@ class HttpCacheMiddlewareTest extends TestCase
         $a = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 3);
 
-        if(time() == $current) {
+        if (time() == $current) {
             sleep(1);
         }
 
         $b = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 3);
 
         $this->assertEquals($a, $b);
 
         $fileStorage->clear();
     }
-
 
     public function testStaleContentCacheIsBeingCheckedOnFreshnessWhenUsingFileStorageIcwRfc2616Policy()
     {
@@ -233,27 +232,29 @@ class HttpCacheMiddlewareTest extends TestCase
         $a = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
+                ->then(function (ResponseInterface $response) {
                     /* @var $request RequestInterface */
                     $request = $response->getMetadata('request');
                     // First request so it should not have the If-None-Match header
                     $this->assertFalse($request->hasHeader('If-None-Match'));
-                    return (string)$response->getBody();
+
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 10);
 
-        if(time() == $current) {
+        if (time() == $current) {
             sleep(1);
         }
 
         $b = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) use ($eTag) {
+                ->then(function (ResponseInterface $response) use ($eTag) {
                     /* @var $request RequestInterface */
                     $request = $response->getMetadata('request');
                     // Second request so it should have the If-None-Match header
                     $this->assertEquals($eTag, $request->getHeaderLine('If-None-Match'));
-                    return (string)$response->getBody();
+
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 10);
 
         $this->assertEquals($a, $b);

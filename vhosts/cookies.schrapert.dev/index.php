@@ -1,7 +1,8 @@
 <?php
+
 session_start();
 
-if(!isset($_COOKIE['times_visited'])) {
+if (! isset($_COOKIE['times_visited'])) {
     $timesVisited = 1;
 } else {
     $timesVisited = $_COOKIE['times_visited'] + 1;

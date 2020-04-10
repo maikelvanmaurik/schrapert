@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader;
 
 use React\EventLoop\LoopInterface;

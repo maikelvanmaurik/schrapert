@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\DependencyInjection;
 
 interface ContainerInterface

@@ -1,10 +1,11 @@
 <?php
+
 namespace Schrapert\Core;
 
+use React\Promise\PromiseInterface;
 use Schrapert\Crawl\RequestInterface;
 use Schrapert\Crawl\ResponseInterface;
 use Schrapert\SpiderInterface;
-use React\Promise\PromiseInterface;
 
 interface ScraperInterface
 {

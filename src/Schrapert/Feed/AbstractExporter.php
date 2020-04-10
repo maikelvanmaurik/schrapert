@@ -1,8 +1,8 @@
 <?php
+
 namespace Schrapert\Feed;
 
 use Schrapert\Scraping\ItemInterface;
-use Schrapert\SpiderInterface;
 
 abstract class AbstractExporter implements ExporterInterface
 {
@@ -23,6 +23,7 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $new = clone $this;
         $new->fieldsToExport = array_unique(array_merge($fields, $new->fieldsToExport));
+
         return $new;
     }
 
@@ -30,6 +31,7 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $new = clone $this;
         $new->fieldsToExport = array_unique(array_merge([$field], $new->fieldsToExport));
+
         return $new;
     }
 
@@ -37,6 +39,7 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $new = clone $this;
         $new->fieldsToExport = array_diff($new->fieldsToExport, $fields);
+
         return $new;
     }
 
@@ -44,6 +47,7 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $new = clone $this;
         $new->fieldsToExport = array_diff($new->fieldsToExport, [$field]);
+
         return $new;
     }
 
@@ -56,14 +60,17 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $data = [];
         $fields = $this->getExportFields();
-        if(empty($fields)) {
-            $fields = array_map(function($item) { return $item->getName(); }, $item->getFields());
+        if (empty($fields)) {
+            $fields = array_map(function ($item) {
+                return $item->getName();
+            }, $item->getFields());
         }
-        foreach($item->getFields() as $itemField) {
-            if(in_array($itemField->getName(), $fields)) {
+        foreach ($item->getFields() as $itemField) {
+            if (in_array($itemField->getName(), $fields)) {
                 $data[$itemField->getName()] = $itemField->getValue();
             }
         }
+
         return $data;
     }
 
@@ -71,6 +78,7 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $new = clone $this;
         $new->encoding = $encoding;
+
         return $new;
     }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Filter;
 
 use React\Promise\Deferred;
@@ -27,7 +28,7 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
     private function push($fp)
     {
         $this->fingerprints[] = $fp;
-        if(null !== $this->maxMemorySize && count($this->fingerprints) >= $this->maxMemorySize) {
+        if (null !== $this->maxMemorySize && count($this->fingerprints) >= $this->maxMemorySize) {
             $this->fingerprints = array_slice($this->fingerprints, max(1000, ceil($this->maxMemorySize, 4)));
         }
     }
@@ -39,7 +40,7 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
         $fingerprint = $this->fingerprintGenerator->fingerprint($request);
 
         // Check the memory first
-        if(in_array($fingerprint, $this->fingerprints)) {
+        if (in_array($fingerprint, $this->fingerprints)) {
             $deferred->resolve(true);
         } else {
             // We need to read the fingerprint file
@@ -53,6 +54,5 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
 
     public function open(SpiderInterface $spider)
     {
-
     }
 }

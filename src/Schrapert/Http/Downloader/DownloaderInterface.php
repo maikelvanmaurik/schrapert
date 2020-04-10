@@ -1,9 +1,9 @@
 <?php
+
 namespace Schrapert\Http\Downloader;
 
-use Schrapert\Http\RequestInterface;
-use Schrapert\SpiderInterface;
 use React\Promise\PromiseInterface;
+use Schrapert\Http\RequestInterface;
 
 interface DownloaderInterface
 {

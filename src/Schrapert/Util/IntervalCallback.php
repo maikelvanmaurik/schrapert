@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Util;
 
 use React\EventLoop\LoopInterface;
@@ -20,7 +21,7 @@ class IntervalCallback
 
     public function stop()
     {
-        if($this->timer) {
+        if ($this->timer) {
             $this->loop->cancelTimer($this->timer);
         }
     }

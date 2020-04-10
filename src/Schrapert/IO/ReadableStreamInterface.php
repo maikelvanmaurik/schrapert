@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\IO;
 
 interface ReadableStreamInterface extends StreamInterface

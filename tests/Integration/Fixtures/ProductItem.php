@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Fixtures;
 
 use Schrapert\Scraping\Field;

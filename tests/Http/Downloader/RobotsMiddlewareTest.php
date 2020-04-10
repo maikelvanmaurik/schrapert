@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
 use Schrapert\Http\Downloader\Downloader;

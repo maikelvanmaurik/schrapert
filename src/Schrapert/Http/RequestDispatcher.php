@@ -1,12 +1,13 @@
 <?php
+
 namespace Schrapert\Http;
 
+use Psr\Http\Message\RequestInterface as PsrRequestInterface;
 use React\HttpClient\Client;
+use React\HttpClient\Response as ResponseStream;
 use React\Promise;
 use React\Promise\Deferred;
-use React\HttpClient\Response as ResponseStream;
 use React\Stream\ReadableStreamInterface;
-use Psr\Http\Message\RequestInterface as PsrRequestInterface;
 
 class RequestDispatcher implements RequestDispatcherInterface
 {
@@ -29,17 +30,16 @@ class RequestDispatcher implements RequestDispatcherInterface
         }
         $body = $request->getBody();
 
-        $headers = array();
+        $headers = [];
         foreach ($request->getHeaders() as $name => $values) {
             $headers[$name] = implode(', ', $values);
         }
         $deferred = new Deferred();
-        $requestStream = $this->client->request($request->getMethod(), (string)$uri, $headers);
-        $requestStream->on('error', function($error) use ($deferred) {
+        $requestStream = $this->client->request($request->getMethod(), (string) $uri, $headers);
+        $requestStream->on('error', function ($error) use ($deferred) {
             $deferred->reject($error);
         });
         $requestStream->on('response', function (ResponseStream $responseStream) use ($deferred) {
-
             $response = $this->responseFactory->createResponse(
                 $responseStream->getVersion(),
                 $responseStream->getCode(),
@@ -60,9 +60,9 @@ class RequestDispatcher implements RequestDispatcherInterface
                     // length unknown => apply chunked transfer-encoding
                     // this should be moved somewhere else obviously
                     $body->on('data', function ($data) use ($requestStream) {
-                        $requestStream->write(dechex(strlen($data)) . "\r\n" . $data . "\r\n");
+                        $requestStream->write(dechex(strlen($data))."\r\n".$data."\r\n");
                     });
-                    $body->on('end', function() use ($requestStream) {
+                    $body->on('end', function () use ($requestStream) {
                         $requestStream->end("0\r\n\r\n");
                     });
                 }
@@ -72,8 +72,9 @@ class RequestDispatcher implements RequestDispatcherInterface
             }
         } else {
             // body is fully buffered => write as one chunk
-            $requestStream->end((string)$body);
+            $requestStream->end((string) $body);
         }
+
         return $deferred->promise();
     }
 }

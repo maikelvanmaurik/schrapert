@@ -25,7 +25,6 @@ interface Dispatcher extends PsrDispatcher, PsrListenerProvider
      */
     public function hasListeners(string $event): bool;
 
-
     public function getListeners(string $event, $priority = null);
 
     /**

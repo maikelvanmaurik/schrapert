@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Event;
 
 interface EventInterface

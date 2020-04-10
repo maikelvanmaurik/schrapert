@@ -1,16 +1,17 @@
 <?php
+
 namespace Schrapert\Schedule;
 
-use Schrapert\Crawl\RequestInterface;
-use React\Promise\Promise;
 use Countable;
+use React\Promise\Promise;
+use Schrapert\Crawl\RequestInterface;
 use Schrapert\SpiderInterface;
 
 interface PriorityQueueInterface extends Countable
 {
     /**
      * @param RequestInterface $request
-     * @return Promise|boolean true if the request was pushed; otherwise, false
+     * @return Promise|bool true if the request was pushed; otherwise, false
      */
     public function push(RequestInterface $request);
 

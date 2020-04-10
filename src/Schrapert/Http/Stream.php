@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Psr\Http\Message\StreamInterface;
@@ -15,19 +16,19 @@ class Stream implements StreamInterface
             'r' => true, 'w+' => true, 'r+' => true, 'x+' => true, 'c+' => true,
             'rb' => true, 'w+b' => true, 'r+b' => true, 'x+b' => true,
             'c+b' => true, 'rt' => true, 'w+t' => true, 'r+t' => true,
-            'x+t' => true, 'c+t' => true, 'a+' => true
+            'x+t' => true, 'c+t' => true, 'a+' => true,
         ],
         'write' => [
             'w' => true, 'w+' => true, 'rw' => true, 'r+' => true, 'x+' => true,
             'c+' => true, 'wb' => true, 'w+b' => true, 'r+b' => true,
             'x+b' => true, 'c+b' => true, 'w+t' => true, 'r+t' => true,
-            'x+t' => true, 'c+t' => true, 'a' => true, 'a+' => true
-        ]
+            'x+t' => true, 'c+t' => true, 'a' => true, 'a+' => true,
+        ],
     ];
 
     public function __construct($stream)
     {
-        if (!is_resource($stream)) {
+        if (! is_resource($stream)) {
             throw new \InvalidArgumentException('Stream must be a resource');
         }
 
@@ -47,6 +48,7 @@ class Stream implements StreamInterface
     {
         try {
             $this->seek(0);
+
             return (string) stream_get_contents($this->resource);
         } catch (\Exception $e) {
             return '';
@@ -77,13 +79,14 @@ class Stream implements StreamInterface
      */
     public function detach()
     {
-        if (!isset($this->resource)) {
-            return null;
+        if (! isset($this->resource)) {
+            return;
         }
         $result = $this->resource;
         unset($this->resource);
         $this->size = null;
         $this->readable = $this->writable = $this->seekable = false;
+
         return $result;
     }
 
@@ -97,19 +100,19 @@ class Stream implements StreamInterface
         if ($this->size !== null) {
             return $this->size;
         }
-        if (!isset($this->resource)) {
-            return null;
+        if (! isset($this->resource)) {
+            return;
         }
         $stats = fstat($this->resource);
         if (isset($stats['size'])) {
             $this->size = $stats['size'];
+
             return $this->size;
         }
-        return null;
     }
 
     /**
-     * Returns the current position of the file read/write pointer
+     * Returns the current position of the file read/write pointer.
      *
      * @return int Position of the file pointer
      * @throws \RuntimeException on error.
@@ -123,6 +126,7 @@ class Stream implements StreamInterface
         if (! is_int($result)) {
             throw new RuntimeException('Error occurred during tell operation');
         }
+
         return $result;
     }
 
@@ -136,6 +140,7 @@ class Stream implements StreamInterface
         if (! $this->resource) {
             return true;
         }
+
         return feof($this->resource);
     }
 
@@ -163,11 +168,11 @@ class Stream implements StreamInterface
      */
     public function seek($offset, $whence = SEEK_SET)
     {
-        if (!$this->seekable) {
+        if (! $this->seekable) {
             throw new \RuntimeException('Stream is not seekable');
         } elseif (fseek($this->resource, $offset, $whence) === -1) {
             throw new \RuntimeException('Unable to seek to stream position '
-                . $offset . ' with whence ' . var_export($whence, true));
+                .$offset.' with whence '.var_export($whence, true));
         }
     }
 
@@ -205,7 +210,7 @@ class Stream implements StreamInterface
      */
     public function write($string)
     {
-        if (!$this->writable) {
+        if (! $this->writable) {
             throw new \RuntimeException('Cannot write to a non-writable stream');
         }
         // We can't know the size after writing anything
@@ -214,7 +219,9 @@ class Stream implements StreamInterface
         if ($result === false) {
             throw new \RuntimeException('Unable to write to stream');
         }
-        return $result;    }
+
+        return $result;
+    }
 
     /**
      * Returns whether or not the stream is readable.
@@ -238,14 +245,15 @@ class Stream implements StreamInterface
      */
     public function read($length)
     {
-        if (!$this->readable) {
+        if (! $this->readable) {
             throw new RuntimeException('Cannot read from non-readable stream');
         }
+
         return fread($this->resource, $length);
     }
 
     /**
-     * Returns the remaining contents in a string
+     * Returns the remaining contents in a string.
      *
      * @return string
      * @throws \RuntimeException if unable to read or an error occurs while
@@ -257,6 +265,7 @@ class Stream implements StreamInterface
         if ($contents === false) {
             throw new RuntimeException('Unable to read stream contents');
         }
+
         return $contents;
     }
 
@@ -279,9 +288,9 @@ class Stream implements StreamInterface
         }
         $metadata = stream_get_meta_data($this->resource);
         if (! array_key_exists($key, $metadata)) {
-            return null;
+            return;
         }
+
         return $metadata[$key];
     }
-
 }

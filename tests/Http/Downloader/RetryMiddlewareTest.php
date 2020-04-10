@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
 use Schrapert\Http\Downloader\Downloader;
@@ -27,7 +28,7 @@ class RetryMiddlewareTest extends TestCase
     }
 
     /**
-     * When the Cache-Control header contains a no-store directive the response should not be cached
+     * When the Cache-Control header contains a no-store directive the response should not be cached.
      */
     public function testRequestsKeepAreBeingRetriedUntilSuccess()
     {

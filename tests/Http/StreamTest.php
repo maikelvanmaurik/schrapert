@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Test\Http;
 
 use Schrapert\Http\Stream;

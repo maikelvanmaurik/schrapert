@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Core\Event;
 
 use Schrapert\Event\Event;

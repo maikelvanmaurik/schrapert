@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Http;
 
 use Schrapert\Http\Uri;
@@ -18,7 +19,7 @@ class UriTest extends TestCase
         $this->assertEquals('/some/test/path', $uri->getPath());
         $this->assertEquals('q=abc', $uri->getQuery());
         $this->assertEquals('fragment', $uri->getFragment());
-        $this->assertEquals('https://user:pass@example.com:1337/some/test/path?q=abc#fragment', (string)$uri);
+        $this->assertEquals('https://user:pass@example.com:1337/some/test/path?q=abc#fragment', (string) $uri);
     }
 
     public function testCanAssembleUriAndRetrievePartsProperly()
@@ -39,6 +40,6 @@ class UriTest extends TestCase
         $this->assertEquals('/some/test/path', $uri->getPath());
         $this->assertEquals('q=abc', $uri->getQuery());
         $this->assertEquals('fragment', $uri->getFragment());
-        $this->assertEquals('https://user:pass@example.com:1337/some/test/path?q=abc#fragment', (string)$uri);
+        $this->assertEquals('https://user:pass@example.com:1337/some/test/path?q=abc#fragment', (string) $uri);
     }
 }

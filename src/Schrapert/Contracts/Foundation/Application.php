@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Contracts\Foundation;
 
 use Schrapert\Contracts\DI\Container;

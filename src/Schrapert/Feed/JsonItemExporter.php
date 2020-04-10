@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Feed;
 
+use Schrapert\IO\StreamInterface;
 use Schrapert\Scraping\ItemInterface;
 use Schrapert\SpiderInterface;
-use Schrapert\IO\StreamInterface;
 
 class JsonItemExporter extends AbstractExporter
 {
@@ -24,12 +25,13 @@ class JsonItemExporter extends AbstractExporter
     public function finishExporting(SpiderInterface $spider)
     {
         $this->stream->write(']');
+
         return $this->getStorage()->close($this->stream);
     }
 
     public function exportItem(SpiderInterface $spider, ItemInterface $item)
     {
-        if($this->firstItem) {
+        if ($this->firstItem) {
             $this->firstItem = false;
         } else {
             $this->stream->write("\n,");

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Feature;
 
 use Schrapert\Core\Event\SpiderOpenedEvent;
@@ -9,8 +10,6 @@ use Schrapert\Log\LoggerInterface;
 
 /**
  * Feature which throttles the downloads.
- *
- * @package Schrapert\Feature
  */
 class AutoThrottleFeature implements FeatureInterface
 {
@@ -53,15 +52,16 @@ class AutoThrottleFeature implements FeatureInterface
 
     public function init()
     {
-        $this->events->addListener('spider-opened', array($this, 'onSpiderOpened'));
-        $this->events->addListener('response-downloaded', array($this, 'onResponseDownloaded'));
-        $this->events->addListener('download-request', array($this, 'onDownloadRequest'));
+        $this->events->addListener('spider-opened', [$this, 'onSpiderOpened']);
+        $this->events->addListener('response-downloaded', [$this, 'onResponseDownloaded']);
+        $this->events->addListener('download-request', [$this, 'onDownloadRequest']);
     }
 
     public function withTargetConcurrency($concurrency)
     {
         $new = clone $this;
         $new->targetConcurrency = $concurrency;
+
         return $new;
     }
 
@@ -69,6 +69,7 @@ class AutoThrottleFeature implements FeatureInterface
     {
         $new = clone $this;
         $new->minDelay = $delay;
+
         return $new;
     }
 
@@ -76,6 +77,7 @@ class AutoThrottleFeature implements FeatureInterface
     {
         $new = clone $this;
         $new->maxDelay = $delay;
+
         return $new;
     }
 
@@ -83,23 +85,23 @@ class AutoThrottleFeature implements FeatureInterface
     {
         $new = clone $this;
         $new->startDelay = $delay;
+
         return $new;
     }
 
     public function onSpiderOpened(SpiderOpenedEvent $event)
     {
         $spider = $event->getSpider();
-        if($spider instanceof SpiderProvidingDownloadDelayInterface) {
+        if ($spider instanceof SpiderProvidingDownloadDelayInterface) {
             $this->minDelay = $spider->getDownloadDelay();
         }
-        if(null === $this->startDelay) {
+        if (null === $this->startDelay) {
             $this->startDelay = $this->minDelay;
         }
     }
 
     public function onDownloadRequest(DownloadRequestEvent $event)
     {
-
     }
 
     public function onResponseDownloaded(ResponseDownloadedEvent $event)

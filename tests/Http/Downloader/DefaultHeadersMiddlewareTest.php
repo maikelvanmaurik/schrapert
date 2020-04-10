@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
 use Schrapert\Http\Downloader\Downloader;
@@ -32,7 +33,7 @@ class DefaultHeadersMiddlewareTest extends TestCase
         $downloader = $this->downloader->withMiddleware(
             $this->middleware->withHeaders([
                 'FOO' => 'bar',
-                'BAR' => 'baz'
+                'BAR' => 'baz',
             ]));
 
         $request = new Request('http://headers.schrapert.dev/request.php');
@@ -40,9 +41,9 @@ class DefaultHeadersMiddlewareTest extends TestCase
         $content = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
-            }), $this->eventLoop, 10);
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
+                }), $this->eventLoop, 10);
 
         $returnedHeaders = json_decode($content, true);
 
@@ -58,7 +59,7 @@ class DefaultHeadersMiddlewareTest extends TestCase
 
         $downloader = $this->downloader->withMiddleware(
             $this->middleware->withHeaders([
-                'User-Agent' => 'Middleware'
+                'User-Agent' => 'Middleware',
             ]));
 
         $request = (new Request('http://headers.schrapert.dev/request.php'))
@@ -67,8 +68,8 @@ class DefaultHeadersMiddlewareTest extends TestCase
         $content = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
-                    return (string)$response->getBody();
+                ->then(function (ResponseInterface $response) {
+                    return (string) $response->getBody();
                 }), $this->eventLoop, 10);
 
         $returnedHeaders = json_decode($content, true);

@@ -2,13 +2,13 @@
 
 namespace Schrapert\Foundation;
 
-use Schrapert\Events\EventServiceProvider;
+use Illuminate\Container\Container;
 use Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables;
 use Illuminate\Foundation\EnvironmentDetector;
 use Illuminate\Foundation\Events\LocaleUpdated;
-use Schrapert\Log\LogServiceProvider;
 use Schrapert\Contracts\Foundation\Application as ApplicationContract;
-use Illuminate\Container\Container;
+use Schrapert\Events\EventServiceProvider;
+use Schrapert\Log\LogServiceProvider;
 
 class Application extends Container implements ApplicationContract
 {
@@ -192,11 +192,11 @@ class Application extends Container implements ApplicationContract
         $this->hasBeenBootstrapped = true;
 
         foreach ($bootstrappers as $bootstrapper) {
-            $this['events']->dispatch('bootstrapping: ' . $bootstrapper, [$this]);
+            $this['events']->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
             $this->make($bootstrapper)->bootstrap($this);
 
-            $this['events']->dispatch('bootstrapped: ' . $bootstrapper, [$this]);
+            $this['events']->dispatch('bootstrapped: '.$bootstrapper, [$this]);
         }
     }
 
@@ -222,7 +222,7 @@ class Application extends Container implements ApplicationContract
      */
     public function beforeBootstrapping($bootstrapper, Closure $callback)
     {
-        $this['events']->listen('bootstrapping: ' . $bootstrapper, $callback);
+        $this['events']->listen('bootstrapping: '.$bootstrapper, $callback);
     }
 
     /**
@@ -234,7 +234,7 @@ class Application extends Container implements ApplicationContract
      */
     public function afterBootstrapping($bootstrapper, Closure $callback)
     {
-        $this['events']->listen('bootstrapped: ' . $bootstrapper, $callback);
+        $this['events']->listen('bootstrapped: '.$bootstrapper, $callback);
     }
 
     /**
@@ -288,9 +288,9 @@ class Application extends Container implements ApplicationContract
      */
     public function path($path = '')
     {
-        $appPath = $this->appPath ?: $this->basePath . DIRECTORY_SEPARATOR . 'app';
+        $appPath = $this->appPath ?: $this->basePath.DIRECTORY_SEPARATOR.'app';
 
-        return $appPath . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $appPath.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -316,7 +316,7 @@ class Application extends Container implements ApplicationContract
      */
     public function basePath($path = '')
     {
-        return $this->basePath . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $this->basePath.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -327,7 +327,7 @@ class Application extends Container implements ApplicationContract
      */
     public function bootstrapPath($path = '')
     {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'bootstrap' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'bootstrap'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -338,7 +338,7 @@ class Application extends Container implements ApplicationContract
      */
     public function configPath($path = '')
     {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'config' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'config'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -349,7 +349,7 @@ class Application extends Container implements ApplicationContract
      */
     public function databasePath($path = '')
     {
-        return ($this->databasePath ?: $this->basePath . DIRECTORY_SEPARATOR . 'database') . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return ($this->databasePath ?: $this->basePath.DIRECTORY_SEPARATOR.'database').($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -374,7 +374,7 @@ class Application extends Container implements ApplicationContract
      */
     public function langPath()
     {
-        return $this->resourcePath() . DIRECTORY_SEPARATOR . 'lang';
+        return $this->resourcePath().DIRECTORY_SEPARATOR.'lang';
     }
 
     /**
@@ -384,7 +384,7 @@ class Application extends Container implements ApplicationContract
      */
     public function publicPath()
     {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'public';
+        return $this->basePath.DIRECTORY_SEPARATOR.'public';
     }
 
     /**
@@ -394,7 +394,7 @@ class Application extends Container implements ApplicationContract
      */
     public function storagePath()
     {
-        return $this->storagePath ?: $this->basePath . DIRECTORY_SEPARATOR . 'storage';
+        return $this->storagePath ?: $this->basePath.DIRECTORY_SEPARATOR.'storage';
     }
 
     /**
@@ -420,7 +420,7 @@ class Application extends Container implements ApplicationContract
      */
     public function resourcePath($path = '')
     {
-        return $this->basePath . DIRECTORY_SEPARATOR . 'resources' . ($path ? DIRECTORY_SEPARATOR . $path : $path);
+        return $this->basePath.DIRECTORY_SEPARATOR.'resources'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
@@ -476,7 +476,7 @@ class Application extends Container implements ApplicationContract
      */
     public function environmentFilePath()
     {
-        return $this->environmentPath() . DIRECTORY_SEPARATOR . $this->environmentFile();
+        return $this->environmentPath().DIRECTORY_SEPARATOR.$this->environmentFile();
     }
 
     /**
@@ -581,7 +581,7 @@ class Application extends Container implements ApplicationContract
      */
     public function register($provider, $force = false)
     {
-        if (($registered = $this->getProvider($provider)) && !$force) {
+        if (($registered = $this->getProvider($provider)) && ! $force) {
             return $registered;
         }
 
@@ -696,7 +696,7 @@ class Application extends Container implements ApplicationContract
      */
     public function loadDeferredProvider($service)
     {
-        if (!$this->isDeferredService($service)) {
+        if (! $this->isDeferredService($service)) {
             return;
         }
 
@@ -705,7 +705,7 @@ class Application extends Container implements ApplicationContract
         // If the service provider has not already been loaded and registered we can
         // register it with the application and remove the service from this list
         // of deferred services, since it will already be loaded on subsequent.
-        if (!isset($this->loadedProviders[$provider])) {
+        if (! isset($this->loadedProviders[$provider])) {
             $this->registerDeferredProvider($provider, $service);
         }
     }
@@ -728,7 +728,7 @@ class Application extends Container implements ApplicationContract
 
         $this->register($instance = new $provider($this));
 
-        if (!$this->isBooted()) {
+        if (! $this->isBooted()) {
             $this->booting(function () use ($instance) {
                 $this->bootProvider($instance);
             });
@@ -772,7 +772,7 @@ class Application extends Container implements ApplicationContract
      */
     protected function loadDeferredProviderIfNeeded($abstract)
     {
-        if ($this->isDeferredService($abstract) && !isset($this->instances[$abstract])) {
+        if ($this->isDeferredService($abstract) && ! isset($this->instances[$abstract])) {
             $this->loadDeferredProvider($abstract);
         }
     }
@@ -1110,57 +1110,57 @@ class Application extends Container implements ApplicationContract
     public function registerCoreContainerAliases()
     {
         foreach ([
-                     'app'              => [
-                         self::class,
-                         \Illuminate\Contracts\Container\Container::class,
-                         \Illuminate\Contracts\Foundation\Application::class,
-                         \Psr\Container\ContainerInterface::class
-                     ],
-                     'cache'            => [
-                         \Illuminate\Cache\CacheManager::class,
-                         \Illuminate\Contracts\Cache\Factory::class
-                     ],
-                     'cache.store'      => [
-                         \Illuminate\Cache\Repository::class,
-                         \Illuminate\Contracts\Cache\Repository::class,
-                         \Psr\SimpleCache\CacheInterface::class
-                     ],
-                     'cache.psr6'       => [
-                         \Symfony\Component\Cache\Adapter\Psr16Adapter::class,
-                         \Symfony\Component\Cache\Adapter\AdapterInterface::class,
-                         \Psr\Cache\CacheItemPoolInterface::class
-                     ],
-                     'config'           => [
-                         \Illuminate\Config\Repository::class,
-                         \Illuminate\Contracts\Config\Repository::class
-                     ],
-                     'events'           => [
-                         \Illuminate\Events\Dispatcher::class,
-                         \Illuminate\Contracts\Events\Dispatcher::class
-                     ],
-                     'files'            => [\Illuminate\Filesystem\Filesystem::class],
-                     'filesystem'       => [
-                         \Illuminate\Filesystem\FilesystemManager::class,
-                         \Illuminate\Contracts\Filesystem\Factory::class
-                     ],
-                     'filesystem.disk'  => [\Illuminate\Contracts\Filesystem\Filesystem::class],
-                     'filesystem.cloud' => [\Illuminate\Contracts\Filesystem\Cloud::class],
-                     'hash'             => [\Illuminate\Hashing\HashManager::class],
-                     'hash.driver'      => [\Illuminate\Contracts\Hashing\Hasher::class],
-                     'translator'       => [
-                         \Illuminate\Translation\Translator::class,
-                         \Illuminate\Contracts\Translation\Translator::class
-                     ],
-                     'log'              => [\Illuminate\Log\LogManager::class, \Psr\Log\LoggerInterface::class],
-                     'mail.manager'     => [
-                         \Illuminate\Mail\MailManager::class,
-                         \Illuminate\Contracts\Mail\Factory::class
-                     ],
-                     'url'              => [
-                         \Illuminate\Routing\UrlGenerator::class,
-                         \Illuminate\Contracts\Routing\UrlGenerator::class
-                     ],
-                 ] as $key => $aliases) {
+            'app'              => [
+                self::class,
+                \Illuminate\Contracts\Container\Container::class,
+                \Illuminate\Contracts\Foundation\Application::class,
+                \Psr\Container\ContainerInterface::class,
+            ],
+            'cache'            => [
+                \Illuminate\Cache\CacheManager::class,
+                \Illuminate\Contracts\Cache\Factory::class,
+            ],
+            'cache.store'      => [
+                \Illuminate\Cache\Repository::class,
+                \Illuminate\Contracts\Cache\Repository::class,
+                \Psr\SimpleCache\CacheInterface::class,
+            ],
+            'cache.psr6'       => [
+                \Symfony\Component\Cache\Adapter\Psr16Adapter::class,
+                \Symfony\Component\Cache\Adapter\AdapterInterface::class,
+                \Psr\Cache\CacheItemPoolInterface::class,
+            ],
+            'config'           => [
+                \Illuminate\Config\Repository::class,
+                \Illuminate\Contracts\Config\Repository::class,
+            ],
+            'events'           => [
+                \Illuminate\Events\Dispatcher::class,
+                \Illuminate\Contracts\Events\Dispatcher::class,
+            ],
+            'files'            => [\Illuminate\Filesystem\Filesystem::class],
+            'filesystem'       => [
+                \Illuminate\Filesystem\FilesystemManager::class,
+                \Illuminate\Contracts\Filesystem\Factory::class,
+            ],
+            'filesystem.disk'  => [\Illuminate\Contracts\Filesystem\Filesystem::class],
+            'filesystem.cloud' => [\Illuminate\Contracts\Filesystem\Cloud::class],
+            'hash'             => [\Illuminate\Hashing\HashManager::class],
+            'hash.driver'      => [\Illuminate\Contracts\Hashing\Hasher::class],
+            'translator'       => [
+                \Illuminate\Translation\Translator::class,
+                \Illuminate\Contracts\Translation\Translator::class,
+            ],
+            'log'              => [\Illuminate\Log\LogManager::class, \Psr\Log\LoggerInterface::class],
+            'mail.manager'     => [
+                \Illuminate\Mail\MailManager::class,
+                \Illuminate\Contracts\Mail\Factory::class,
+            ],
+            'url'              => [
+                \Illuminate\Routing\UrlGenerator::class,
+                \Illuminate\Contracts\Routing\UrlGenerator::class,
+            ],
+        ] as $key => $aliases) {
             foreach ($aliases as $alias) {
                 $this->alias($key, $alias);
             }
@@ -1198,14 +1198,14 @@ class Application extends Container implements ApplicationContract
      */
     public function getNamespace()
     {
-        if (!is_null($this->namespace)) {
+        if (! is_null($this->namespace)) {
             return $this->namespace;
         }
 
         $composer = json_decode(file_get_contents($this->basePath('composer.json')), true);
 
-        foreach ((array)data_get($composer, 'autoload.psr-4') as $namespace => $path) {
-            foreach ((array)$path as $pathChoice) {
+        foreach ((array) data_get($composer, 'autoload.psr-4') as $namespace => $path) {
+            foreach ((array) $path as $pathChoice) {
                 if (realpath($this->path()) === realpath($this->basePath($pathChoice))) {
                     return $this->namespace = $namespace;
                 }

@@ -1,13 +1,11 @@
 <?php
+
 namespace Schrapert\Schedule;
 
-use React\Promise\Deferred;
-use React\Promise\RejectedPromise;
-use Schrapert\Filter\DuplicateRequestFilterInterface;
+use React\Promise\PromiseInterface;
 use Schrapert\Crawl\RequestInterface;
 use Schrapert\Log\LoggerInterface;
 use Schrapert\SpiderInterface;
-use React\Promise\PromiseInterface;
 
 class Scheduler implements SchedulerInterface
 {
@@ -40,9 +38,10 @@ class Scheduler implements SchedulerInterface
      */
     public function enqueueRequest(RequestInterface $req)
     {
-        $this->logger->debug("Scheduler enqueue request {uri}", ['uri' => $req->getUri()]);
-        return $this->priorityQueue->push($req)->then(function() {
-           return true;
+        $this->logger->debug('Scheduler enqueue request {uri}', ['uri' => $req->getUri()]);
+
+        return $this->priorityQueue->push($req)->then(function () {
+            return true;
         });
     }
 

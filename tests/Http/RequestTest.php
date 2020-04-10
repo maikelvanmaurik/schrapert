@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Http;
 
 use Schrapert\Tests\TestCase;
@@ -13,14 +14,13 @@ class RequestTest extends TestCase
         $this->assertEquals($request->getRequestTarget(), '/foo');
         $this->assertEquals($request2->getRequestTarget(), '/foo');
 
-
         $request3 = $request->withRequestTarget('test');
         $this->assertNotSame($request, $request3);
     }
 
     public function testRequestTargetIsProperlySetFromUri()
     {
-        $requestWithoutSlashInPath =  new \Schrapert\Http\Request('http://schrapert.dev?foo=bar');
+        $requestWithoutSlashInPath = new \Schrapert\Http\Request('http://schrapert.dev?foo=bar');
         $requestWithSlashInPath = new \Schrapert\Http\Request('http://schrapert.dev/?foo=bar');
 
         $this->assertEquals('/?foo=bar', $requestWithoutSlashInPath->getRequestTarget());

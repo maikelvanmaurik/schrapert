@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -10,9 +11,10 @@ class TestCase extends BaseTestCase
 
     public function getContainer()
     {
-        if(!$this->container) {
+        if (! $this->container) {
             $this->container = new DefaultServiceContainer();
         }
+
         return $this->container;
     }
 }

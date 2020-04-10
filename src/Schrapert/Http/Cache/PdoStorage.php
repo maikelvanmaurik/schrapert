@@ -1,11 +1,12 @@
 <?php
+
 namespace Schrapert\Http\Cache;
 
+use PDO;
 use React\Promise\PromiseInterface;
 use Schrapert\Crawl\RequestFingerprintGeneratorInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Http\ResponseInterface;
-use PDO;
 
 class PdoStorage implements StorageInterface
 {
@@ -18,7 +19,6 @@ class PdoStorage implements StorageInterface
 
     public function clear()
     {
-
     }
 
     public function withPdo(PDO $pdo)
@@ -33,7 +33,6 @@ class PdoStorage implements StorageInterface
     public function retrieveResponse(RequestInterface $request)
     {
         $key = $this->fingerPrinter->fingerprint($request);
-
     }
 
     /**

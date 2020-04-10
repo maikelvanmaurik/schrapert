@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Crawl;
 
 interface MessageInterface

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Psr\Http\Message\StreamInterface;
@@ -18,6 +19,7 @@ class StreamFactory implements StreamFactoryInterface
                 fwrite($stream, $resource);
                 fseek($stream, 0);
             }
+
             return new Stream($stream, $options);
         }
         switch (gettype($resource)) {
@@ -28,11 +30,12 @@ class StreamFactory implements StreamFactoryInterface
                     return $resource;
                 } elseif ($resource instanceof \Iterator) {
                     return new PumpStream(function () use ($resource) {
-                        if (!$resource->valid()) {
+                        if (! $resource->valid()) {
                             return false;
                         }
                         $result = $resource->current();
                         $resource->next();
+
                         return $result;
                     }, $options);
                 } elseif (method_exists($resource, '__toString')) {
@@ -45,7 +48,6 @@ class StreamFactory implements StreamFactoryInterface
         if (is_callable($resource)) {
             return new PumpStream($resource, $options);
         }
-        throw new \InvalidArgumentException('Invalid resource type: ' . gettype($resource));
+        throw new \InvalidArgumentException('Invalid resource type: '.gettype($resource));
     }
-
 }

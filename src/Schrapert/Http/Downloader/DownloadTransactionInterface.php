@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader;
 
 use Psr\Http\Message\RequestInterface;

@@ -1,12 +1,13 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http;
 
 use Schrapert\Feature\AutoThrottleFeature;
 use Schrapert\Feed\ExporterFactory;
 use Schrapert\Http\ResponseInterface;
 use Schrapert\Runner;
-use Schrapert\Tests\TestCase;
 use Schrapert\Tests\Integration\Fixtures\TestSpider;
+use Schrapert\Tests\TestCase;
 
 class AutoThrottleFeatureTest extends TestCase
 {
@@ -38,8 +39,8 @@ class AutoThrottleFeatureTest extends TestCase
         $feature = $this->autoThrottleFeature;
         $this->runner
             ->withFeature($feature)
-            ->withSpider(new TestSpider(['http://throttle.schrapert.dev/delay.php'], function(ResponseInterface $response) {
-                var_dump("CALLBACK!");
+            ->withSpider(new TestSpider(['http://throttle.schrapert.dev/delay.php'], function (ResponseInterface $response) {
+                var_dump('CALLBACK!');
             }))
             ->start();
     }

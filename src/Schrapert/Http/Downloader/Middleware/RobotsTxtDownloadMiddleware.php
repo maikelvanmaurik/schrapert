@@ -1,16 +1,15 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
+use React\Promise\PromiseInterface;
 use Schrapert\Crawl\Exception\IgnoreRequestException;
 use Schrapert\Http\Downloader\DownloaderInterface;
-use Schrapert\Http\Request;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Http\ResponseInterface;
-use Schrapert\Http\RobotsTxt\ParserInterface as RobotsTxtParserInterface;
 use Schrapert\Http\RobotsTxt\ParseResultInterface;
+use Schrapert\Http\RobotsTxt\ParserInterface as RobotsTxtParserInterface;
 use Schrapert\Log\LoggerInterface;
-use Schrapert\SpiderInterface;
-use React\Promise\PromiseInterface;
 
 class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, ProcessRequestMiddlewareInterface
 {
@@ -29,7 +28,7 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
 
     public function processRequest(RequestInterface $request)
     {
-        if ($request->getMetadata('ignore_robots.txt') || !$request instanceof RequestInterface || $request->getUri()->getPath() == '/robots.txt') {
+        if ($request->getMetadata('ignore_robots.txt') || ! $request instanceof RequestInterface || $request->getUri()->getPath() == '/robots.txt') {
             return $request;
         }
 
@@ -41,9 +40,9 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
             } else {
                 $this->logger->debug("Resource '{path}' not allowed for user-agent '{ua}' when obeying robots.txt, drop request", [
                     'path' => $request->getUri()->getPath(),
-                    'ua' => $ua
+                    'ua' => $ua,
                 ]);
-                throw new IgnoreRequestException("Not allowed");
+                throw new IgnoreRequestException('Not allowed');
             }
         });
     }
@@ -59,7 +58,8 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
             ->withMetadata('ignore_robots.txt', true);
 
         return $this->downloader->download($robotsRequest)->then(function (ResponseInterface $response) {
-            $txt = (string)$response->getBody();
+            $txt = (string) $response->getBody();
+
             return $this->robotsTxtParser->parse($txt);
         });
     }

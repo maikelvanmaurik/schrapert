@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
 use React\Promise\Deferred;
@@ -22,7 +23,6 @@ class CompressionMiddlewareTest extends TestCase
         parent::setUp();
     }
 
-
     public function testGzipIsWorkingWithStreamingRequests()
     {
         return;
@@ -36,9 +36,10 @@ class CompressionMiddlewareTest extends TestCase
         $headers = [];
 
         $promise = $downloader->download($request)
-            ->then(function(ResponseInterface $response) use (&$headers) {
+            ->then(function (ResponseInterface $response) use (&$headers) {
                 $headers = $response->getHeaders();
                 $deferred = new Deferred();
+
                 return $deferred->promise();
             });
 
@@ -59,9 +60,10 @@ class CompressionMiddlewareTest extends TestCase
         $headers = [];
 
         $promise = $downloader->download($request)
-            ->then(function(ResponseInterface $response) use (&$headers) {
+            ->then(function (ResponseInterface $response) use (&$headers) {
                 $headers = $response->getHeaders();
-                return (string)$response->getBody();
+
+                return (string) $response->getBody();
             });
 
         $content = await($promise, $this->eventLoop, 10);

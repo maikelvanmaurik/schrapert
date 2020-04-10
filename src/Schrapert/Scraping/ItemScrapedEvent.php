@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Scraping;
 
 use Schrapert\Event\Event;

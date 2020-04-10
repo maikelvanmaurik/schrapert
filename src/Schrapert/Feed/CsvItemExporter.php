@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Feed;
 
+use Schrapert\IO\StreamInterface;
 use Schrapert\Scraping\ItemInterface;
 use Schrapert\SpiderInterface;
-use Schrapert\IO\StreamInterface;
 
 class CsvItemExporter extends AbstractExporter
 {
@@ -16,11 +17,10 @@ class CsvItemExporter extends AbstractExporter
 
     private $includeHeaderLine;
 
-    public function __construct(StorageInterface $storage, array $fields = [], $encoding, $includeHeaderLine=true)
+    public function __construct(StorageInterface $storage, array $fields, $encoding, $includeHeaderLine = true)
     {
         parent::__construct($storage, $fields, $encoding);
         $this->includeHeaderLine = $includeHeaderLine;
-
     }
 
     public function startExporting(SpiderInterface $spider)
@@ -36,7 +36,7 @@ class CsvItemExporter extends AbstractExporter
 
     private function writeRow(array $columns)
     {
-        $columns = array_map(function($item) {
+        $columns = array_map(function ($item) {
             return addslashes($item);
         }, $columns);
         $this->stream->write(sprintf("\"%s\"\n", implode('","', $columns)));
@@ -50,7 +50,7 @@ class CsvItemExporter extends AbstractExporter
 
     public function exportItem(SpiderInterface $spider, ItemInterface $item)
     {
-        if(!$this->headersWritten && $this->includeHeaderLine) {
+        if (! $this->headersWritten && $this->includeHeaderLine) {
             $this->writeHeaders($item);
             $this->headersWritten = true;
         }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Core\Event;
 
 use Schrapert\Crawl\RequestInterface;
@@ -7,8 +8,6 @@ use Schrapert\SpiderInterface;
 
 /**
  * Represents an event which is dispatched when a request is going to be scheduled into the scheduler.
- *
- * @package Schrapert\Core\Event
  */
 class ScheduleRequestEvent extends Event
 {

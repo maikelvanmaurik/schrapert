@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Log;
 
 use Schrapert\Foundation\Application;

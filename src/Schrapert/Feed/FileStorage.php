@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Feed;
 
 use Schrapert\IO\Stream;
@@ -32,6 +33,7 @@ class FileStorage implements StorageInterface
     {
         $resource = fopen($this->getFilename(), 'w+');
         $this->stream = new Stream($resource);
+
         return $this->stream;
     }
 

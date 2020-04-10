@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Events;
 
 use Psr\EventDispatcher\StoppableEventInterface;
@@ -13,7 +14,7 @@ class EventDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->addEventListener(BasicEvent::class, function(BasicEvent $event) {
+        $d->addEventListener(BasicEvent::class, function (BasicEvent $event) {
             $_SERVER['__event.test'] = 'bar';
         });
         $event = $d->dispatch(new BasicEvent());
@@ -43,7 +44,7 @@ class EventDispatcherTest extends TestCase
     {
         unset($_SERVER['__event.test']);
         $d = new Dispatcher;
-        $d->addEventListener( BasicEvent::class, function () {
+        $d->addEventListener(BasicEvent::class, function () {
             $_SERVER['__event.test'] = 'foo';
         });
         $d->removeEventListener(BasicEvent::class);
@@ -59,10 +60,10 @@ class EventDispatcherTest extends TestCase
             $_SERVER['__event.test'] = 'foo';
         };
         $d = new Dispatcher;
-        $d->addEventListener(BasicEvent::class, function() {
+        $d->addEventListener(BasicEvent::class, function () {
             $_SERVER['__event.test'] = 'baz';
         });
-        $d->addEventListener( BasicEvent::class, $callback);
+        $d->addEventListener(BasicEvent::class, $callback);
         $d->removeEventListener(BasicEvent::class, $callback);
         $d->dispatch(new BasicEvent());
 
@@ -87,7 +88,6 @@ class EventDispatcherTest extends TestCase
         $d->subscribe($s);
         $this->assertTrue($d->hasListeners());
     }
-
 }
 
 class BasicEvent
@@ -133,5 +133,4 @@ class BasicSubscriber implements Subscriber
     {
         $dispatcher->removeEventListener(BasicEvent::class, [$this, 'callback']);
     }
-
 }

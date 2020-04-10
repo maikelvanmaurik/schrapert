@@ -1,7 +1,11 @@
 <?php
+
 namespace Schrapert\Crawling;
 
+use DateTime;
+use Exception;
 use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
 use React\Promise\RejectedPromise;
 use Schrapert\Core\Event\EngineStartedEvent;
 use Schrapert\Core\Event\RequestDroppedEvent;
@@ -18,15 +22,11 @@ use Schrapert\SpiderInterface;
 use Schrapert\Util\DelayedCallbackFactory;
 use Schrapert\Util\IntervalCallback;
 use Schrapert\Util\IntervalCallbackFactory;
-use Exception;
-use DateTime;
-use React\Promise\PromiseInterface;
 
 /**
  * The execution engine is responsible for handling requests created by the spiders.
  *
  * Class ExecutionEngine
- * @package Schrapert\Core
  */
 class Engine
 {
@@ -123,10 +123,10 @@ class Engine
     {
         $this->events->dispatch(new ScheduleRequestEvent($request, $spider));
 
-        return $this->scheduler->enqueueRequest($request)->then(function($scheduled) use ($spider, $request) {
+        return $this->scheduler->enqueueRequest($request)->then(function ($scheduled) use ($spider, $request) {
             return true;
-        }, function($error) use ($request, $spider) {
-            if($error instanceof DropRequestException) {
+        }, function ($error) use ($request, $spider) {
+            if ($error instanceof DropRequestException) {
                 $this->events->dispatch(new RequestDroppedEvent($request, $spider));
             } else {
                 throw $error;
@@ -146,14 +146,14 @@ class Engine
 
         $this->scheduler->open($spider);
         $this->scraper->open($spider);
-        if($this->dupeFilter) {
+        if ($this->dupeFilter) {
             $this->dupeFilter->open($spider);
         }
-        $this->next = $this->delayedCallbackFactory->factory(function() use ($spider) {
+        $this->next = $this->delayedCallbackFactory->factory(function () use ($spider) {
             return $this->nextRequest($spider);
         }, [$spider]);
         $this->next->schedule();
-        $this->heartbeat = $this->intervalCallbackFactory->factory(array($this->next, 'schedule'));
+        $this->heartbeat = $this->intervalCallbackFactory->factory([$this->next, 'schedule']);
         $this->heartbeat->start(5);
         $this->events->dispatch(new SpiderOpenedEvent($spider));
     }
@@ -161,17 +161,18 @@ class Engine
     private function needsBackOut(SpiderInterface $spider)
     {
         // Any running processes
-        foreach($this->processes as $process) {
-            if($process->needsBackOut()) {
+        foreach ($this->processes as $process) {
+            if ($process->needsBackOut()) {
                 return true;
             }
         }
-        return !$this->running || $this->closing || count($this->processes) > 10;
+
+        return ! $this->running || $this->closing || count($this->processes) > 10;
     }
 
     /**
      * Retrieve the next request from the scheduler, if there are no next requests (yet)
-     * the promise will reject
+     * the promise will reject.
      *
      * @param SpiderInterface $spider
      * @return PromiseInterface
@@ -185,21 +186,21 @@ class Engine
 
     private function requestProcessFinished(RequestInterface $request, RequestProcessInterface $process = null)
     {
-        $this->logger->debug("Process {uri} finished", ['uri' => $request->getUri()]);
+        $this->logger->debug('Process {uri} finished', ['uri' => $request->getUri()]);
 
         // Remove the process & request
         $index = array_search($request, $this->processing, true);
-        $this->logger->debug("Index of the request {uri} -> {index}", ['uri' => $request->getUri(), 'index' => $index]);
+        $this->logger->debug('Index of the request {uri} -> {index}', ['uri' => $request->getUri(), 'index' => $index]);
         if (false !== $index) {
             unset($this->processing[$index]);
         }
-        if(null !== $process) {
+        if (null !== $process) {
             $index = array_search($process, $this->processes, true);
             if (false !== $index) {
                 unset($this->processes[$index]);
             }
         }
-        $this->logger->debug("Number of pending processed {processed}, processing {processing}", ['processed' => count($this->processes), 'processing' => count($this->processing)]);
+        $this->logger->debug('Number of pending processed {processed}, processing {processing}', ['processed' => count($this->processes), 'processing' => count($this->processing)]);
     }
 
     /**
@@ -209,37 +210,38 @@ class Engine
      */
     private function process(RequestInterface $request, SpiderInterface $spider)
     {
-        $this->logger->debug("Process request {uri}", ['uri' => $request->getUri()]);
+        $this->logger->debug('Process request {uri}', ['uri' => $request->getUri()]);
 
         $this->processing[] = $request;
 
         $process = null;
 
         try {
-
             $processor = $this->requestProcessorFactory->factory($request);
 
             $process = $processor->process($this, $request, $spider);
 
             $this->processes[] = $process;
 
-            return $process->run()->always(function() use ($request, $process) {
+            return $process->run()->always(function () use ($request, $process) {
                 $this->requestProcessFinished($request, $process);
             });
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->requestProcessFinished($request, $process);
+
             return new RejectedPromise($e);
         }
     }
 
     private function scheduleCrawl(RequestInterface $request, SpiderInterface $spider)
     {
-        $this->logger->debug("Schedule request {uri}", ['uri' => (string)$request->getUri()]);
+        $this->logger->debug('Schedule request {uri}', ['uri' => (string) $request->getUri()]);
 
         return $this->schedule($request, $spider)->then(function ($scheduled) {
-            if($scheduled) {
+            if ($scheduled) {
                 $this->next->schedule();
             }
+
             return true;
         });
     }
@@ -248,26 +250,28 @@ class Engine
     {
         if (null !== $this->dupeFilter) {
             return $this->dupeFilter->isDuplicateRequest($request)->then(function ($isDuplicate) use ($request, $spider) {
-                if($isDuplicate) {
-                    $this->logger->debug("Request {uri} is a duplicate request", ['uri' => $request->getUri()]);
-                    throw new DropRequestException("Duplicate request");
+                if ($isDuplicate) {
+                    $this->logger->debug('Request {uri} is a duplicate request', ['uri' => $request->getUri()]);
+                    throw new DropRequestException('Duplicate request');
                 } else {
-                    $this->logger->debug("Request {uri} is not a duplicate request", ['uri' => $request->getUri()]);
+                    $this->logger->debug('Request {uri} is not a duplicate request', ['uri' => $request->getUri()]);
                 }
+
                 return $this->scheduleCrawl($request, $spider);
             });
         }
+
         return $this->scheduleCrawl($request, $spider);
     }
 
     private function spiderIsIdle(SpiderInterface $spider)
     {
-        $this->logger->debug("Check if spider idle");
-        if (!$this->scraper->isIdle()) {
+        $this->logger->debug('Check if spider idle');
+        if (! $this->scraper->isIdle()) {
             //$this->logger->debug("Not idle (scraper is not idle)");
             return false;
         }
-        if (!empty($this->processing)) {
+        if (! empty($this->processing)) {
             //$this->logger->debug("Not idle (still processing requests)");
             //$this->logger->debug('this url ' . reset($this->processing)->getUri());
             return false;
@@ -282,30 +286,29 @@ class Engine
             return false;
         }
 
-        $this->logger->debug("Spider is idle");
+        $this->logger->debug('Spider is idle');
 
         return true;
     }
 
     private function spiderIdle(SpiderInterface $spider)
     {
-        $this->logger->debug("Spider became idle");
+        $this->logger->debug('Spider became idle');
     }
 
     private function nextRequest(SpiderInterface $spider)
     {
-        if($this->paused) {
+        if ($this->paused) {
             return;
         }
 
-        if(!$this->needsBackOut($spider)) {
-
-            return $this->nextRequestFromScheduler($spider)->then(null, function() use ($spider) {
+        if (! $this->needsBackOut($spider)) {
+            return $this->nextRequestFromScheduler($spider)->then(null, function () use ($spider) {
 
                 // Fail to get next request
-                if(!empty($this->startRequests) && !$this->needsBackOut($spider)) {
-                    if(false !== ($request = current($this->startRequests))) {
-                        $this->crawl($request, $spider)->then(null, function($e) {
+                if (! empty($this->startRequests) && ! $this->needsBackOut($spider)) {
+                    if (false !== ($request = current($this->startRequests))) {
+                        $this->crawl($request, $spider)->then(null, function ($e) {
                             $this->logger->error('Error during crawl: {error}', ['error' => $e->getMessage()]);
                             $this->stop();
                         });
@@ -317,12 +320,11 @@ class Engine
                 }
 
                 return true;
-
-            })->then(function() use ($spider) {
-                if($this->spiderIsIdle($spider)) {
+            })->then(function () use ($spider) {
+                if ($this->spiderIsIdle($spider)) {
                     $this->maybeShutdownIdleSpider($spider);
                 }
-            }, function($e) {
+            }, function ($e) {
                 $this->logger->error($e->getMessage());
             });
         }
@@ -330,40 +332,39 @@ class Engine
 
     private function closeSpider(SpiderInterface $spider, $reason = 'cancelled')
     {
-        $this->logger->info("Close spider");
+        $this->logger->info('Close spider');
 
-        if($this->closing) {
+        if ($this->closing) {
             return $this->closing;
         }
 
         $deferred = new Deferred();
         $promise = $deferred->promise();
 
-
-        $promise->then(function() {
+        $promise->then(function () {
             // Cancel the next call
             $this->next->cancel();
+
             return true;
         });
 
-        $promise->then(function() {
+        $promise->then(function () {
             $this->heartbeat->stop();
         });
 
-        $promise->then(function() use ($spider) {
+        $promise->then(function () use ($spider) {
             return $this->scraper->closeSpider($spider);
         });
 
-        $promise->then(function() use ($spider, $reason) {
+        $promise->then(function () use ($spider, $reason) {
             return $this->scheduler->close($spider, $reason);
         });
 
-        $promise->then(function($result) use ($spider) {
-
+        $promise->then(function ($result) use ($spider) {
             $this->events->dispatch(new SpiderClosedEvent($spider));
         });
 
-        $promise->then(function() {
+        $promise->then(function () {
             $this->closeWait->resolve(true);
         });
 
@@ -382,24 +383,26 @@ class Engine
     {
         try {
             if ($this->running) {
-                throw new \Exception("Already running");
+                throw new \Exception('Already running');
             }
             $this->startTime = date_create();
             $this->events->dispatch(new EngineStartedEvent($this));
-            $this->logger->info("Started");
+            $this->logger->info('Started');
             $this->running = true;
             $this->closeWait = new Deferred();
+
             return $this->closeWait->promise();
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $this->logger->error($e->getMessage());
+
             return new RejectedPromise($e);
         }
     }
 
     public function stop()
     {
-        if(!$this->running) {
-            throw new \Exception("Not running");
+        if (! $this->running) {
+            throw new \Exception('Not running');
         }
         $this->running = false;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Event;
 
 /**
@@ -8,8 +9,6 @@ namespace Schrapert\Event;
  * state information to an event handler when an event is raised.
  *
  * Further event handling can be aborted by calling the {@see stopPropagation()}
- *
- * @package Schrapert\Event
  */
 class Event implements EventInterface
 {
@@ -24,6 +23,7 @@ class Event implements EventInterface
      * @var bool Whether no further event listeners should be triggered
      */
     private $propagationStopped = false;
+
     /**
      * Returns whether further event listeners should be triggered.
      *
@@ -49,7 +49,7 @@ class Event implements EventInterface
     }
 
     /**
-     * Gets the name of the event
+     * Gets the name of the event.
      *
      * @return string
      */
