@@ -1,15 +1,16 @@
 <?php
 namespace Schrapert\Log;
 
+use Schrapert\Foundation\Application;
+
 class LogServiceProvider
 {
-    public function __construct($app)
+    public function __construct(Application $app)
     {
         $this->app = $app;
     }
 
     public function register()
     {
-        $this->app->singleont
     }
 }
