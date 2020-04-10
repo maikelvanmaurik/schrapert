@@ -75,12 +75,12 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
      */
     public function processRequest(RequestInterface $request)
     {
-        if($request->getMetaData('skip_cache')) {
+        if($request->getMetadata('skip_cache')) {
             return $request;
         }
 
         if(!$this->policy->shouldCacheRequest($request)) {
-            return $request->withMetaData('_skip_cache', true);
+            return $request->withMetadata('_skip_cache', true);
         }
 
         $cached = $this->storage->retrieveResponse($request);
@@ -96,10 +96,10 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
         }
 
         if($this->policy->isCachedResponseFresh($cached, $request)) {
-            return $cached->withMetaData('request', $request);
+            return $cached->withMetadata('request', $request);
         }
 
-        return $request->withMetaData('cached_response', $cached);
+        return $request->withMetadata('cached_response', $cached);
     }
 
     private function cache(RequestInterface $request, ResponseInterface $response)
@@ -120,7 +120,7 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
 
     public function processResponse(ResponseInterface $response, RequestInterface $request)
     {
-        if($request->getMetaData('skip_cache', false)) {
+        if($request->getMetadata('skip_cache', false)) {
             return $response;
         }
 
@@ -129,7 +129,7 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
             $response = $response->withHeader('Date', gmdate('r'));
         }
 
-        $cached = $request->getMetaData('cached_response');
+        $cached = $request->getMetadata('cached_response');
         if(!$cached) {
             return $this->cache($request, $response)->then(function() use ($response) {
                 return $response;

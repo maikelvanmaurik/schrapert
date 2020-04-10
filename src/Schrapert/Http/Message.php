@@ -20,7 +20,7 @@ abstract class Message
         return $this->protocol;
     }
 
-    public function getMetaData($key = null, $default = null)
+    public function getMetadata($key = null, $default = null)
     {
         if(null === $key) {
             return $this->meta;
@@ -28,7 +28,7 @@ abstract class Message
         return array_key_exists($key, $this->meta) ? $this->meta[$key] : $default;
     }
 
-    public function withMetaData($key, $value)
+    public function withMetadata($key, $value)
     {
         $new = clone $this;
         $new->meta[$key] = $value;

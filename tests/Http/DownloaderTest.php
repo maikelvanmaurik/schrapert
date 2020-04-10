@@ -35,7 +35,7 @@ class DownloaderTest extends TestCase
     public function testDownloadTimeouts()
     {
         $request = (new Request('http://timeout.schrapert.dev/?delay=100'))
-            ->withMetaData('download_timeout', 2);
+            ->withMetadata('download_timeout', 2);
 
         $promise = $this->downloader->download($request)->otherwise(function($e) {
             throw $e;
@@ -47,8 +47,8 @@ class DownloaderTest extends TestCase
     public function testBasicStreamingDownloadIsWorking()
     {
         $request = (new Request('http://stream.schrapert.dev/big.php'))
-            ->withMetaData('streaming', true)
-            ->withMetaData('obey_success_code', false);
+            ->withMetadata('streaming', true)
+            ->withMetadata('obey_success_code', false);
 
         $chunks = [];
 
@@ -79,7 +79,7 @@ class DownloaderTest extends TestCase
     {
         return;
 
-        $request = new Request('http://blog.schrapert.dev');
+        $request = new Request('http://test-web-server');
 
         $complete = false;
 
@@ -94,7 +94,7 @@ class DownloaderTest extends TestCase
 
     public function testBasicNonStreamingDownloadIsWorking()
     {
-        $request = new Request('http://blog.schrapert.dev');
+        $request = new Request('http://test-web-server');
 
         $html = '';
 

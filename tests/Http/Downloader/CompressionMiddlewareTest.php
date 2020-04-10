@@ -31,7 +31,7 @@ class CompressionMiddlewareTest extends TestCase
         $downloader = $this->downloader->withMiddleware($compressionMiddleware);
 
         $request = (new Request('http://compression.schrapert.dev'))
-            ->withMetaData('streaming', true);
+            ->withMetadata('streaming', true);
 
         $headers = [];
 

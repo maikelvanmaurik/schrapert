@@ -235,7 +235,7 @@ class HttpCacheMiddlewareTest extends TestCase
                 ->download($request)
                 ->then(function(ResponseInterface $response) {
                     /* @var $request RequestInterface */
-                    $request = $response->getMetaData('request');
+                    $request = $response->getMetadata('request');
                     // First request so it should not have the If-None-Match header
                     $this->assertFalse($request->hasHeader('If-None-Match'));
                     return (string)$response->getBody();
@@ -250,7 +250,7 @@ class HttpCacheMiddlewareTest extends TestCase
                 ->download($request)
                 ->then(function(ResponseInterface $response) use ($eTag) {
                     /* @var $request RequestInterface */
-                    $request = $response->getMetaData('request');
+                    $request = $response->getMetadata('request');
                     // Second request so it should have the If-None-Match header
                     $this->assertEquals($eTag, $request->getHeaderLine('If-None-Match'));
                     return (string)$response->getBody();

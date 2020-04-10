@@ -19,20 +19,37 @@ use React\Promise\PromiseInterface;
 
 class Downloader implements DownloaderInterface
 {
+    /**
+     * @var array
+     */
     private $queue;
-
+    /**
+     * @var array
+     */
     private $transferring;
-
+    /**
+     * @var LoggerInterface
+     */
     private $logger;
-
+    /**
+     * @var array
+     */
     private $middleware;
-
+    /**
+     * @var DownloadTransactionFactoryInterface
+     */
     private $transactionFactory;
-
+    /**
+     * @var EventDispatcherInterface
+     */
     private $events;
 
-    public function __construct(EventDispatcherInterface $events, LoggerInterface $logger, DownloadTransactionFactoryInterface $transactionFactory, array $middleware = [])
-    {
+    public function __construct(
+        EventDispatcherInterface $events,
+        LoggerInterface $logger,
+        DownloadTransactionFactoryInterface $transactionFactory,
+        array $middleware = []
+    ) {
         $this->events = $events;
         $this->logger = $logger;
         $this->middleware = [];
@@ -68,8 +85,8 @@ class Downloader implements DownloaderInterface
             $this->logger->debug("Process en-queued download request {uri}", ['uri' => (string)$request->getUri()]);
             $download = $this->fetch($request);
             $download->then(function($response) use ($deferred, $request) {
-                if($response instanceof \Schrapert\Http\ResponseInterface) {
-                    $response = $response->withMetaData('request', $request);
+                if ($response instanceof \Schrapert\Http\ResponseInterface) {
+                    $response = $response->withMetadata('request', $request);
                 }
                 $deferred->resolve($response);
                 return $response;
@@ -92,7 +109,7 @@ class Downloader implements DownloaderInterface
         $transaction = $this
             ->transactionFactory
             ->createTransaction($request)
-            ->withOptions($request->getMetaData());
+            ->withOptions($request->getMetadata());
 
         return $transaction->send($request)->then(function(ResponseInterface $response) {
             return $response;
@@ -115,8 +132,8 @@ class Downloader implements DownloaderInterface
     {
         $new = clone $this;
         $new->middleware = [];
-        foreach($this->middleware as $item) {
-            if($item !== $middleware) {
+        foreach ($this->middleware as $item) {
+            if ($item !== $middleware) {
                 $new->middleware[] = $item;
             }
         }
@@ -124,8 +141,8 @@ class Downloader implements DownloaderInterface
 
     public function hasMiddleware(DownloadMiddlewareInterface $middleware)
     {
-        foreach($this->middleware as $item) {
-            if($middleware === $item) {
+        foreach ($this->middleware as $item) {
+            if ($middleware === $item) {
                 return true;
             }
         }
@@ -140,7 +157,7 @@ class Downloader implements DownloaderInterface
     private function setMiddleware($middleware)
     {
         foreach((array)$middleware as $item) {
-            if(!$item instanceof DownloadMiddlewareInterface) {
+            if (!$item instanceof DownloadMiddlewareInterface) {
                 throw new InvalidArgumentException("Invalid middleware");
             }
         }
@@ -160,18 +177,18 @@ class Downloader implements DownloaderInterface
         $promise = $deferred->promise();
 
         foreach ($this->middleware as $middleware) {
-            if(!$middleware instanceof ProcessRequestMiddlewareInterface) {
+            if (!$middleware instanceof ProcessRequestMiddlewareInterface) {
                 continue;
             }
             $promise = $promise->then(function ($request) use ($middleware, &$promise, &$downloaded) {
                 $result = $middleware->processRequest($request);
-                if($result instanceof PromiseInterface) {
+                if ($result instanceof PromiseInterface) {
                     return $result->otherwise(function($e) use ($downloaded) {
                         $downloaded->reject($e);
                         //throw $e;
                     });
                 }
-                if($result instanceof ResponseInterface) {
+                if ($result instanceof ResponseInterface) {
                     $downloaded->resolve($result);
                 }
                 return $result;
@@ -188,14 +205,14 @@ class Downloader implements DownloaderInterface
         });
 
         // With the downloaded response apply the post processing middleware
-        foreach($this->middleware as $middleware) {
-            if(!$middleware instanceof ProcessResponseMiddlewareInterface) {
+        foreach ($this->middleware as $middleware) {
+            if (!$middleware instanceof ProcessResponseMiddlewareInterface) {
                 continue;
             }
             $promise = $promise->then(function($message) use ($middleware, $request) {
                 $this->logger->debug("Middleware manager: let the {middleware} middleware process the response", ['middleware' => get_class($middleware)]);
                 $message = $middleware->processResponse($message, $request);
-                if($message instanceof RequestInterface) {
+                if ($message instanceof RequestInterface) {
                     return $this->download($message);
                 }
                 return $message;
@@ -203,7 +220,7 @@ class Downloader implements DownloaderInterface
         }
 
         $promise->then(function ($message) use (&$downloaded, $request) {
-            if($message instanceof ResponseInterface) {
+            if ($message instanceof ResponseInterface) {
                 $this->logger->debug("Middleware manager: downloaded {uri}", ['uri' => $request->getUri()]);
                 $this->events->dispatch(new ResponseDownloadedEvent($this, $message, $request));
                 $downloaded->resolve($message);

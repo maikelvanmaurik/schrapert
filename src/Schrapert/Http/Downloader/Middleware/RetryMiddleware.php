@@ -107,7 +107,7 @@ class RetryMiddleware implements DownloadMiddlewareInterface, ProcessResponseMid
 
     public function processResponse(ResponseInterface $response, RequestInterface $request)
     {
-        if(!filter_var($request->getMetaData('retry', true), FILTER_VALIDATE_BOOLEAN)) {
+        if(!filter_var($request->getMetadata('retry', true), FILTER_VALIDATE_BOOLEAN)) {
             return $response;
         }
         if(in_array($response->getStatusCode(), $this->getHttpRetryCodes())) {
@@ -124,14 +124,14 @@ class RetryMiddleware implements DownloadMiddlewareInterface, ProcessResponseMid
      */
     private function retry(RequestInterface $request, $reason)
     {
-        $timesRetried = $request->getMetaData('retried', 0);
+        $timesRetried = $request->getMetadata('retried', 0);
         if($timesRetried <= $this->getMaxRetries()) {
             $this->logger->debug('Retrying request {uri} (failed {retries} times): {reason}', [
                 'uri' => $request->getUri(),
                 'retries' => $timesRetried,
                 'reason' => $reason
             ]);
-            return $request->withMetaData('retried', ++$timesRetried);
+            return $request->withMetadata('retried', ++$timesRetried);
         }
         $this->logger->debug('Gave up request {uri} tried {retries}, reason: {reason}', [
             'uri' => $request->getUri(),

@@ -29,7 +29,7 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
 
     public function processRequest(RequestInterface $request)
     {
-        if ($request->getMetaData('ignore_robots.txt') || !$request instanceof RequestInterface || $request->getUri()->getPath() == '/robots.txt') {
+        if ($request->getMetadata('ignore_robots.txt') || !$request instanceof RequestInterface || $request->getUri()->getPath() == '/robots.txt') {
             return $request;
         }
 
@@ -56,7 +56,7 @@ class RobotsTxtDownloadMiddleware implements DownloadMiddlewareInterface, Proces
     {
         $robotsRequest = $request
             ->withUri($request->getUri()->withPath('/robots.txt'))
-            ->withMetaData('ignore_robots.txt', true);
+            ->withMetadata('ignore_robots.txt', true);
 
         return $this->downloader->download($robotsRequest)->then(function (ResponseInterface $response) {
             $txt = (string)$response->getBody();
