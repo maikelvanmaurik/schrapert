@@ -1,12 +1,11 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Psr\Http\Message\StreamInterface;
-use InvalidArgumentException;
 
 class Response extends Message implements ResponseInterface
 {
-
     private static $phrases = [
         100 => 'Continue',
         101 => 'Switching Protocols',
@@ -72,7 +71,7 @@ class Response extends Message implements ResponseInterface
 
     public function __construct($statusCode = 200, StreamInterface $body = null, array $headers = [], $protocol = '1.1', $reasonPhrase = null)
     {
-        $this->statusCode = (int)$statusCode;
+        $this->statusCode = (int) $statusCode;
 
         $this->stream = $body;
 
@@ -80,7 +79,7 @@ class Response extends Message implements ResponseInterface
         if ($reasonPhrase == '' && isset(self::$phrases[$this->statusCode])) {
             $this->reasonPhrase = self::$phrases[$this->statusCode];
         } else {
-            $this->reasonPhrase = (string)$reasonPhrase;
+            $this->reasonPhrase = (string) $reasonPhrase;
         }
         $this->protocol = $protocol;
     }
@@ -141,6 +140,7 @@ class Response extends Message implements ResponseInterface
             $reasonPhrase = self::$phrases[$new->statusCode];
         }
         $new->reasonPhrase = $reasonPhrase;
+
         return $new;
     }
 

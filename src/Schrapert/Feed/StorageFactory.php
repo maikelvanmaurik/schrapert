@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Feed;
 
 class StorageFactory implements StorageFactoryInterface
@@ -18,10 +19,10 @@ class StorageFactory implements StorageFactoryInterface
 
     private function registerDefaults()
     {
-        $this->register('file', function($uri) {
+        $this->register('file', function ($uri) {
             return new FileStorage($uri);
         });
-        $this->register('ftp', function($uri) {
+        $this->register('ftp', function ($uri) {
             return new FtpStorage();
         });
     }
@@ -33,7 +34,7 @@ class StorageFactory implements StorageFactoryInterface
     public function createStorage($uri)
     {
         $scheme = parse_url($uri, PHP_URL_SCHEME);
-        if(!array_key_exists($scheme, $this->types)) {
+        if (! array_key_exists($scheme, $this->types)) {
             throw new \RuntimeException(sprintf("Unknown storage type '%s'", $scheme));
         }
 

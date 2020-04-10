@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Test\Http;
 
 use Schrapert\Http\Response;
@@ -14,7 +15,7 @@ class ResponseTest extends TestCase
         $this->assertSame('OK', $r->getReasonPhrase());
         $this->assertSame([], $r->getHeaders());
         $this->assertNull($r->getBody());
-        $this->assertSame('', (string)$r->getBody());
+        $this->assertSame('', (string) $r->getBody());
     }
 
     public function testCanConstructWithHeaders()

@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Crawling;
 
+use Schrapert\Contracts\Crawling\Kernel as KernelContract;
 use Schrapert\Contracts\Events\Dispatcher;
 use Schrapert\Contracts\Foundation\Application;
-use Schrapert\Contracts\Crawling\Kernel as KernelContract;
 
 class Kernel implements KernelContract
 {
@@ -37,19 +38,16 @@ class Kernel implements KernelContract
     public function crawl($crawler)
     {
         try {
-
             $crawlers = func_get_args() > 1
                 ? func_get_args()
                 : (is_iterable($crawler) ? iterator_to_array($crawler) : [$crawler]);
 
-            $crawlers = array_map(function($crawler) {
+            $crawlers = array_map(function ($crawler) {
                 return $this->app->make($crawler);
             }, $crawlers);
 
             $this->engine->run($crawlers);
-
         } catch (\Throwable $e) {
-
         }
     }
 

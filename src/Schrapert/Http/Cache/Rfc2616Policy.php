@@ -1,20 +1,20 @@
 <?php
+
 namespace Schrapert\Http\Cache;
 
+use DateTime;
 use Psr\Http\Message\MessageInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Http\ResponseInterface;
-use DateTime;
 
 /**
- * Class Rfc2616Policy
+ * Class Rfc2616Policy.
  * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching
- * @package Schrapert\Http\Cache
  */
 class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
 {
     /**
-     * One year
+     * One year.
      * @var int
      */
     const MAX_AGE = 31536000;
@@ -37,9 +37,9 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     private function parseCacheControlHeader(MessageInterface $message)
     {
         $directives = array_filter(explode(',', $message->getHeaderLine('Cache-Control')), 'trim');
-        foreach ((array)$directives as $index => &$directive) {
+        foreach ((array) $directives as $index => &$directive) {
             if (strpos($directive, '=')) {
-                list($key, $value) = explode('=', $directive, 2);
+                [$key, $value] = explode('=', $directive, 2);
             } else {
                 $key = $directive;
                 $value = null;
@@ -47,6 +47,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
             unset($directives[$index]);
             $directives[$key] = $value;
         }
+
         return $directives;
     }
 
@@ -59,6 +60,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     {
         $new = clone $this;
         $new->ignoreSchemes = array_unique(array_merge($this->ignoreSchemes, $schemes));
+
         return $new;
     }
 
@@ -66,6 +68,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     {
         $new = clone $this;
         $new->ignoreSchemes = array_diff($this->ignoreSchemes, $schemes);
+
         return $new;
     }
 
@@ -73,6 +76,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     {
         $new = clone $this;
         $new->alwaysStore = filter_var($store, FILTER_VALIDATE_BOOLEAN);
+
         return $new;
     }
 
@@ -80,6 +84,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     {
         $clone = clone $this;
         $clone->ignoreCacheControls = array_unique(array_merge($clone->ignoreCacheControls, $cacheControls));
+
         return $clone;
     }
 
@@ -87,9 +92,9 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     {
         // Use the cached response if the new response is a server error,
         // as long as the old response didn't specify must-revalidate.
-        if($response->getStatusCode() >= 500) {
+        if ($response->getStatusCode() >= 500) {
             $cc = $this->parseCacheControlHeader($cached);
-            if (!array_key_exists('must-revalidate', $cc)) {
+            if (! array_key_exists('must-revalidate', $cc)) {
                 return true;
             }
         }
@@ -106,6 +111,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
         if (array_key_exists('no-store', $cc)) {
             return false;
         }
+
         return true;
     }
 
@@ -146,9 +152,9 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     {
         if (array_key_exists('max-age', $directives)) {
             $value = intval($directives['max-age']);
+
             return $value < 0 ? null : $value;
         }
-        return null;
     }
 
     private function rfc1123ToEpoch($value)
@@ -157,12 +163,11 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
         if ($date instanceof DateTime) {
             return $date->getTimestamp();
         }
-        return null;
     }
 
     /**
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Caching#Freshness describes how the
-     * freshness lifetime is calculated
+     * freshness lifetime is calculated.
      *
      * @param ResponseInterface $response
      * @param RequestInterface $request
@@ -186,6 +191,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
             if (null === ($expires = $this->rfc1123ToEpoch($response->getHeaderLine('Expires')))) {
                 return 0;
             }
+
             return max(0, $expires - $date);
         }
 
@@ -207,9 +213,10 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
 
     public function getCurrentTime()
     {
-        if(null === ($time = $this->time)) {
+        if (null === ($time = $this->time)) {
             return time();
         }
+
         return $time;
     }
 
@@ -217,6 +224,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
     {
         $new = clone $this;
         $new->time = $time;
+
         return $new;
     }
 
@@ -233,40 +241,40 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
         $freshnessLifetime = $this->computeFreshnessLifetime($cachedResponse, $request, $now);
         $currentAge = $this->computeCurrentAge($cachedResponse, $request, $now);
 
-        if(null !== ($requestMaxAge = $this->getMaxAge($ccRequest))) {
-            if(0 === $freshnessLifetime) { // When there was to little data to compute the freshness lifetime by the response just use the request max age
+        if (null !== ($requestMaxAge = $this->getMaxAge($ccRequest))) {
+            if (0 === $freshnessLifetime) { // When there was to little data to compute the freshness lifetime by the response just use the request max age
                 $freshnessLifetime = $requestMaxAge;
             } else {
                 $freshnessLifetime = min($freshnessLifetime, $requestMaxAge);
             }
         }
 
-        if(array_key_exists('min-fresh', $ccRequest)) {
+        if (array_key_exists('min-fresh', $ccRequest)) {
             $minFreshSeconds = $ccRequest['min-fresh'];
-            if($currentAge + $minFreshSeconds > $freshnessLifetime) {
+            if ($currentAge + $minFreshSeconds > $freshnessLifetime) {
                 return false;
             }
         }
 
-        if($currentAge < $freshnessLifetime) {
+        if ($currentAge < $freshnessLifetime) {
             return true;
         }
 
-        if(array_key_exists('max-stale', $ccRequest) && !array_key_exists('must-revalidate', $ccResponse)) {
-            # From RFC2616: "Indicates that the client is willing to
-            # accept a response that has exceeded its expiration time.
-            # If max-stale is assigned a value, then the client is
-            # willing to accept a response that has exceeded its
-            # expiration time by no more than the specified number of
-            # seconds. If no value is assigned to max-stale, then the
-            # client is willing to accept a stale response of any age."
+        if (array_key_exists('max-stale', $ccRequest) && ! array_key_exists('must-revalidate', $ccResponse)) {
+            // From RFC2616: "Indicates that the client is willing to
+            // accept a response that has exceeded its expiration time.
+            // If max-stale is assigned a value, then the client is
+            // willing to accept a response that has exceeded its
+            // expiration time by no more than the specified number of
+            // seconds. If no value is assigned to max-stale, then the
+            // client is willing to accept a stale response of any age."
             $staleAge = $ccRequest['max-stale'];
 
             if (null === $staleAge) {
                 return true;
             }
 
-            if($currentAge < ($freshnessLifetime + max(0, intval($staleAge)))) {
+            if ($currentAge < ($freshnessLifetime + max(0, intval($staleAge)))) {
                 return true;
             }
         }
@@ -276,7 +284,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
 
     /**
      * Processes the request allowing a policy to add additional headers etc. before
-     * dispatching the request
+     * dispatching the request.
      *
      * @param ResponseInterface $cachedResponse
      * @param RequestInterface $request
@@ -290,6 +298,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
         if ($cachedResponse->hasHeader('ETag')) {
             $request = $request->withHeader('If-None-Match', $cachedResponse->getHeaderLine('ETag'));
         }
+
         return $request;
     }
 
@@ -308,6 +317,7 @@ class Rfc2616Policy implements PolicyInterface, RequestProcessorPolicyInterface
         if ($response->hasHeader('Age')) {
             $currentAge = intval($response->getHeaderLine('Age'));
         }
+
         return $currentAge;
     }
 }

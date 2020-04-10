@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Event;
 
+use DateTime;
 use Schrapert\Event\Event;
 use Schrapert\Http\RequestInterface;
-use DateTime;
 
 class DownloadRequestEvent extends Event
 {

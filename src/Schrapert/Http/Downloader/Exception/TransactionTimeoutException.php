@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Exception;
 
 use Psr\Http\Message\RequestInterface;

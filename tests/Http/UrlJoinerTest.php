@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Http;
 
 use Schrapert\Tests\TestCase;

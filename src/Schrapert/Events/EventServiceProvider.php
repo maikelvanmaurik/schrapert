@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Events;
 
 use Schrapert\Foundation\Application;
@@ -14,8 +15,8 @@ class EventServiceProvider
 
     public function register()
     {
-        $this->app->singleton(\Schrapert\Contracts\Events\Dispatcher::class, function() {
-           return new Dispatcher;
+        $this->app->singleton(\Schrapert\Contracts\Events\Dispatcher::class, function () {
+            return new Dispatcher;
         });
     }
 }

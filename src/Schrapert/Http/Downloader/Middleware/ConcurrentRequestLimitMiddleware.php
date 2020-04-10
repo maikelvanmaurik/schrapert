@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
 use React\Dns\Resolver\Resolver;
@@ -46,6 +47,7 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
     {
         $new = clone $this;
         $new->events = $events;
+
         return $new;
     }
 
@@ -53,6 +55,7 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
     {
         $new = clone $this;
         $new->totalConcurrentRequests = intval($total);
+
         return $new;
     }
 
@@ -60,6 +63,7 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
     {
         $new = clone $this;
         $new->randomizeDownloadDelay = filter_var($bool, FILTER_VALIDATE_BOOLEAN);
+
         return $new;
     }
 
@@ -67,6 +71,7 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
     {
         $new = clone $this;
         $new->mode = $mode;
+
         return $new;
     }
 
@@ -78,6 +83,7 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
     {
         $new = clone $this;
         $new->delay = $delay;
+
         return $new;
     }
 
@@ -85,6 +91,7 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
     {
         $new = clone $this;
         $new->perSlotConcurrentRequests = intval($concurrentRequests);
+
         return $new;
     }
 
@@ -92,19 +99,19 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
     {
         $host = $request->getUri()->getHost();
         $deferred = new Deferred();
-        switch($this->mode) {
+        switch ($this->mode) {
             case self::DOMAIN_CONCURRENCY_MODE:
                 return new FulfilledPromise($host);
                 break;
             case self::IP_CONCURRENCY_MODE:
-                $this->dnsResolver->resolve($host)->then(function($value) use ($deferred) {
+                $this->dnsResolver->resolve($host)->then(function ($value) use ($deferred) {
                     $deferred->resolve($value);
-                }, function($e) use ($deferred) {
+                }, function ($e) use ($deferred) {
                     $deferred->reject($e);
                 });
                 break;
             default:
-                $deferred->reject("Invalid mode");
+                $deferred->reject('Invalid mode');
                 break;
         }
 
@@ -113,9 +120,10 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
 
     private function getAwaitDelay()
     {
-        if($this->randomizeDelay) {
+        if ($this->randomizeDelay) {
             return abs(rand(.5 * $this->delay, 1.5, $this->delay));
         }
+
         return $this->delay;
     }
 
@@ -127,23 +135,22 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
      */
     public function awaitPossible($key, RequestInterface $request, Deferred $deferred)
     {
-        if($this->numActive >= $this->totalConcurrentRequests) {
+        if ($this->numActive >= $this->totalConcurrentRequests) {
             $delay = $this->getAwaitDelay();
             $this->events->dispatch(new ConcurrentRequestLimitTotalExceededEvent($request, $delay));
-            $this->logger->debug("Delay request {uri} (key: {key}, total requests exceeded", ['uri' => (string)$request->getUri(), 'key' => $key]);
-            $this->delayedCallbackFactory->factory(array($this, 'awaitPossible'), [$key, $request, $deferred])->schedule($this->getAwaitDelay());
-
+            $this->logger->debug('Delay request {uri} (key: {key}, total requests exceeded', ['uri' => (string) $request->getUri(), 'key' => $key]);
+            $this->delayedCallbackFactory->factory([$this, 'awaitPossible'], [$key, $request, $deferred])->schedule($this->getAwaitDelay());
         } else {
-
-            if(!array_key_exists($key, $this->slots)) {
+            if (! array_key_exists($key, $this->slots)) {
                 $this->slots[$key] = [];
             }
 
             if (count($this->slots[$key]) >= $this->perSlotConcurrentRequests) {
                 $delay = $this->getAwaitDelay();
                 $this->events->dispatch(new ConcurrentRequestLimitSlotsExceededEvent($request, $delay));
-                $this->logger->debug("Delay request {uri} (key: {key}, slot requests exceeded", ['uri' => (string)$request->getUri(), 'key' => $key]);
-                $this->delayedCallbackFactory->factory(array($this, 'awaitPossible'), [$key, $request, $deferred])->schedule($delay);
+                $this->logger->debug('Delay request {uri} (key: {key}, slot requests exceeded', ['uri' => (string) $request->getUri(), 'key' => $key]);
+                $this->delayedCallbackFactory->factory([$this, 'awaitPossible'], [$key, $request, $deferred])->schedule($delay);
+
                 return;
             }
 
@@ -171,11 +178,12 @@ class ConcurrentRequestLimitMiddleware implements DownloadMiddlewareInterface, P
 
     public function processResponse(ResponseInterface $response, RequestInterface $request)
     {
-        $this->getSlotKey($request)->then(function($key) use ($request) {
+        $this->getSlotKey($request)->then(function ($key) use ($request) {
             $index = array_search($request, $this->slots[$key]);
             unset($this->slots[$key][$index]);
             $this->numActive--;
         });
+
         return $response;
     }
 }

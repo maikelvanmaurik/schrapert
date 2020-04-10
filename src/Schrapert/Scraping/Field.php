@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Scraping;
 
 class Field implements FieldInterface

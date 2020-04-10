@@ -1,8 +1,8 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Http\RequestInterface;
-use Schrapert\SpiderInterface;
 
 class UserAgentDownloadMiddleware implements DownloadMiddlewareInterface, ProcessRequestMiddlewareInterface
 {
@@ -15,7 +15,7 @@ class UserAgentDownloadMiddleware implements DownloadMiddlewareInterface, Proces
 
     public function processRequest(RequestInterface $request)
     {
-        if($request instanceof RequestInterface && null === $request->getHeader('User-Agent')) {
+        if ($request instanceof RequestInterface && null === $request->getHeader('User-Agent')) {
             return $request->withHeader('User-Agent', $this->userAgent);
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
 use React\Promise\Deferred;
@@ -12,8 +13,6 @@ use Schrapert\Http\ResponseInterface;
 /**
  * Represents a middleware which provides a low-level cache to all HTTP requests and responses. It has to be combined
  * with a cache storage backend as well as a cache policy.
- *
- * @package Schrapert\Http\Downloader\Middleware
  */
 class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequestMiddlewareInterface, ProcessResponseMiddlewareInterface
 {
@@ -46,6 +45,7 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
     {
         $new = clone $this;
         $new->policy = $policy;
+
         return $new;
     }
 
@@ -65,6 +65,7 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
     {
         $new = clone $this;
         $new->storage = $storage;
+
         return $new;
     }
 
@@ -75,27 +76,28 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
      */
     public function processRequest(RequestInterface $request)
     {
-        if($request->getMetadata('skip_cache')) {
+        if ($request->getMetadata('skip_cache')) {
             return $request;
         }
 
-        if(!$this->policy->shouldCacheRequest($request)) {
+        if (! $this->policy->shouldCacheRequest($request)) {
             return $request->withMetadata('_skip_cache', true);
         }
 
         $cached = $this->storage->retrieveResponse($request);
-        if(!$cached) {
-            if($this->ignoreMissing) {
-                throw new IgnoreRequestException("Ignored request not in cache");
+        if (! $cached) {
+            if ($this->ignoreMissing) {
+                throw new IgnoreRequestException('Ignored request not in cache');
             }
+
             return $request;
         }
 
-        if($this->policy instanceof RequestProcessorPolicyInterface) {
+        if ($this->policy instanceof RequestProcessorPolicyInterface) {
             $request = $this->policy->processRequest($cached, $request);
         }
 
-        if($this->policy->isCachedResponseFresh($cached, $request)) {
+        if ($this->policy->isCachedResponseFresh($cached, $request)) {
             return $cached->withMetadata('request', $request);
         }
 
@@ -105,10 +107,10 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
     private function cache(RequestInterface $request, ResponseInterface $response)
     {
         $deferred = new Deferred();
-        if($this->policy->shouldCacheResponse($response, $request)) {
-            return $this->storage->storeResponse($request, $response)->then(function() use ($response, $deferred) {
+        if ($this->policy->shouldCacheResponse($response, $request)) {
+            return $this->storage->storeResponse($request, $response)->then(function () use ($response, $deferred) {
                 $deferred->resolve($response);
-            }, function($e) use ($deferred) {
+            }, function ($e) use ($deferred) {
                 $deferred->reject($e);
             });
         } else {
@@ -120,27 +122,27 @@ class HttpCacheMiddleware implements DownloadMiddlewareInterface, ProcessRequest
 
     public function processResponse(ResponseInterface $response, RequestInterface $request)
     {
-        if($request->getMetadata('skip_cache', false)) {
+        if ($request->getMetadata('skip_cache', false)) {
             return $response;
         }
 
         // When the response does not contain a Date header add it
-        if(!$response->getHeaderLine('Date')) {
+        if (! $response->getHeaderLine('Date')) {
             $response = $response->withHeader('Date', gmdate('r'));
         }
 
         $cached = $request->getMetadata('cached_response');
-        if(!$cached) {
-            return $this->cache($request, $response)->then(function() use ($response) {
+        if (! $cached) {
+            return $this->cache($request, $response)->then(function () use ($response) {
                 return $response;
             });
         }
 
-        if($this->policy->isCachedResponseValid($cached, $response, $request)) {
+        if ($this->policy->isCachedResponseValid($cached, $response, $request)) {
             return $cached;
         }
 
-        return $this->cache($request, $response)->then(function() use ($response) {
+        return $this->cache($request, $response)->then(function () use ($response) {
             return $response;
         });
     }

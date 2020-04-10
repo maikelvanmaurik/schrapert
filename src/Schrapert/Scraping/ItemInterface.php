@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Scraping;
 
 interface ItemInterface

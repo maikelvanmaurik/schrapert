@@ -1,13 +1,15 @@
 <?php
+
 namespace Schrapert\Http\Cache;
 
+use React\Promise\PromiseInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Http\ResponseInterface;
-use React\Promise\PromiseInterface;
 
 interface StorageInterface
 {
     public function clear();
+
     /**
      * @param RequestInterface $request
      * @return ResponseInterface

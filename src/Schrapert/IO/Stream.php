@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\IO;
 
 class Stream implements WritableStreamInterface, ReadableStreamInterface
@@ -8,12 +9,10 @@ class Stream implements WritableStreamInterface, ReadableStreamInterface
     public function __construct($resource)
     {
         $this->resource = $resource;
-
     }
 
     public function isReadable()
     {
-
     }
 
     public function seek($position = 0)
@@ -45,5 +44,4 @@ class Stream implements WritableStreamInterface, ReadableStreamInterface
     {
         // TODO: Implement end() method.
     }
-
 }

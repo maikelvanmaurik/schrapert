@@ -1,10 +1,11 @@
 <?php
+
 namespace Schrapert\Http\Cookies;
 
 use ArrayIterator;
 
 /**
- * Cookie jar that stores cookies as an array
+ * Cookie jar that stores cookies as an array.
  */
 class CookieJar implements CookieJarInterface
 {
@@ -28,7 +29,7 @@ class CookieJar implements CookieJarInterface
         $this->strictMode = $strictMode;
 
         foreach ($cookies as $cookie) {
-            if (!($cookie instanceof SetCookie)) {
+            if (! ($cookie instanceof SetCookie)) {
                 $cookie = new SetCookie($cookie);
             }
             $this->setCookie($cookie);
@@ -51,7 +52,7 @@ class CookieJar implements CookieJarInterface
                 'Domain'  => $domain,
                 'Name'    => $name,
                 'Value'   => $value,
-                'Discard' => true
+                'Discard' => true,
             ]));
         }
 
@@ -71,7 +72,7 @@ class CookieJar implements CookieJarInterface
         $allowSessionCookies = false
     ) {
         if ($cookie->getExpires() || $allowSessionCookies) {
-            if (!$cookie->getDiscard()) {
+            if (! $cookie->getDiscard()) {
                 return true;
             }
         }
@@ -88,21 +89,22 @@ class CookieJar implements CookieJarInterface
 
     public function clear($domain = null, $path = null, $name = null)
     {
-        if (!$domain) {
+        if (! $domain) {
             $this->cookies = [];
+
             return;
-        } elseif (!$path) {
+        } elseif (! $path) {
             $this->cookies = array_filter(
                 $this->cookies,
                 function (SetCookie $cookie) use ($path, $domain) {
-                    return !$cookie->matchesDomain($domain);
+                    return ! $cookie->matchesDomain($domain);
                 }
             );
-        } elseif (!$name) {
+        } elseif (! $name) {
             $this->cookies = array_filter(
                 $this->cookies,
                 function (SetCookie $cookie) use ($path, $domain) {
-                    return !($cookie->matchesPath($path) &&
+                    return ! ($cookie->matchesPath($path) &&
                         $cookie->matchesDomain($domain));
                 }
             );
@@ -110,7 +112,7 @@ class CookieJar implements CookieJarInterface
             $this->cookies = array_filter(
                 $this->cookies,
                 function (SetCookie $cookie) use ($path, $domain, $name) {
-                    return !($cookie->getName() == $name &&
+                    return ! ($cookie->getName() == $name &&
                         $cookie->matchesPath($path) &&
                         $cookie->matchesDomain($domain));
                 }
@@ -123,7 +125,7 @@ class CookieJar implements CookieJarInterface
         $this->cookies = array_filter(
             $this->cookies,
             function (SetCookie $cookie) {
-                return !$cookie->getDiscard() && $cookie->getExpires();
+                return ! $cookie->getDiscard() && $cookie->getExpires();
             }
         );
     }
@@ -133,7 +135,7 @@ class CookieJar implements CookieJarInterface
         // If the name string is empty (but not 0), ignore the set-cookie
         // string entirely.
         $name = $cookie->getName();
-        if (!$name && $name !== '0') {
+        if (! $name && $name !== '0') {
             return false;
         }
 
@@ -141,9 +143,10 @@ class CookieJar implements CookieJarInterface
         $result = $cookie->validate();
         if ($result !== true) {
             if ($this->strictMode) {
-                throw new \RuntimeException('Invalid cookie: ' . $result);
+                throw new \RuntimeException('Invalid cookie: '.$result);
             } else {
                 $this->removeCookieIfEmpty($cookie);
+
                 return false;
             }
         }
@@ -162,7 +165,7 @@ class CookieJar implements CookieJarInterface
 
             // The previously set cookie is a discard cookie and this one is
             // not so allow the new cookie to be set
-            if (!$cookie->getDiscard() && $c->getDiscard()) {
+            if (! $cookie->getDiscard() && $c->getDiscard()) {
                 unset($this->cookies[$i]);
                 continue;
             }

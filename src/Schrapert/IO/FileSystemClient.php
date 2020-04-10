@@ -1,12 +1,13 @@
 <?php
+
 namespace Schrapert\IO;
 
+use Exception;
 use React\Filesystem\FilesystemInterface;
 use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Stream\BufferedSink;
 use React\Stream\WritableStreamInterface;
-use Exception;
 
 class FileSystemClient implements FileSystemClientInterface
 {
@@ -25,16 +26,16 @@ class FileSystemClient implements FileSystemClientInterface
 
         $f = $this->fs->file($file);
 
-        $f->exists()->then(function() use ($f, $deferred) {
+        $f->exists()->then(function () use ($f, $deferred) {
             $f->open('r')->then(function ($stream) use ($f, $deferred) {
                 $deferred->resolve(BufferedSink::createPromise($stream)->always(function () {
                     $handle->close();
                 }));
-            }, function() use ($deferred) {
-                $deferred->reject("file does not exist");
+            }, function () use ($deferred) {
+                $deferred->reject('file does not exist');
             });
-        }, function() use ($deferred) {
-            $deferred->reject("File does not exist");
+        }, function () use ($deferred) {
+            $deferred->reject('File does not exist');
         });
 
         return $promise;
@@ -49,11 +50,12 @@ class FileSystemClient implements FileSystemClientInterface
     {
         return $this->fs->file($file)->open('cwt')->then(function (WritableStreamInterface $stream) use ($data) {
             try {
-                $stream->write((string)$data);
+                $stream->write((string) $data);
                 $stream->end();
             } catch (Exception $e) {
                 throw $e;
             }
+
             return true;
         });
     }
@@ -80,7 +82,8 @@ class FileSystemClient implements FileSystemClientInterface
     public function readDirSync($directory)
     {
         $files = scandir($directory);
-        return array_filter($files, function($item) {
+
+        return array_filter($files, function ($item) {
             return $item != '.' && $item != '..';
         });
     }

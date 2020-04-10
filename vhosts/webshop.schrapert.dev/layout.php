@@ -4,6 +4,6 @@
     </head>
     <body>
         <h2>Awesome Webshop</h2>
-        <?php print $content ?>
+        <?php echo $content ?>
     </body>
 </html>

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Fixtures;
 
 use Schrapert\Crawl\ResponseInterface;
@@ -8,7 +9,7 @@ class TestSpider extends Spider
 {
     private $parseCallback;
 
-    public function __construct(array $startUris = [], callable $parseCallback)
+    public function __construct(array $startUris, callable $parseCallback)
     {
         $this->startUris = $startUris;
         $this->parseCallback = $parseCallback;

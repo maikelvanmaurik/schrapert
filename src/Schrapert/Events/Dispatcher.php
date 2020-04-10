@@ -1,10 +1,10 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Schrapert\Events;
 
 use Psr\EventDispatcher\StoppableEventInterface;
-use RuntimeException;
 use Schrapert\Contracts\Events\Dispatcher as BaseDispatcher;
 use Schrapert\Contracts\Events\Event;
 use Schrapert\Contracts\Events\Subscriber;
@@ -12,13 +12,11 @@ use Schrapert\Contracts\Events\Subscriber;
 /**
  * The event dispatcher allows event listeners to be registered and is
  * responsible for dispatching the events.
- *
- * @package Schrapert\Events
  */
 class Dispatcher implements BaseDispatcher
 {
-    private $listeners = array();
-    private $sorted = array();
+    private $listeners = [];
+    private $sorted = [];
 
     /**
      * {@inheritdoc}
@@ -70,7 +68,7 @@ class Dispatcher implements BaseDispatcher
      */
     public function getEventListenerPriority(string $event, $listener): ?int
     {
-        if (!isset($this->listeners[$event])) {
+        if (! isset($this->listeners[$event])) {
             return null;
         }
 
@@ -79,6 +77,7 @@ class Dispatcher implements BaseDispatcher
                 return $priority;
             }
         }
+
         return null;
     }
 
@@ -87,7 +86,7 @@ class Dispatcher implements BaseDispatcher
      */
     public function hasListeners(string $event)
     {
-        return (bool)iterator_count($this->getListenersForEvent($event));
+        return (bool) iterator_count($this->getListenersForEvent($event));
     }
 
     /**
@@ -104,12 +103,13 @@ class Dispatcher implements BaseDispatcher
      */
     public function removeEventListener(string $event, $listener = null)
     {
-        if (!isset($this->listeners[$event])) {
+        if (! isset($this->listeners[$event])) {
             return $this;
         }
         if (null === $listener) {
             $this->listeners[$event] = [];
             unset($this->sorted[$event]);
+
             return $this;
         }
         foreach ($this->listeners[$event] as $priority => $listeners) {
@@ -117,6 +117,7 @@ class Dispatcher implements BaseDispatcher
                 unset($this->listeners[$event][$priority][$key], $this->sorted[$event]);
             }
         }
+
         return $this;
     }
 

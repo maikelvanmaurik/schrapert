@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Feed;
 
+use Schrapert\IO\StreamInterface;
 use Schrapert\Scraping\ItemInterface;
 use Schrapert\SpiderInterface;
-use Schrapert\IO\StreamInterface;
 
 class JsonLinesItemExporter extends AbstractExporter
 {

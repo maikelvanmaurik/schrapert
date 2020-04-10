@@ -1,15 +1,14 @@
 <?php
+
 namespace Schrapert;
 
+use React\EventLoop\LoopInterface;
 use Schrapert\Core\ExecutionEngine;
 use Schrapert\Event\EventDispatcherInterface;
 use Schrapert\Feature\FeatureInterface;
-use React\EventLoop\LoopInterface;
 
 /**
  * The runner provides the functionality to start running given spiders.
- *
- * @package Schrapert
  */
 class Runner
 {
@@ -44,6 +43,7 @@ class Runner
     {
         $new = clone $this;
         $new->spiders[] = $spider;
+
         return $new;
     }
 
@@ -65,10 +65,11 @@ class Runner
      */
     private function crawl(SpiderInterface $spider)
     {
-        foreach($this->getFeatures() as $feature) {
+        foreach ($this->getFeatures() as $feature) {
             $feature->init();
         }
         $this->engine->openSpider($spider, $spider->startRequests());
+
         return $this->engine->start();
     }
 
@@ -76,17 +77,18 @@ class Runner
     {
         $new = clone $this;
         $new->features[] = $feature;
+
         return $new;
     }
 
-    public function start($stop=true)
+    public function start($stop = true)
     {
         $finished = 0;
-        foreach($this->spiders as $spider) {
-            $this->crawl($spider)->then(function() use (&$finished) {
+        foreach ($this->spiders as $spider) {
+            $this->crawl($spider)->then(function () use (&$finished) {
                 $finished++;
-                if($finished == count($this->spiders)) {
-                    if($this->loop) {
+                if ($finished == count($this->spiders)) {
+                    if ($this->loop) {
                         $this->loop->stop();
                     }
                 }
@@ -97,6 +99,5 @@ class Runner
 
     public function stop()
     {
-
     }
 }

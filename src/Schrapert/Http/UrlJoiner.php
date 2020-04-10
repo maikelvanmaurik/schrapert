@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 class UrlJoiner implements UrlJoinerInterface
@@ -10,13 +11,15 @@ class UrlJoiner implements UrlJoinerInterface
         }
 
         /* queries and anchors */
-        if ($uri[0] == '#' || $uri[0] == '?') return $baseUri . $uri;
+        if ($uri[0] == '#' || $uri[0] == '?') {
+            return $baseUri.$uri;
+        }
 
         /* parse base URL and convert to local variables:
          $scheme, $host, $path */
         $data = parse_url($baseUri);
 
-        if(!array_key_exists('path', $data)) {
+        if (! array_key_exists('path', $data)) {
             $data['path'] = '';
         }
 
@@ -32,7 +35,7 @@ class UrlJoiner implements UrlJoinerInterface
         $abs = "$data[host]$data[path]/$uri";
 
         /* replace '//' or '/./' or '/foo/../' with '/' */
-        $re = array('#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#');
+        $re = ['#(/\.?/)#', '#/(?!\.\.)[^/]+/\.\./#'];
         for ($n = 1; $n > 0; $abs = preg_replace($re, '/', $abs, -1, $n)) {
         }
 

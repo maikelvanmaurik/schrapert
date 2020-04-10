@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert;
 
 use Schrapert\Crawl\ResponseInterface;

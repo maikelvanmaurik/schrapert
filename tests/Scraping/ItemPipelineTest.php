@@ -1,10 +1,10 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http;
 
 use React\EventLoop\LoopInterface;
 use Schrapert\Runner;
 use Schrapert\Tests\TestCase;
-use Zend\Dom\Document;
 
 class ItemPipelineTest extends TestCase
 {

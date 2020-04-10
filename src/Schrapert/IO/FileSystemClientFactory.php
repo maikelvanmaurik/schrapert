@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\IO;
 
 use React\EventLoop\LoopInterface;

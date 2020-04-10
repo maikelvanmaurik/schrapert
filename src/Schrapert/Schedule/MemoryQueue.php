@@ -1,22 +1,21 @@
 <?php
+
 namespace Schrapert\Schedule;
 
-use Schrapert\Crawl\RequestInterface;
-use React\Promise\PromiseInterface;
-use React\Promise\Deferred;
 use Exception;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use Schrapert\Crawl\RequestInterface;
 use Schrapert\SpiderInterface;
 
 class MemoryQueue implements PriorityQueueInterface
 {
     public function open(SpiderInterface $spider)
     {
-
     }
 
     public function close(SpiderInterface $spider)
     {
-
     }
 
     /**
@@ -25,7 +24,7 @@ class MemoryQueue implements PriorityQueueInterface
      */
     public function push(RequestInterface $request)
     {
-        throw new Exception("TODO!");
+        throw new Exception('TODO!');
     }
 
     /**
@@ -33,12 +32,12 @@ class MemoryQueue implements PriorityQueueInterface
      */
     public function pop()
     {
-        throw new Exception("TODO!");
+        throw new Exception('TODO!');
     }
 
     /**
      * (PHP 5 &gt;= 5.1.0)<br/>
-     * Count elements of an object
+     * Count elements of an object.
      * @link http://php.net/manual/en/countable.count.php
      * @return int The custom count as an integer.
      * </p>

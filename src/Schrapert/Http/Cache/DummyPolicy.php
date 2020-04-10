@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Cache;
 
 use Schrapert\Http\RequestInterface;
@@ -10,7 +11,7 @@ class DummyPolicy implements PolicyInterface
 
     private $ignoreHttpCodes;
 
-    public function __construct(array $ignoreSchemes = ['file'], array $ignoreHttpCodes =  [])
+    public function __construct(array $ignoreSchemes = ['file'], array $ignoreHttpCodes = [])
     {
         $this->ignoreSchemes = $ignoreSchemes;
         $this->ignoreHttpCodes = $ignoreHttpCodes;
@@ -23,17 +24,16 @@ class DummyPolicy implements PolicyInterface
 
     public function shouldCacheRequest(RequestInterface $request)
     {
-        return !in_array($request->getUri()->getScheme(), $this->ignoreSchemes);
+        return ! in_array($request->getUri()->getScheme(), $this->ignoreSchemes);
     }
 
     public function shouldCacheResponse(ResponseInterface $response, RequestInterface $request)
     {
-        return !in_array($response->getStatusCode(), $this->ignoreHttpCodes);
+        return ! in_array($response->getStatusCode(), $this->ignoreHttpCodes);
     }
 
     public function isCachedResponseFresh(ResponseInterface $response, RequestInterface $request)
     {
         return true;
     }
-
 }

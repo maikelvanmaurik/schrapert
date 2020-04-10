@@ -1,19 +1,20 @@
 <?php
+
 namespace Schrapert\DI;
 
+use ArrayAccess;
+use Closure;
+use LogicException;
+use ReflectionClass;
+use ReflectionParameter;
 use Schrapert\Container\BoundMethod;
 use Schrapert\Container\ContextualBindingBuilder;
 use Schrapert\Container\EntryNotFoundException;
 use Schrapert\Container\RewindableGenerator;
 use Schrapert\Container\Util;
-use ReflectionParameter;
 use Schrapert\Contracts\DI\BindingResolutionException;
-use Schrapert\Contracts\DI\Container as ContainerContract;
 use Schrapert\Contracts\DI\Container as BaseContainer;
-use Closure;
-use ReflectionClass;
-use LogicException;
-use ArrayAccess;
+use Schrapert\Contracts\DI\Container as ContainerContract;
 
 class Container implements BaseContainer, ArrayAccess
 {
@@ -756,7 +757,7 @@ class Container implements BaseContainer, ArrayAccess
         // given abstract type. So, we will need to check if any aliases exist with this
         // type and then spin through them and check for contextual bindings on these.
         if (empty($this->abstractAliases[$abstract])) {
-            return null;
+            return;
         }
 
         foreach ($this->abstractAliases[$abstract] as $alias) {
@@ -764,7 +765,6 @@ class Container implements BaseContainer, ArrayAccess
                 return $binding;
             }
         }
-        return null;
     }
 
     /**
@@ -953,9 +953,9 @@ class Container implements BaseContainer, ArrayAccess
             return $this->make($parameter->getClass()->name);
         }
 
-            // If we can not resolve the class instance, we will check to see if the value
-            // is optional, and if it is we will return the optional parameter value as
-            // the value of the dependency, similarly to how we do this with scalars.
+        // If we can not resolve the class instance, we will check to see if the value
+        // is optional, and if it is we will return the optional parameter value as
+        // the value of the dependency, similarly to how we do this with scalars.
         catch (BindingResolutionException $e) {
             if ($parameter->isOptional()) {
                 return $parameter->getDefaultValue();

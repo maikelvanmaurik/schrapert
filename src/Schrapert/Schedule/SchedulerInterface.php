@@ -1,16 +1,15 @@
 <?php
+
 namespace Schrapert\Schedule;
 
-use Schrapert\Crawl\RequestInterface;
 use Countable;
-use Schrapert\SpiderInterface;
 use React\Promise\PromiseInterface;
+use Schrapert\Crawl\RequestInterface;
+use Schrapert\SpiderInterface;
 
 /**
  * The Scheduler receives requests from the engine and enqueues them for
  * feeding them later (also to the engine) when the engine requests them.
- *
- * @package Schrapert\Core
  */
 interface SchedulerInterface extends Countable
 {

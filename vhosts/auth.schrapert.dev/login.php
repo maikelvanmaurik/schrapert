@@ -1,13 +1,12 @@
 <?php
 session_start();
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
-
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
     $_SESSION['authorized'] = $username == 'schrapert' && $password == strrev('schrapert');
 
-    if($_SESSION['authorized']) {
+    if ($_SESSION['authorized']) {
         header('Location: restricted.php');
         exit;
     }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Event;
 
 use Schrapert\Event\Event;

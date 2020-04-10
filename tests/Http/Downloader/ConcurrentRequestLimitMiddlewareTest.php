@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
 use Schrapert\Event\EventDispatcherInterface;
@@ -41,9 +42,9 @@ class ConcurrentRequestLimitMiddlewareTest extends TestCase
         $secondRequestIsDeferred = false;
         $usedDelay = null;
 
-        $events->addListener('concurrent-request-limit-slots-exceeded', function(ConcurrentRequestLimitSlotsExceededEvent $e) use (&$secondRequestIsDeferred, &$usedDelay) {
+        $events->addListener('concurrent-request-limit-slots-exceeded', function (ConcurrentRequestLimitSlotsExceededEvent $e) use (&$secondRequestIsDeferred, &$usedDelay) {
             $request = $e->getRequest();
-            if('http://webshop.schrapert.dev' == (string)$request->getUri()) {
+            if ('http://webshop.schrapert.dev' == (string) $request->getUri()) {
                 $secondRequestIsDeferred = true;
             }
             $usedDelay = $e->getDelay();
@@ -62,12 +63,12 @@ class ConcurrentRequestLimitMiddlewareTest extends TestCase
         $requestB = (new Request('http://webshop.schrapert.dev'));
 
         $promiseA = $downloader->download($requestA)
-            ->then(function(ResponseInterface $response) {
+            ->then(function (ResponseInterface $response) {
                 return time();
             });
 
         $promiseB = $downloader->download($requestB)
-            ->then(function(ResponseInterface $response) {
+            ->then(function (ResponseInterface $response) {
                 return time();
             });
 
@@ -82,15 +83,14 @@ class ConcurrentRequestLimitMiddlewareTest extends TestCase
     {
         return;
 
-
         $events = clone $this->events;
 
         $secondRequestIsDeferred = false;
         $usedDelay = null;
 
-        $events->addListener('concurrent-request-limit-slots-exceeded', function(ConcurrentRequestLimitSlotsExceededEvent $e) use (&$secondRequestIsDeferred, &$usedDelay) {
+        $events->addListener('concurrent-request-limit-slots-exceeded', function (ConcurrentRequestLimitSlotsExceededEvent $e) use (&$secondRequestIsDeferred, &$usedDelay) {
             $request = $e->getRequest();
-            if('http://webshop.schrapert.dev' == (string)$request->getUri()) {
+            if ('http://webshop.schrapert.dev' == (string) $request->getUri()) {
                 $secondRequestIsDeferred = true;
             }
             $usedDelay = $e->getDelay();
@@ -109,12 +109,12 @@ class ConcurrentRequestLimitMiddlewareTest extends TestCase
         $requestB = (new Request('http://webshop.schrapert.dev'));
 
         $promiseA = $downloader->download($requestA)
-            ->then(function(ResponseInterface $response) {
+            ->then(function (ResponseInterface $response) {
                 return time();
             });
 
         $promiseB = $downloader->download($requestB)
-            ->then(function(ResponseInterface $response) {
+            ->then(function (ResponseInterface $response) {
                 return time();
             });
 

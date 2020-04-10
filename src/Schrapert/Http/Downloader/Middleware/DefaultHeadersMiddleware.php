@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Http\RequestInterface;
@@ -16,6 +17,7 @@ class DefaultHeadersMiddleware implements DownloadMiddlewareInterface, ProcessRe
     {
         $new = clone $this;
         $new->headers[$name] = $value;
+
         return $new;
     }
 
@@ -23,16 +25,18 @@ class DefaultHeadersMiddleware implements DownloadMiddlewareInterface, ProcessRe
     {
         $new = clone $this;
         $new->headers = array_merge($new->headers, $headers);
+
         return $new;
     }
 
     public function processRequest(RequestInterface $request)
     {
-        foreach($this->headers as $name => $value) {
-            if(!$request->hasHeader($name)) {
+        foreach ($this->headers as $name => $value) {
+            if (! $request->hasHeader($name)) {
                 $request = $request->withHeader($name, $value);
             }
         }
+
         return $request;
     }
 }

@@ -6,14 +6,13 @@ use Psr\Http\Message\UriInterface;
 
 class Request extends Message implements RequestInterface
 {
-
     private $callback;
 
     private $requestTarget;
 
     public function __construct($uri, $method = 'GET', array $headers = [], $body = null, $version = '1.1', array $meta = [])
     {
-        if (!($uri instanceof UriInterface)) {
+        if (! ($uri instanceof UriInterface)) {
             $uri = new Uri($uri);
         }
 
@@ -32,6 +31,7 @@ class Request extends Message implements RequestInterface
     {
         $new = clone $this;
         $new->callback = $callback;
+
         return $new;
     }
 
@@ -71,8 +71,9 @@ class Request extends Message implements RequestInterface
             $target = '/';
         }
         if ('' != ($query = $this->uri->getQuery())) {
-            $target .= '?' . $query;
+            $target .= '?'.$query;
         }
+
         return $target;
     }
 
@@ -102,8 +103,8 @@ class Request extends Message implements RequestInterface
         }
         $new = clone $this;
         $new->requestTarget = $requestTarget;
-        return $new;
 
+        return $new;
     }
 
     /**
@@ -125,6 +126,7 @@ class Request extends Message implements RequestInterface
     {
         $request = clone $this;
         $request->method = $method;
+
         return $request;
     }
 
@@ -162,9 +164,10 @@ class Request extends Message implements RequestInterface
     {
         $new = clone $this;
         $new->uri = $uri;
-        if (!$preserveHost) {
+        if (! $preserveHost) {
             $new->updateHostFromUri();
         }
+
         return $new;
     }
 
@@ -175,7 +178,7 @@ class Request extends Message implements RequestInterface
             return;
         }
         if (($port = $this->uri->getPort()) !== null) {
-            $host .= ':' . $port;
+            $host .= ':'.$port;
         }
         if (isset($this->headerNames['host'])) {
             $header = $this->headerNames['host'];

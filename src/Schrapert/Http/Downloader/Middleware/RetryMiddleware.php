@@ -1,9 +1,9 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Crawl\Exception\DropRequestException;
 use Schrapert\Http\RequestInterface;
-use Schrapert\Http\ResponseException;
 use Schrapert\Http\ResponseInterface;
 use Schrapert\Log\LoggerInterface;
 
@@ -97,6 +97,7 @@ class RetryMiddleware implements DownloadMiddlewareInterface, ProcessResponseMid
     {
         $new = clone $this;
         $new->maxRetries = intval($retries);
+
         return $new;
     }
 
@@ -107,13 +108,15 @@ class RetryMiddleware implements DownloadMiddlewareInterface, ProcessResponseMid
 
     public function processResponse(ResponseInterface $response, RequestInterface $request)
     {
-        if(!filter_var($request->getMetadata('retry', true), FILTER_VALIDATE_BOOLEAN)) {
+        if (! filter_var($request->getMetadata('retry', true), FILTER_VALIDATE_BOOLEAN)) {
             return $response;
         }
-        if(in_array($response->getStatusCode(), $this->getHttpRetryCodes())) {
+        if (in_array($response->getStatusCode(), $this->getHttpRetryCodes())) {
             $reason = $this->getStatusCodeMessage($response->getStatusCode());
+
             return $this->retry($request, $reason) ?: $response;
         }
+
         return $response;
     }
 
@@ -125,18 +128,19 @@ class RetryMiddleware implements DownloadMiddlewareInterface, ProcessResponseMid
     private function retry(RequestInterface $request, $reason)
     {
         $timesRetried = $request->getMetadata('retried', 0);
-        if($timesRetried <= $this->getMaxRetries()) {
+        if ($timesRetried <= $this->getMaxRetries()) {
             $this->logger->debug('Retrying request {uri} (failed {retries} times): {reason}', [
                 'uri' => $request->getUri(),
                 'retries' => $timesRetried,
-                'reason' => $reason
+                'reason' => $reason,
             ]);
+
             return $request->withMetadata('retried', ++$timesRetried);
         }
         $this->logger->debug('Gave up request {uri} tried {retries}, reason: {reason}', [
             'uri' => $request->getUri(),
             'retries' => $timesRetried,
-            'reason' => $reason
+            'reason' => $reason,
         ]);
         throw new DropRequestException();
     }

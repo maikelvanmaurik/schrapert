@@ -13,10 +13,10 @@ include_once 'bootstrap.php' ?>
             </tr>
         </thead>
         <tbody>
-        <?php foreach($products as $product): ?>
+        <?php foreach ($products as $product): ?>
             <tr class="product">
                 <td class="name"><?php echo $product['name'] ?></td>
-                <td class="price"><?php printf("%.2f", $product['price']) ?></td>
+                <td class="price"><?php printf('%.2f', $product['price']) ?></td>
                 <td><button type="submit" value="<?php echo $product['id'] ?>">Add to cart</button></td>
 
             </tr>
@@ -24,4 +24,4 @@ include_once 'bootstrap.php' ?>
         </tbody>
     </table>
 </form>
-<?php print do_layout(ob_get_clean()); ?>
+<?php echo do_layout(ob_get_clean()); ?>

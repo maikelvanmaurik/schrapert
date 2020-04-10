@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests;
 
 use Schrapert\Http\PathNormalizer;
@@ -6,7 +7,6 @@ use Schrapert\Http\Uri;
 use Schrapert\Http\UriFactory;
 use Schrapert\Http\UriResolver;
 use Schrapert\Http\UriResolverInterface;
-use Schrapert\Tests\TestCase;
 
 class UriResolverTest extends TestCase
 {
@@ -28,10 +28,10 @@ class UriResolverTest extends TestCase
 
         $new = $this->resolver->resolve($base, '../other-path');
 
-        $this->assertEquals('https://user:pass@example.com:1337/some/other-path', (string)$new);
+        $this->assertEquals('https://user:pass@example.com:1337/some/other-path', (string) $new);
 
         $new = $this->resolver->resolve($base, '../other-path/');
 
-        $this->assertEquals('https://user:pass@example.com:1337/some/other-path/', (string)$new);
+        $this->assertEquals('https://user:pass@example.com:1337/some/other-path/', (string) $new);
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Contracts\Crawling;
 
 interface Crawler

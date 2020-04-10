@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware\Event;
 
 use Schrapert\Event\Event;
@@ -7,8 +8,6 @@ use Schrapert\Http\RequestInterface;
 /**
  * An event which gets dispatched when the concurrent request downloader
  * middleware runs out of free slots.
- *
- * @package Schrapert\Http\Downloader\Middleware\Event
  */
 class ConcurrentRequestLimitSlotsExceededEvent extends Event
 {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Contracts\Events;
 
 interface Subscriber

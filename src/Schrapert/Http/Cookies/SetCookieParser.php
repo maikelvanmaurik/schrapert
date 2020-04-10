@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Cookies;
 
 class SetCookieParser implements SetCookieParserInterface
@@ -15,19 +16,18 @@ class SetCookieParser implements SetCookieParserInterface
             'Expires'  => null,
             'Secure'   => false,
             'Discard'  => false,
-            'HttpOnly' => false
+            'HttpOnly' => false,
         ];
         $data = $defaults;
         // Explode the cookie string using a series of semicolons
         $pieces = array_filter(array_map('trim', explode(';', $cookie)));
         // The name of the cookie (first kvp) must include an equal sign.
-        if (empty($pieces) || !strpos($pieces[0], '=')) {
+        if (empty($pieces) || ! strpos($pieces[0], '=')) {
             return new SetCookie($data);
         }
 
         // Add the cookie pieces into the parsed data array
         foreach ($pieces as $part) {
-
             $cookieParts = explode('=', $part, 2);
             $key = trim($cookieParts[0]);
             $value = isset($cookieParts[1])
@@ -40,7 +40,7 @@ class SetCookieParser implements SetCookieParserInterface
                 $data['Value'] = $value;
             } else {
                 foreach (array_keys($defaults) as $search) {
-                    if (!strcasecmp($search, $key)) {
+                    if (! strcasecmp($search, $key)) {
                         $data[$search] = $value;
                         continue 2;
                     }

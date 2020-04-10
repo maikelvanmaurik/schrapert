@@ -1,10 +1,12 @@
 <?php
+
 namespace Schrapert\Http\Downloader;
 
+use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
 use Schrapert\Event\EventDispatcherInterface;
-use Schrapert\Http\Downloader\Event\DownloadCompleteEvent;
 use Schrapert\Http\Downloader\Event\DownloadRequestEvent;
 use Schrapert\Http\Downloader\Event\ResponseDownloadedEvent;
 use Schrapert\Http\Downloader\Exception\DownloaderTimeoutException;
@@ -14,8 +16,6 @@ use Schrapert\Http\Downloader\Middleware\ProcessRequestMiddlewareInterface;
 use Schrapert\Http\Downloader\Middleware\ProcessResponseMiddlewareInterface;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Log\LoggerInterface;
-use InvalidArgumentException;
-use React\Promise\PromiseInterface;
 
 class Downloader implements DownloaderInterface
 {
@@ -67,7 +67,7 @@ class Downloader implements DownloaderInterface
 
     private function enqueueRequest(RequestInterface $request)
     {
-        $this->logger->debug("Enqueue download request {uri}", ['uri' => $request->getUri()]);
+        $this->logger->debug('Enqueue download request {uri}', ['uri' => $request->getUri()]);
         $deferred = new Deferred();
 
         $this->queue[] = [$request, $deferred];
@@ -79,23 +79,25 @@ class Downloader implements DownloaderInterface
 
     private function processQueue()
     {
-        while(count($this->queue) > 0) {
-            list($request,$deferred) = array_shift($this->queue);
+        while (count($this->queue) > 0) {
+            [$request,$deferred] = array_shift($this->queue);
 
-            $this->logger->debug("Process en-queued download request {uri}", ['uri' => (string)$request->getUri()]);
+            $this->logger->debug('Process en-queued download request {uri}', ['uri' => (string) $request->getUri()]);
             $download = $this->fetch($request);
-            $download->then(function($response) use ($deferred, $request) {
+            $download->then(function ($response) use ($deferred, $request) {
                 if ($response instanceof \Schrapert\Http\ResponseInterface) {
                     $response = $response->withMetadata('request', $request);
                 }
                 $deferred->resolve($response);
+
                 return $response;
-            }, function($error) use ($deferred) {
+            }, function ($error) use ($deferred) {
                 $deferred->reject($error);
+
                 return $error;
             });
-            $download->always(function() use ($request) {
-               $this->removeTransferred($request);
+            $download->always(function () use ($request) {
+                $this->removeTransferred($request);
             });
         }
     }
@@ -111,10 +113,10 @@ class Downloader implements DownloaderInterface
             ->createTransaction($request)
             ->withOptions($request->getMetadata());
 
-        return $transaction->send($request)->then(function(ResponseInterface $response) {
+        return $transaction->send($request)->then(function (ResponseInterface $response) {
             return $response;
-        }, function(\Exception $e) use ($request) {
-            if($e instanceof TransactionTimeoutException) {
+        }, function (\Exception $e) use ($request) {
+            if ($e instanceof TransactionTimeoutException) {
                 $e = new DownloaderTimeoutException($this, $request);
             }
             throw $e;
@@ -125,6 +127,7 @@ class Downloader implements DownloaderInterface
     {
         $new = clone $this;
         $new->middleware[] = $middleware;
+
         return $new;
     }
 
@@ -146,6 +149,7 @@ class Downloader implements DownloaderInterface
                 return true;
             }
         }
+
         return false;
     }
 
@@ -156,9 +160,9 @@ class Downloader implements DownloaderInterface
 
     private function setMiddleware($middleware)
     {
-        foreach((array)$middleware as $item) {
-            if (!$item instanceof DownloadMiddlewareInterface) {
-                throw new InvalidArgumentException("Invalid middleware");
+        foreach ((array) $middleware as $item) {
+            if (! $item instanceof DownloadMiddlewareInterface) {
+                throw new InvalidArgumentException('Invalid middleware');
             }
         }
         $this->middleware = $middleware;
@@ -166,7 +170,7 @@ class Downloader implements DownloaderInterface
 
     public function download(RequestInterface $request)
     {
-        $this->logger->debug("Downloader: download {uri}", ['uri' => $request->getUri()]);
+        $this->logger->debug('Downloader: download {uri}', ['uri' => $request->getUri()]);
 
         /*
          * Create 2 deferred objects 1 for creating the request object and 1 to pass back to
@@ -177,13 +181,13 @@ class Downloader implements DownloaderInterface
         $promise = $deferred->promise();
 
         foreach ($this->middleware as $middleware) {
-            if (!$middleware instanceof ProcessRequestMiddlewareInterface) {
+            if (! $middleware instanceof ProcessRequestMiddlewareInterface) {
                 continue;
             }
             $promise = $promise->then(function ($request) use ($middleware, &$promise, &$downloaded) {
                 $result = $middleware->processRequest($request);
                 if ($result instanceof PromiseInterface) {
-                    return $result->otherwise(function($e) use ($downloaded) {
+                    return $result->otherwise(function ($e) use ($downloaded) {
                         $downloaded->reject($e);
                         //throw $e;
                     });
@@ -191,42 +195,46 @@ class Downloader implements DownloaderInterface
                 if ($result instanceof ResponseInterface) {
                     $downloaded->resolve($result);
                 }
+
                 return $result;
             });
         }
 
         // When all the middleware have run call the download method
         $promise = $promise->then(function ($message) {
-            if($message instanceof RequestInterface) {
+            if ($message instanceof RequestInterface) {
                 // Here the request is finished being processed by all middleware
                 return $this->enqueueRequest($message);
             }
+
             return $message;
         });
 
         // With the downloaded response apply the post processing middleware
         foreach ($this->middleware as $middleware) {
-            if (!$middleware instanceof ProcessResponseMiddlewareInterface) {
+            if (! $middleware instanceof ProcessResponseMiddlewareInterface) {
                 continue;
             }
-            $promise = $promise->then(function($message) use ($middleware, $request) {
-                $this->logger->debug("Middleware manager: let the {middleware} middleware process the response", ['middleware' => get_class($middleware)]);
+            $promise = $promise->then(function ($message) use ($middleware, $request) {
+                $this->logger->debug('Middleware manager: let the {middleware} middleware process the response', ['middleware' => get_class($middleware)]);
                 $message = $middleware->processResponse($message, $request);
                 if ($message instanceof RequestInterface) {
                     return $this->download($message);
                 }
+
                 return $message;
             });
         }
 
         $promise->then(function ($message) use (&$downloaded, $request) {
             if ($message instanceof ResponseInterface) {
-                $this->logger->debug("Middleware manager: downloaded {uri}", ['uri' => $request->getUri()]);
+                $this->logger->debug('Middleware manager: downloaded {uri}', ['uri' => $request->getUri()]);
                 $this->events->dispatch(new ResponseDownloadedEvent($this, $message, $request));
                 $downloaded->resolve($message);
             }
+
             return $message;
-        }, function($e) use ($downloaded) {
+        }, function ($e) use ($downloaded) {
             $downloaded->reject($e);
         });
 

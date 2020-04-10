@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Cookies;
 
 use Countable;

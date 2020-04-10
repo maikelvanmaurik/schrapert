@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Core\Event;
 
 use Schrapert\Core\ExecutionEngine;
@@ -6,8 +7,6 @@ use Schrapert\Event\Event;
 
 /**
  * Represents an event which is dispatched when the execution engine starts.
- *
- * @package Schrapert\Core\Event
  */
 class EngineStartedEvent extends Event
 {

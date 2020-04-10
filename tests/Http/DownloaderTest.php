@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Tests\Integration\Http;
 
 use React\Promise\Deferred;
@@ -37,7 +38,7 @@ class DownloaderTest extends TestCase
         $request = (new Request('http://timeout.schrapert.dev/?delay=100'))
             ->withMetadata('download_timeout', 2);
 
-        $promise = $this->downloader->download($request)->otherwise(function($e) {
+        $promise = $this->downloader->download($request)->otherwise(function ($e) {
             throw $e;
         });
 
@@ -54,16 +55,17 @@ class DownloaderTest extends TestCase
 
         $promise = $this->downloader
             ->download($request)
-            ->then(function($response) use (&$chunks, &$streamingPromise) {
+            ->then(function ($response) use (&$chunks, &$streamingPromise) {
                 $deferred = new Deferred();
-                if($response->getBody() instanceof ReadableBodyStream) {
-                    $response->getBody()->on('data', function($data) use (&$chunks) {
-                        $chunks[] = (string)$data;
+                if ($response->getBody() instanceof ReadableBodyStream) {
+                    $response->getBody()->on('data', function ($data) use (&$chunks) {
+                        $chunks[] = (string) $data;
                     });
-                    $response->getBody()->on('end', function() use ($deferred) {
+                    $response->getBody()->on('end', function () use ($deferred) {
                         $deferred->resolve();
                     });
                 }
+
                 return $deferred->promise();
             });
 
@@ -83,7 +85,7 @@ class DownloaderTest extends TestCase
 
         $complete = false;
 
-        $this->eventDispatcher->addListener('response-downloaded', function(DownloadCompleteEvent $e) use (&$complete) {
+        $this->eventDispatcher->addListener('response-downloaded', function (DownloadCompleteEvent $e) use (&$complete) {
             $complete = true;
         });
 
@@ -100,13 +102,12 @@ class DownloaderTest extends TestCase
 
         $promise = $this->downloader
             ->download($request)
-            ->then(function($response) use (&$html) {
-                $html = (string)$response->getBody();
+            ->then(function ($response) use (&$html) {
+                $html = (string) $response->getBody();
             });
 
         await($promise, $this->eventLoop, 10);
 
         $this->assertContains('Welcome to my blog!', $html);
     }
-
 }

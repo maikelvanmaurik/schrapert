@@ -1,7 +1,7 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
-use React\Promise\Deferred;
 use React\Promise\FulfilledPromise;
 use Schrapert\Http\RequestInterface;
 use Schrapert\Http\ResponseInterface;
@@ -27,7 +27,7 @@ class CompressionMiddleware implements DownloadMiddlewareInterface, ProcessReque
 
     private function decode($raw)
     {
-        $raw = (string)$raw;
+        $raw = (string) $raw;
         //TODO non-blocking gzip decoding
         return new FulfilledPromise(gzdecode($raw));
     }
@@ -35,12 +35,13 @@ class CompressionMiddleware implements DownloadMiddlewareInterface, ProcessReque
     public function processResponse(ResponseInterface $response, RequestInterface $request)
     {
         $headers = $response->getHeaderLine('Content-Encoding');
-        if(!empty($headers)) {
+        if (! empty($headers)) {
             // Decode the body
-            return $this->decode($response->getBody())->then(function($body) use ($response) {
+            return $this->decode($response->getBody())->then(function ($body) use ($response) {
                 return $response->withBody($this->streamFactory->createStream($body));
             });
         }
+
         return $response;
     }
 }

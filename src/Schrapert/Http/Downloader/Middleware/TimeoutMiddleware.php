@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Http\RequestInterface;
@@ -31,15 +32,15 @@ class TimeoutMiddleware implements DownloadMiddlewareInterface, ProcessRequestMi
         foreach ($this->cookies->getIterator() as $cookie) {
             if ($cookie->matchesPath($path) &&
                 $cookie->matchesDomain($host) &&
-                !$cookie->isExpired() &&
-                (!$cookie->getSecure() || $scheme === 'https')
+                ! $cookie->isExpired() &&
+                (! $cookie->getSecure() || $scheme === 'https')
             ) {
-                $values[] = $cookie->getName() . '='
-                    . $cookie->getValue();
+                $values[] = $cookie->getName().'='
+                    .$cookie->getValue();
             }
         }
 
-        if($values) {
+        if ($values) {
             $request = $request->withHeader('Cookie', implode('; ', $values));
         }
 
@@ -49,9 +50,9 @@ class TimeoutMiddleware implements DownloadMiddlewareInterface, ProcessRequestMi
     public function processResponse(ResponseInterface $response, RequestInterface $request)
     {
         if (null !== ($headers = $response->getHeader('Set-Cookie'))) {
-            foreach ((array)$headers as $cookie) {
+            foreach ((array) $headers as $cookie) {
                 $cookie = $this->parser->parse($cookie);
-                if (!$cookie->getDomain()) {
+                if (! $cookie->getDomain()) {
                     $cookie->setDomain($request->getUri()->getHost());
                 }
                 $this->cookies->setCookie($cookie);

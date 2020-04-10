@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Core;
 
 use React\Promise\PromiseInterface;

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Downloader\Middleware;
 
 use Schrapert\Http\Downloader\DownloaderInterface;
@@ -6,7 +7,7 @@ use Schrapert\Http\Downloader\DownloaderInterface;
 /**
  * Default implementation of the download middleware factory
  * which allows types to be registered so that custom middleware
- * can be used
+ * can be used.
  */
 class DownloadMiddlewareFactory implements DownloadMiddlewareFactoryInterface
 {

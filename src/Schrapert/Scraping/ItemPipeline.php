@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Scraping;
 
 use React\Promise\Deferred;
@@ -17,6 +18,7 @@ class ItemPipeline implements ItemPipelineInterface
     {
         $new = clone $this;
         $new->stages[] = $this;
+
         return $new;
     }
 
@@ -39,15 +41,15 @@ class ItemPipeline implements ItemPipelineInterface
 
         $promise = $chain->promise();
 
-        foreach($this->getStages() as $stage) {
-            $promise = $promise->then(function($item) use ($stage) {
-               return $stage->processItem($item);
+        foreach ($this->getStages() as $stage) {
+            $promise = $promise->then(function ($item) use ($stage) {
+                return $stage->processItem($item);
             });
         }
 
-        $promise->then(function($item) use ($deferred) {
+        $promise->then(function ($item) use ($deferred) {
             $deferred->resolve($item);
-        }, function($reason) use ($deferred) {
+        }, function ($reason) use ($deferred) {
             $deferred->reject($reason);
         });
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Crawl;
 
 class Request extends Message implements RequestInterface
@@ -24,6 +25,7 @@ class Request extends Message implements RequestInterface
     {
         $new = clone $this;
         $new->callback = $callback;
+
         return $new;
     }
 }
