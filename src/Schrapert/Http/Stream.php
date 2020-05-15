@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Psr\Http\Message\StreamInterface;
@@ -27,7 +28,7 @@ class Stream implements StreamInterface
 
     public function __construct($stream)
     {
-        if (!is_resource($stream)) {
+        if (! is_resource($stream)) {
             throw new \InvalidArgumentException('Stream must be a resource');
         }
 
@@ -77,7 +78,7 @@ class Stream implements StreamInterface
      */
     public function detach()
     {
-        if (!isset($this->resource)) {
+        if (! isset($this->resource)) {
             return null;
         }
         $result = $this->resource;
@@ -97,7 +98,7 @@ class Stream implements StreamInterface
         if ($this->size !== null) {
             return $this->size;
         }
-        if (!isset($this->resource)) {
+        if (! isset($this->resource)) {
             return null;
         }
         $stats = fstat($this->resource);
@@ -109,7 +110,7 @@ class Stream implements StreamInterface
     }
 
     /**
-     * Returns the current position of the file read/write pointer
+     * Returns the current position of the file read/write pointer.
      *
      * @return int Position of the file pointer
      * @throws \RuntimeException on error.
@@ -163,11 +164,11 @@ class Stream implements StreamInterface
      */
     public function seek($offset, $whence = SEEK_SET)
     {
-        if (!$this->seekable) {
+        if (! $this->seekable) {
             throw new \RuntimeException('Stream is not seekable');
         } elseif (fseek($this->resource, $offset, $whence) === -1) {
             throw new \RuntimeException('Unable to seek to stream position '
-                . $offset . ' with whence ' . var_export($whence, true));
+                .$offset.' with whence '.var_export($whence, true));
         }
     }
 
@@ -205,7 +206,7 @@ class Stream implements StreamInterface
      */
     public function write($string)
     {
-        if (!$this->writable) {
+        if (! $this->writable) {
             throw new \RuntimeException('Cannot write to a non-writable stream');
         }
         // We can't know the size after writing anything
@@ -214,7 +215,8 @@ class Stream implements StreamInterface
         if ($result === false) {
             throw new \RuntimeException('Unable to write to stream');
         }
-        return $result;    }
+        return $result;
+    }
 
     /**
      * Returns whether or not the stream is readable.
@@ -238,14 +240,14 @@ class Stream implements StreamInterface
      */
     public function read($length)
     {
-        if (!$this->readable) {
+        if (! $this->readable) {
             throw new RuntimeException('Cannot read from non-readable stream');
         }
         return fread($this->resource, $length);
     }
 
     /**
-     * Returns the remaining contents in a string
+     * Returns the remaining contents in a string.
      *
      * @return string
      * @throws \RuntimeException if unable to read or an error occurs while
@@ -283,5 +285,4 @@ class Stream implements StreamInterface
         }
         return $metadata[$key];
     }
-
 }

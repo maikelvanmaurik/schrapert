@@ -1,10 +1,11 @@
 <?php
+
 namespace Schrapert\Tests\Http;
 
+use DateTime;
 use Schrapert\Http\Cache\Rfc2616Policy;
 use Schrapert\Http\Request;
 use Schrapert\Http\Response;
-use DateTime;
 use Schrapert\Tests\TestCase;
 
 class Rfc2616PolicyTest extends TestCase
@@ -28,8 +29,6 @@ class Rfc2616PolicyTest extends TestCase
 
         $policy = $policy->withIgnoreSchemes(['file']);
         $this->assertCount(1, $policy->getIgnoreSchemes());
-
-
     }
 
     public function testRequestShouldNotBeCachedWhenItContainsACacheControlNoStoreHeader()
@@ -61,9 +60,15 @@ class Rfc2616PolicyTest extends TestCase
         $policy = $this->policy->withCurrentTime($now);
         $cachedResponse = (new Response(200, null, [
             'Expires' => date_create()->setTimestamp($now - 1800)->format(DateTime::RFC1123),
-            'Date' => date_create()->setTimestamp($cachedResponseTime)->format(DateTime::RFC1123)
+            'Date'    => date_create()->setTimestamp($cachedResponseTime)->format(DateTime::RFC1123)
         ]));
-        $request = (new Request('http://foo.bar', 'GET', ['Cache-Control' => 'max-stale=' . (self::SECONDS_IN_DAY * 2)]));
+        $request = new Request(
+            'http://foo.bar',
+            'GET',
+            [
+                'Cache-Control' => 'max-stale=' . (self::SECONDS_IN_DAY * 2)
+            ]
+        );
         $this->assertTrue($policy->isCachedResponseFresh($cachedResponse, $request));
         $request = (new Request('http://foo.bar', 'GET', ['Cache-Control' => 'max-stale=120']));
         $this->assertFalse($policy->isCachedResponseFresh($cachedResponse, $request));
@@ -81,9 +86,10 @@ class Rfc2616PolicyTest extends TestCase
         $policy = $this->policy->withCurrentTime($now);
         $cachedResponse = (new Response(200, null, [
             'Expires' => date_create()->setTimestamp($now + 1800)->format(DateTime::RFC1123),
-            'Date' => date_create()->setTimestamp($cachedResponseTime)->format(DateTime::RFC1123)
+            'Date'    => date_create()->setTimestamp($cachedResponseTime)->format(DateTime::RFC1123)
         ]));
-        $request = (new Request('http://foo.bar', 'GET', ['Cache-Control' => 'min-fresh=' . (self::SECONDS_IN_DAY * 2)]));
+        $request =
+            (new Request('http://foo.bar', 'GET', ['Cache-Control' => 'min-fresh=' . (self::SECONDS_IN_DAY * 2)]));
         $this->assertFalse($policy->isCachedResponseFresh($cachedResponse, $request));
         $request = (new Request('http://foo.bar', 'GET', ['Cache-Control' => 'min-fresh=120']));
         $this->assertTrue($policy->isCachedResponseFresh($cachedResponse, $request));

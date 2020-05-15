@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Http;
 
-use Schrapert\Crawl\RequestInterface as CrawlRequest;
+use Schrapert\Downloading\RequestInterface as CrawlRequest;
+use Psr\Http\Message\RequestInterface as PsrRequest;
 
-interface RequestInterface extends CrawlRequest, \Psr\Http\Message\RequestInterface
+interface RequestInterface extends CrawlRequest, PsrRequest
 {
-
 }

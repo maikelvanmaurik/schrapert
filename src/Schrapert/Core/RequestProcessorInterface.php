@@ -1,7 +1,8 @@
 <?php
+
 namespace Schrapert\Core;
 
-use Schrapert\Crawl\RequestInterface;
+use Schrapert\Downloading\RequestInterface;
 use Schrapert\SpiderInterface;
 
 interface RequestProcessorInterface

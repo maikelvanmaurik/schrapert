@@ -1,8 +1,8 @@
 <?php
+
 namespace Schrapert\Feed;
 
 use Schrapert\Scraping\ItemInterface;
-use Schrapert\SpiderInterface;
 
 abstract class AbstractExporter implements ExporterInterface
 {
@@ -56,11 +56,13 @@ abstract class AbstractExporter implements ExporterInterface
     {
         $data = [];
         $fields = $this->getExportFields();
-        if(empty($fields)) {
-            $fields = array_map(function($item) { return $item->getName(); }, $item->getFields());
+        if (empty($fields)) {
+            $fields = array_map(function ($item) {
+                return $item->getName();
+            }, $item->getFields());
         }
-        foreach($item->getFields() as $itemField) {
-            if(in_array($itemField->getName(), $fields)) {
+        foreach ($item->getFields() as $itemField) {
+            if (in_array($itemField->getName(), $fields)) {
                 $data[$itemField->getName()] = $itemField->getValue();
             }
         }

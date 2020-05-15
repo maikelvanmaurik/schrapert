@@ -1,10 +1,15 @@
 <?php
-function await(\React\Promise\PromiseInterface $promise, \React\EventLoop\LoopInterface $loop, $timeout = null) {
+function await(\React\Promise\PromiseInterface $promise, \React\EventLoop\LoopInterface $loop = null, $timeout = 10)
+{
+    if (null === $loop) {
+        $loop = \React\EventLoop\Factory::create();
+    }
     return \Clue\React\Block\await($promise, $loop, $timeout);
 }
 
-function rmdir_recursive($dir) {
-    if(!is_dir($dir)) {
+function rmdir_recursive($dir)
+{
+    if (!is_dir($dir)) {
         return;
     }
     $files = array_diff(scandir($dir), array('.','..'));

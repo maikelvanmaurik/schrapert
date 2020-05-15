@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\RobotsTxt;
 
 class Parser implements ParserInterface
@@ -14,7 +15,7 @@ class Parser implements ParserInterface
         $ua = [];
         foreach (preg_split('/$\R?^/m', $txt) as $line) {
             if (preg_match("/^User\-agent:\s*([^#\s]+)/", $line, $m)) {
-                if($readingRules) {
+                if ($readingRules) {
                     $ua = [];
                 }
                 $ua[] = $m[1];

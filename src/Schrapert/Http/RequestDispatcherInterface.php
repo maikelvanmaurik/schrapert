@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Psr\Http\Message\RequestInterface as PsrRequestInterface;

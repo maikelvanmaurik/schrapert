@@ -1,7 +1,8 @@
 <?php
+
 namespace Schrapert\Feature;
 
-use Schrapert\Event\EventDispatcherInterface;
+use Schrapert\Events\EventDispatcherInterface;
 use Schrapert\Feature\Telnet\TelnetServer;
 
 class Telnet implements FeatureInterface
@@ -18,8 +19,8 @@ class Telnet implements FeatureInterface
 
     public function init()
     {
-        $this->events->addListener('execution-engine-started', array($this, 'startListening'));
-        $this->events->addListener('execution-engine-stopped', array($this, 'stopListening'));
+        $this->events->addListener('execution-engine-started', [$this, 'startListening']);
+        $this->events->addListener('execution-engine-stopped', [$this, 'stopListening']);
     }
 
     public function startListening()
@@ -29,6 +30,5 @@ class Telnet implements FeatureInterface
 
     public function protocol()
     {
-
     }
 }

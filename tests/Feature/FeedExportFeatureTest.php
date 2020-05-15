@@ -54,7 +54,7 @@ class FeedExportFeatureTest extends TestCase
     public function testDoesSupportMultipleExporters()
     {
         $exportPath = ETC_DIR . 'export-test/';
-        if(!is_dir($exportPath)) {
+        if (!is_dir($exportPath)) {
             mkdir($exportPath, 0777, true);
         }
 
@@ -65,7 +65,7 @@ class FeedExportFeatureTest extends TestCase
             ->withExporter($this->exporterFactory->createExporter('xml', 'file://' . $exportPath . 'feed.xml'));
         $this->runner
             ->withFeature($feature)
-            ->withSpider(new TestSpider(['http://webshop.schrapert.dev/products.php'], function(ResponseInterface $response) {
+            ->withSpider(new TestSpider(['http://webshop.schrapert.dev/products.php'], function (ResponseInterface $response) {
                 $html = (string)$response->getBody();
                 $products = $this->parseProducts($html);
                 return $products;

@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Feature;
 
-use Schrapert\Core\Event\SpiderClosedEvent;
-use Schrapert\Core\Event\SpiderOpenedEvent;
-use Schrapert\Event\EventDispatcherInterface;
+use Schrapert\Core\Event\SpiderClosed;
+use Schrapert\Core\Event\SpiderOpened;
+use Schrapert\Events\EventDispatcherInterface;
 use Schrapert\Feed\ExporterInterface;
 use Schrapert\Scraping\ItemScrapedEvent;
 
@@ -34,28 +35,28 @@ class FeedExportFeature implements FeatureInterface
 
     public function init()
     {
-        $this->events->addListener('spider-opened', array($this, 'openSpider'));
-        $this->events->addListener('spider-closed', array($this, 'closeSpider'));
-        $this->events->addListener('item-scraped', array($this, 'itemScraped'));
+        $this->events->addListener('spider-opened', [$this, 'openSpider']);
+        $this->events->addListener('spider-closed', [$this, 'closeSpider']);
+        $this->events->addListener('item-scraped', [$this, 'itemScraped']);
     }
 
     public function itemScraped(ItemScrapedEvent $event)
     {
-        foreach($this->getExporters() as $exporter) {
+        foreach ($this->getExporters() as $exporter) {
             $exporter->exportItem($event->getSpider(), $event->getItem());
         }
     }
 
-    public function openSpider(SpiderOpenedEvent $event)
+    public function openSpider(SpiderOpened $event)
     {
-        foreach($this->getExporters() as $exporter) {
+        foreach ($this->getExporters() as $exporter) {
             $exporter->startExporting($event->getSpider());
         }
     }
 
-    public function closeSpider(SpiderClosedEvent $event)
+    public function closeSpider(SpiderClosed $event)
     {
-        foreach($this->getExporters() as $exporter) {
+        foreach ($this->getExporters() as $exporter) {
             $exporter->finishExporting($event->getSpider());
         }
     }

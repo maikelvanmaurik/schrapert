@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Filter;
 
 use React\Promise\Deferred;
-use Schrapert\Crawl\RequestFingerprintGeneratorInterface;
-use Schrapert\Crawl\RequestInterface;
+use Schrapert\Downloading\RequestFingerprintGeneratorInterface;
+use Schrapert\Downloading\RequestInterface;
 use Schrapert\SpiderInterface;
 
 class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterface
@@ -16,8 +17,11 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
 
     private $fingerprintGenerator;
 
-    public function __construct(RequestFingerprintGeneratorInterface $fingerprintGenerator, $path = null, $maxMemorySize = 1000000)
-    {
+    public function __construct(
+        RequestFingerprintGeneratorInterface $fingerprintGenerator,
+        $path = null,
+        $maxMemorySize = 1000000
+    ) {
         $this->fingerprintGenerator = $fingerprintGenerator;
         $this->path = $path;
         $this->maxMemorySize = $maxMemorySize;
@@ -27,7 +31,7 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
     private function push($fp)
     {
         $this->fingerprints[] = $fp;
-        if(null !== $this->maxMemorySize && count($this->fingerprints) >= $this->maxMemorySize) {
+        if (null !== $this->maxMemorySize && count($this->fingerprints) >= $this->maxMemorySize) {
             $this->fingerprints = array_slice($this->fingerprints, max(1000, ceil($this->maxMemorySize, 4)));
         }
     }
@@ -39,7 +43,7 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
         $fingerprint = $this->fingerprintGenerator->fingerprint($request);
 
         // Check the memory first
-        if(in_array($fingerprint, $this->fingerprints)) {
+        if (in_array($fingerprint, $this->fingerprints)) {
             $deferred->resolve(true);
         } else {
             // We need to read the fingerprint file
@@ -53,6 +57,5 @@ class DuplicateFingerprintRequestFilter implements DuplicateRequestFilterInterfa
 
     public function open(SpiderInterface $spider)
     {
-
     }
 }

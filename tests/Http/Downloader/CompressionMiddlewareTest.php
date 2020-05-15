@@ -2,7 +2,7 @@
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
 use React\Promise\Deferred;
-use Schrapert\Http\Downloader\Downloader;
+use Schrapert\Downloading\Downloader;
 use Schrapert\Http\Request;
 use Schrapert\Http\ResponseInterface;
 use Schrapert\Tests\TestCase;
@@ -36,7 +36,7 @@ class CompressionMiddlewareTest extends TestCase
         $headers = [];
 
         $promise = $downloader->download($request)
-            ->then(function(ResponseInterface $response) use (&$headers) {
+            ->then(function (ResponseInterface $response) use (&$headers) {
                 $headers = $response->getHeaders();
                 $deferred = new Deferred();
                 return $deferred->promise();
@@ -59,7 +59,7 @@ class CompressionMiddlewareTest extends TestCase
         $headers = [];
 
         $promise = $downloader->download($request)
-            ->then(function(ResponseInterface $response) use (&$headers) {
+            ->then(function (ResponseInterface $response) use (&$headers) {
                 $headers = $response->getHeaders();
                 return (string)$response->getBody();
             });

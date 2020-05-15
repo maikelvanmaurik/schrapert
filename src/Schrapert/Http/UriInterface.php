@@ -1,9 +1,9 @@
 <?php
 namespace Schrapert\Http;
 
-use Psr\Http\Message\UriInterface as PsrUri;
+use Schrapert\Crawling\UriInterface as BaseUri;
 
-interface UriInterface extends PsrUri
+interface UriInterface extends BaseUri
 {
 
 }

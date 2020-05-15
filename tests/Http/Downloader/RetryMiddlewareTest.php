@@ -1,8 +1,8 @@
 <?php
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
-use Schrapert\Http\Downloader\Downloader;
-use Schrapert\Http\Downloader\Middleware\RetryMiddleware;
+use Schrapert\Downloading\Downloader;
+use Schrapert\Downloading\Middleware\RetryMiddleware;
 use Schrapert\Http\Request;
 use Schrapert\Tests\TestCase;
 

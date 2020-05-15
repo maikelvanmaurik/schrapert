@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\IO;
 
 interface StreamInterface
@@ -11,7 +12,7 @@ interface StreamInterface
 
     public function read();
 
-    public function seek($position=0);
+    public function seek($position = 0);
 
     public function close();
 }

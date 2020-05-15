@@ -6,11 +6,9 @@ use Schrapert\Tests\TestCase;
 
 class StreamTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testConstructorThrowsExceptionOnInvalidArgument()
     {
+        $this->expectException(\InvalidArgumentException::class);
         new Stream(true);
     }
 

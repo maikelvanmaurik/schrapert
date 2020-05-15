@@ -1,10 +1,11 @@
 <?php
+
 namespace Schrapert\Feature;
 
-use Schrapert\Core\Event\SpiderOpenedEvent;
-use Schrapert\Event\EventDispatcherInterface;
-use Schrapert\Http\Downloader\Event\DownloadRequestEvent;
-use Schrapert\Http\Downloader\Event\ResponseDownloadedEvent;
+use Schrapert\Core\Event\SpiderOpened;
+use Schrapert\Downloading\Event\DownloadRequestEvent;
+use Schrapert\Downloading\Event\ResponseDownloadedEvent;
+use Schrapert\Events\EventDispatcherInterface;
 use Schrapert\Log\LoggerInterface;
 
 /**
@@ -53,9 +54,9 @@ class AutoThrottleFeature implements FeatureInterface
 
     public function init()
     {
-        $this->events->addListener('spider-opened', array($this, 'onSpiderOpened'));
-        $this->events->addListener('response-downloaded', array($this, 'onResponseDownloaded'));
-        $this->events->addListener('download-request', array($this, 'onDownloadRequest'));
+        $this->events->addListener('spider-opened', [$this, 'onSpiderOpened']);
+        $this->events->addListener('response-downloaded', [$this, 'onResponseDownloaded']);
+        $this->events->addListener('download-request', [$this, 'onDownloadRequest']);
     }
 
     public function withTargetConcurrency($concurrency)
@@ -86,20 +87,19 @@ class AutoThrottleFeature implements FeatureInterface
         return $new;
     }
 
-    public function onSpiderOpened(SpiderOpenedEvent $event)
+    public function onSpiderOpened(SpiderOpened $event)
     {
         $spider = $event->getSpider();
-        if($spider instanceof SpiderProvidingDownloadDelayInterface) {
+        if ($spider instanceof SpiderProvidingDownloadDelayInterface) {
             $this->minDelay = $spider->getDownloadDelay();
         }
-        if(null === $this->startDelay) {
+        if (null === $this->startDelay) {
             $this->startDelay = $this->minDelay;
         }
     }
 
     public function onDownloadRequest(DownloadRequestEvent $event)
     {
-
     }
 
     public function onResponseDownloaded(ResponseDownloadedEvent $event)

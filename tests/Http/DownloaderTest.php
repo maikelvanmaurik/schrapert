@@ -2,8 +2,8 @@
 namespace Schrapert\Tests\Integration\Http;
 
 use React\Promise\Deferred;
-use Schrapert\Event\EventDispatcherInterface;
-use Schrapert\Http\Downloader\Event\DownloadCompleteEvent;
+use Schrapert\Downloading\Event\DownloadCompleteEvent;
+use Schrapert\Events\EventDispatcherInterface;
 use Schrapert\Http\ReadableBodyStream;
 use Schrapert\Http\Request;
 use Schrapert\Tests\TestCase;
@@ -11,7 +11,7 @@ use Schrapert\Tests\TestCase;
 class DownloaderTest extends TestCase
 {
     /**
-     * @var \Schrapert\Http\Downloader\Downloader
+     * @var \Schrapert\Downloader\Downloader
      */
     private $downloader;
 
@@ -28,16 +28,16 @@ class DownloaderTest extends TestCase
         $this->eventDispatcher = $this->getContainer()->get('event_dispatcher');
         parent::setUp();
     }
-
+    
     /**
-     * @expectedException \Schrapert\Http\Downloader\Exception\DownloaderTimeoutException
+     * @expectedException \Schrapert\Downloading\Exception\DownloaderTimeoutException
      */
     public function testDownloadTimeouts()
     {
         $request = (new Request('http://timeout.schrapert.dev/?delay=100'))
             ->withMetaData('download_timeout', 2);
 
-        $promise = $this->downloader->download($request)->otherwise(function($e) {
+        $promise = $this->downloader->download($request)->otherwise(function ($e) {
             throw $e;
         });
 
@@ -54,13 +54,13 @@ class DownloaderTest extends TestCase
 
         $promise = $this->downloader
             ->download($request)
-            ->then(function($response) use (&$chunks, &$streamingPromise) {
+            ->then(function ($response) use (&$chunks, &$streamingPromise) {
                 $deferred = new Deferred();
-                if($response->getBody() instanceof ReadableBodyStream) {
-                    $response->getBody()->on('data', function($data) use (&$chunks) {
+                if ($response->getBody() instanceof ReadableBodyStream) {
+                    $response->getBody()->on('data', function ($data) use (&$chunks) {
                         $chunks[] = (string)$data;
                     });
-                    $response->getBody()->on('end', function() use ($deferred) {
+                    $response->getBody()->on('end', function () use ($deferred) {
                         $deferred->resolve();
                     });
                 }
@@ -83,7 +83,7 @@ class DownloaderTest extends TestCase
 
         $complete = false;
 
-        $this->eventDispatcher->addListener('response-downloaded', function(DownloadCompleteEvent $e) use (&$complete) {
+        $this->eventDispatcher->addListener('response-downloaded', function (DownloadCompleteEvent $e) use (&$complete) {
             $complete = true;
         });
 
@@ -100,7 +100,7 @@ class DownloaderTest extends TestCase
 
         $promise = $this->downloader
             ->download($request)
-            ->then(function($response) use (&$html) {
+            ->then(function ($response) use (&$html) {
                 $html = (string)$response->getBody();
             });
 
@@ -108,5 +108,4 @@ class DownloaderTest extends TestCase
 
         $this->assertContains('Welcome to my blog!', $html);
     }
-
 }

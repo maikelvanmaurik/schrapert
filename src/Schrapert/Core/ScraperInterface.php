@@ -1,10 +1,11 @@
 <?php
+
 namespace Schrapert\Core;
 
-use Schrapert\Crawl\RequestInterface;
-use Schrapert\Crawl\ResponseInterface;
-use Schrapert\SpiderInterface;
 use React\Promise\PromiseInterface;
+use Schrapert\Downloading\RequestInterface;
+use Schrapert\Downloading\ResponseInterface;
+use Schrapert\SpiderInterface;
 
 interface ScraperInterface
 {
@@ -14,7 +15,12 @@ interface ScraperInterface
      * @param SpiderInterface $spider
      * @return PromiseInterface
      */
-    public function enqueueScrape(ExecutionEngine $engine, RequestInterface $request, ResponseInterface $response, SpiderInterface $spider);
+    public function enqueueScrape(
+        ExecutionEngine $engine,
+        RequestInterface $request,
+        ResponseInterface $response,
+        SpiderInterface $spider
+    );
 
     public function open(SpiderInterface $spider);
 

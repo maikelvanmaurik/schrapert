@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\IO;
 
 interface WritableStreamInterface extends StreamInterface

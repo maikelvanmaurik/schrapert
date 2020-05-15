@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Feed;
 
+use Schrapert\IO\StreamInterface;
 use Schrapert\Scraping\ItemInterface;
 use Schrapert\SpiderInterface;
-use Schrapert\IO\StreamInterface;
 
 class XmlItemExporter extends AbstractExporter
 {
@@ -37,10 +38,10 @@ class XmlItemExporter extends AbstractExporter
 
     private function camelcase($str)
     {
-        if(isset($this->camelcaseCache[$str])) {
+        if (isset($this->camelcaseCache[$str])) {
             return $this->camelcaseCache[$str];
         }
-        $this->camelcaseCache[$str] = $camelcase = preg_replace_callback('/([\s_\-])([a-z])/', function($c) {
+        $this->camelcaseCache[$str] = $camelcase = preg_replace_callback('/([\s_\-])([a-z])/', function ($c) {
             return strtoupper($c[2]);
         }, $str);
 
@@ -64,7 +65,7 @@ class XmlItemExporter extends AbstractExporter
     {
         $this->stream->write(sprintf("\t<%s>\n", $this->getItemTagName()));
         $fields = $this->getSerializedFields($item);
-        foreach($fields as $key => $value) {
+        foreach ($fields as $key => $value) {
             $tagName = $this->camelcase($key);
             $this->stream->write(sprintf("\t\t<%s>%s</%s>\n", $tagName, $value, $tagName));
         }

@@ -1,8 +1,9 @@
 <?php
+
 namespace Schrapert\Filter;
 
-use Schrapert\Crawl\RequestInterface;
 use React\Promise\PromiseInterface;
+use Schrapert\Downloading\RequestInterface;
 use Schrapert\SpiderInterface;
 
 interface DuplicateRequestFilterInterface

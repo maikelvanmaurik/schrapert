@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Psr\Http\Message\StreamInterface;
@@ -22,7 +23,7 @@ abstract class Message
 
     public function getMetaData($key = null, $default = null)
     {
-        if(null === $key) {
+        if (null === $key) {
             return $this->meta;
         }
         return array_key_exists($key, $this->meta) ? $this->meta[$key] : $default;
@@ -59,7 +60,7 @@ abstract class Message
     public function getHeader($header)
     {
         $header = strtolower($header);
-        if (!isset($this->headerNames[$header])) {
+        if (! isset($this->headerNames[$header])) {
             return [];
         }
         $header = $this->headerNames[$header];
@@ -78,7 +79,7 @@ abstract class Message
      */
     public function withHeader($header, $value)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             $value = [$value];
         }
         $value = $this->trimHeaderValues($value);
@@ -99,7 +100,7 @@ abstract class Message
      */
     public function withAddedHeader($header, $value)
     {
-        if (!is_array($value)) {
+        if (! is_array($value)) {
             $value = [$value];
         }
         $value = $this->trimHeaderValues($value);
@@ -118,7 +119,7 @@ abstract class Message
     public function withoutHeader($header)
     {
         $normalized = strtolower($header);
-        if (!isset($this->headerNames[$normalized])) {
+        if (! isset($this->headerNames[$normalized])) {
             return $this;
         }
         $header = $this->headerNames[$normalized];
@@ -147,7 +148,7 @@ abstract class Message
     {
         $this->headerNames = $this->headers = [];
         foreach ($headers as $header => $value) {
-            if (!is_array($value)) {
+            if (! is_array($value)) {
                 $value = [$value];
             }
             $value = $this->trimHeaderValues($value);

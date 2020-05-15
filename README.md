@@ -9,7 +9,7 @@ Example of a simple spider:
 ```php
 namespace Crawl;
 use Schrapert\Spider;
-use Schrapert\Crawl\ResponseInterface;
+use Schrapert\Downloading\ResponseInterface;
 use Schrapert\Http\ResponseInterface as HttpResponse;
 use Schrapert\Http\Request as HttpRequest;
 use DOMDocument;

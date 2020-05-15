@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Http;
 
 use Schrapert\Core\ExecutionEngine;
 use Schrapert\Core\ScraperInterface;
-use Schrapert\Http\Downloader\DownloaderInterface;
+use Schrapert\Downloading\DownloaderInterface;
 use Schrapert\Log\LoggerInterface;
 use Schrapert\SpiderInterface;
 

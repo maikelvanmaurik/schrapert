@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Feed;
 
 use Schrapert\IO\Stream;

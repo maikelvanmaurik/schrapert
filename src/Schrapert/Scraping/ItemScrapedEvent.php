@@ -1,7 +1,8 @@
 <?php
+
 namespace Schrapert\Scraping;
 
-use Schrapert\Event\Event;
+use Schrapert\Events\Event;
 use Schrapert\SpiderInterface;
 
 class ItemScrapedEvent extends Event

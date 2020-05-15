@@ -1,161 +1,156 @@
 <?php
+
 namespace Schrapert\Http\Cookies;
 
 use ArrayIterator;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Traversable;
 
 /**
- * Cookie jar that stores cookies as an array
+ * Cookie jar that stores cookies as an array.
  */
 class CookieJar implements CookieJarInterface
 {
     /**
-     * @var SetCookie[] Loaded cookie data
+     * @var CookieInterface[] Loaded cookie data
      */
-    private $cookies = [];
-
-    /** @var bool */
-    private $strictMode;
+    private array $cookies;
 
     /**
-     * @param bool $strictMode   Set to true to throw exceptions when invalid
-     *                           cookies are added to the cookie jar.
-     * @param array $cookies Array of SetCookie objects or a hash of
-     *                           arrays that can be used with the SetCookie
-     *                           constructor
+     * @var CookiePolicyInterface
      */
-    public function __construct($strictMode = false, array $cookies = [])
-    {
-        $this->strictMode = $strictMode;
+    private CookiePolicyInterface $policy;
 
-        foreach ($cookies as $cookie) {
-            if (!($cookie instanceof SetCookie)) {
-                $cookie = new SetCookie($cookie);
-            }
-            $this->setCookie($cookie);
+    private CookieStringParserInterface $parser;
+
+    /**
+     * @param CookieInterface[]  $cookies  array of Cookie objects
+     * @param CookiePolicyInterface  $policy
+     * @param CookieStringParserInterface $parser
+     */
+    public function __construct(
+        ?iterable $cookies = null,
+        CookiePolicyInterface $policy = null,
+        CookieStringParserInterface $parser = null
+    ) {
+        if (null === $policy) {
+            $policy = new Rfc2616CookiePolicy();
+        }
+        if (null === $parser) {
+            $parser = new CookieStringParser();
+        }
+        $this->policy = $policy;
+        $this->parser = $parser;
+        $this->cookies = [];
+        if (null !== $cookies) {
+            $this->setCookies($cookies);
         }
     }
 
     /**
      * Create a new Cookie jar from an associative array and domain.
      *
-     * @param array  $cookies Cookies to create the jar from
-     * @param string $domain  Domain to set the cookies to
+     * @param  array  $cookies  Cookies to create the jar from
+     * @param  string  $domain  Domain to set the cookies to
      *
      * @return self
      */
     public static function fromArray(array $cookies, $domain)
     {
-        $cookieJar = new self();
+        $jar = new self;
         foreach ($cookies as $name => $value) {
-            $cookieJar->setCookie(new SetCookie([
-                'Domain'  => $domain,
-                'Name'    => $name,
-                'Value'   => $value,
+            $jar->setCookie(new Cookie([
+                'Domain' => $domain,
+                'Name' => $name,
+                'Value' => $value,
                 'Discard' => true
             ]));
         }
 
-        return $cookieJar;
-    }
-
-    /**
-     * Evaluate if this cookie should be persisted to storage
-     * that survives between requests.
-     *
-     * @param SetCookie $cookie Being evaluated.
-     * @param bool $allowSessionCookies If we should persist session cookies
-     * @return bool
-     */
-    public static function shouldPersist(
-        SetCookie $cookie,
-        $allowSessionCookies = false
-    ) {
-        if ($cookie->getExpires() || $allowSessionCookies) {
-            if (!$cookie->getDiscard()) {
-                return true;
-            }
-        }
-
-        return false;
+        return $jar;
     }
 
     public function toArray()
     {
-        return array_map(function (SetCookie $cookie) {
+        return array_map(function (CookieInterface $cookie) {
             return $cookie->toArray();
         }, $this->getIterator()->getArrayCopy());
     }
 
-    public function clear($domain = null, $path = null, $name = null)
+    public function clear(?string $domain = null, ?string $path = null, ?string $name = null): void
     {
-        if (!$domain) {
+        if (null === $domain && null === $path && null === $name) {
             $this->cookies = [];
             return;
-        } elseif (!$path) {
-            $this->cookies = array_filter(
-                $this->cookies,
-                function (SetCookie $cookie) use ($path, $domain) {
-                    return !$cookie->matchesDomain($domain);
-                }
-            );
-        } elseif (!$name) {
-            $this->cookies = array_filter(
-                $this->cookies,
-                function (SetCookie $cookie) use ($path, $domain) {
-                    return !($cookie->matchesPath($path) &&
-                        $cookie->matchesDomain($domain));
-                }
-            );
-        } else {
-            $this->cookies = array_filter(
-                $this->cookies,
-                function (SetCookie $cookie) use ($path, $domain, $name) {
-                    return !($cookie->getName() == $name &&
-                        $cookie->matchesPath($path) &&
-                        $cookie->matchesDomain($domain));
-                }
-            );
         }
-    }
-
-    public function clearSessionCookies()
-    {
         $this->cookies = array_filter(
             $this->cookies,
-            function (SetCookie $cookie) {
-                return !$cookie->getDiscard() && $cookie->getExpires();
+            function (CookieInterface $cookie) use ($domain, $path, $name) {
+                return ((null !== $domain && $domain !== $cookie->getDomain())
+                    || (null !== $path && $path !== $cookie->getPath())
+                    || (null !== $name && $name !== $cookie->getName()));
             }
         );
     }
 
-    public function setCookie(SetCookie $cookie)
+    public function getPolicy(): CookiePolicyInterface
     {
-        // If the name string is empty (but not 0), ignore the set-cookie
-        // string entirely.
-        $name = $cookie->getName();
-        if (!$name && $name !== '0') {
-            return false;
-        }
+        return $this->policy;
+    }
 
-        // Only allow cookies with set and valid domain, name, value
-        $result = $cookie->validate();
-        if ($result !== true) {
-            if ($this->strictMode) {
-                throw new \RuntimeException('Invalid cookie: ' . $result);
-            } else {
-                $this->removeCookieIfEmpty($cookie);
-                return false;
+    /**
+     * @param  CookiePolicyInterface  $policy
+     * @return CookieJarInterface
+     */
+    public function withPolicy(CookiePolicyInterface $policy): CookieJarInterface
+    {
+        $clone = clone $this;
+        $clone->policy = $policy;
+        return $clone;
+    }
+
+    public function withParser(CookieStringParser $parser) : CookieJarInterface
+    {
+        $clone = clone $this;
+        $clone->parser = $parser;
+        return $clone;
+    }
+
+    public function clearSessionCookies(): void
+    {
+        foreach ($this->getIterator() as $cookie) {
+            if ($cookie->getDiscard()) {
+                $this->clear($cookie->getDomain(), $cookie->getPath(), $cookie->getName());
             }
         }
+    }
 
+    public function setCookies(iterable $cookies)
+    {
+        foreach ($cookies as $cookie) {
+            if (!$cookie instanceof CookieInterface) {
+                throw new \InvalidArgumentException("Invalid cookie");
+            }
+            $this->setCookie($cookie);
+        }
+    }
+
+    protected function createCookieKey(CookieInterface $cookie)
+    {
+
+    }
+
+    public function setCookie(CookieInterface $cookie): bool
+    {
+        $key = $this->createCookieKey($cookie);
         // Resolve conflicts with previously set cookies
         foreach ($this->cookies as $i => $c) {
-
             // Two cookies are identical, when their path, and domain are
             // identical.
-            if ($c->getPath() != $cookie->getPath() ||
-                $c->getDomain() != $cookie->getDomain() ||
-                $c->getName() != $cookie->getName()
+            if ($c->getPath() !== $cookie->getPath() ||
+                $c->getDomain() !== $cookie->getDomain() ||
+                $c->getName() !== $cookie->getName()
             ) {
                 continue;
             }
@@ -189,13 +184,27 @@ class CookieJar implements CookieJarInterface
         return true;
     }
 
+    public function setCookieIfAllowed(CookieInterface $cookie, RequestInterface $request): bool
+    {
+        if ($this->policy->isAllowed($cookie, $request)) {
+            $this->setCookie($cookie);
+        }
+    }
+
+    public function setCookiesIfAllowed(iterable $cookies, RequestInterface $request)
+    {
+        foreach ($cookies as $cookie) {
+            $this->setCookieIfAllowed($cookie, $request);
+        }
+    }
+
     public function count()
     {
         return count($this->cookies);
     }
 
     /**
-     * @return SetCookie[]
+     * @return Traversable|CookieInterface[]
      */
     public function getIterator()
     {
@@ -206,9 +215,9 @@ class CookieJar implements CookieJarInterface
      * If a cookie already exists and the server asks to set it again with a
      * null value, the cookie must be deleted.
      *
-     * @param SetCookie $cookie
+     * @param  CookieInterface  $cookie
      */
-    private function removeCookieIfEmpty(SetCookie $cookie)
+    private function removeCookieIfEmpty(CookieInterface $cookie)
     {
         $cookieValue = $cookie->getValue();
         if ($cookieValue === null || $cookieValue === '') {
@@ -217,6 +226,18 @@ class CookieJar implements CookieJarInterface
                 $cookie->getPath(),
                 $cookie->getName()
             );
+        }
+    }
+
+    public function extractCookies(ResponseInterface $response, RequestInterface $request)
+    {
+        $this->policy->extractCookies($response, $request, $this);
+    }
+
+    public function addCookieHeader(RequestInterface $request): RequestInterface
+    {
+        foreach ($this->policy->cookiesForRequest($this, $request) as $cookie) {
+
         }
     }
 }

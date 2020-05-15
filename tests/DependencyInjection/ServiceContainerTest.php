@@ -6,33 +6,33 @@ use Schrapert\Tests\TestCase;
 class ServiceContainerTest extends TestCase
 {
     /**
-     * @var \Schrapert\DependencyInjection\ServiceContainer
+     * @var \Schrapert\DI\Container
      */
     private $container;
 
     public function setUp(): void
     {
         parent::setUp();
-        $this->container = new \Schrapert\DependencyInjection\ServiceContainer();
+        $this->container = new \Schrapert\DI\Container();
     }
 
     public function testCanRegisterValues()
     {
         $foo = 'foo';
-        $this->container->set('foo', $foo);
+        $this->container->bind('foo', $foo);
         $this->assertEquals($foo, $this->container->get('foo'));
     }
 
     public function testCanOverrideValues()
     {
-        $this->container->set('foo', 'bar');
-        $this->container->set('foo', 'baz');
+        $this->container->bind('foo', 'bar');
+        $this->container->bind('foo', 'baz');
         $this->assertEquals('baz', $this->container->get('foo'));
     }
 
     public function testObjectsAreRegisteredAsASingleton()
     {
-        $this->container->set('foo', function() {
+        $this->container->bind('foo', function () {
             return new stdClass();
         });
 

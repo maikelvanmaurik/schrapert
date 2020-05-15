@@ -1,9 +1,10 @@
 <?php
+
 namespace Schrapert\Http;
 
-use Schrapert\Crawl\ResponseInterface as CrawlResponse;
+use Psr\Http\Message\ResponseInterface as PsrResponse;
+use Schrapert\Downloading\ResponseInterface as CrawlResponse;
 
-interface ResponseInterface extends CrawlResponse, \Psr\Http\Message\ResponseInterface
+interface ResponseInterface extends CrawlResponse, PsrResponse
 {
-
 }

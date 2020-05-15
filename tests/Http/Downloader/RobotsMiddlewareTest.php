@@ -1,8 +1,14 @@
 <?php
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
-use Schrapert\Http\Downloader\Downloader;
+use Mockery as m;
+use Schrapert\Crawling\Exceptions\IgnoreRequestException;
+use Schrapert\DI\DefaultContainer;
+use Schrapert\Downloading;
+use Schrapert\Downloading\Middleware\RobotsTxtDownloaderMiddleware;
+use Schrapert\Events\EventDispatcher;
 use Schrapert\Http\Request;
+use Schrapert\Pipeline\PipelineBuilder;
 use Schrapert\Tests\TestCase;
 
 class RobotsMiddlewareTest extends TestCase
@@ -16,20 +22,34 @@ class RobotsMiddlewareTest extends TestCase
     public function setUp(): void
     {
         $this->eventLoop = $this->getContainer()->get('event_loop');
-        $this->downloader = $this->getContainer()->get('downloader');
         parent::setUp();
     }
 
+    protected function getDownloader()
+    {
+        $transactionFactory = m::mock(Downloading\TransactionFactory::class);
+        $transactionFactory
+            ->shouldReceive('createTransaction')
+            ->andReturnUsing(function ($request) {
+                var_dump(get_class($request));
+            });
+        return new Downloader(
+            m::mock(EventDispatcher::class),
+            new PipelineBuilder(new DefaultContainer()),
+            $transactionFactory
+        );
+    }
+
     /**
-     * @expectedException \Schrapert\Crawl\Exception\IgnoreRequestException
+     * @expectedException IgnoreRequestException
      */
     public function testDoesNotAllowBlockedBots()
     {
-        $downloader = $this->downloader->withMiddleware($this->getContainer()->get('downloader_middleware_robots_txt'));
+        $downloader = $this->getDownloader()->withMiddleware(RobotsTxtDownloaderMiddleware::class);
 
         $request = (new Request('http://robotstxt.schrapert.dev/disallowed-for-bad-bot/'))
             ->withHeader('User-Agent', 'BadBot');
 
-        await($downloader->download($request), $this->eventLoop, 10);
+        $response = await($downloader->download($request));
     }
 }

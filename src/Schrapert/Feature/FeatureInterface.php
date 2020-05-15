@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Feature;
 
 interface FeatureInterface

@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Util;
 
 use React\EventLoop\LoopInterface;
@@ -25,7 +26,7 @@ class DelayedCallback
      */
     public function schedule($delay = 0)
     {
-        $this->timer = $this->loop->addTimer($delay, function() {
+        $this->timer = $this->loop->addTimer($delay, function () {
             call_user_func_array($this->callback, $this->args);
         });
     }

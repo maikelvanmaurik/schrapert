@@ -1,8 +1,8 @@
 <?php
 namespace Schrapert\Tests\Integration\Http\Downloader;
 
-use Schrapert\Http\Downloader\Downloader;
-use Schrapert\Http\Downloader\Middleware\DefaultHeadersMiddleware;
+use Schrapert\Downloading\Downloader;
+use Schrapert\Downloading\Middleware\DefaultHeadersMiddleware;
 use Schrapert\Http\Request;
 use Schrapert\Http\ResponseInterface;
 use Schrapert\Tests\TestCase;
@@ -33,16 +33,20 @@ class DefaultHeadersMiddlewareTest extends TestCase
             $this->middleware->withHeaders([
                 'FOO' => 'bar',
                 'BAR' => 'baz'
-            ]));
+            ])
+        );
 
         $request = new Request('http://headers.schrapert.dev/request.php');
 
         $content = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
+                ->then(function (ResponseInterface $response) {
                     return (string)$response->getBody();
-            }), $this->eventLoop, 10);
+                }),
+            $this->eventLoop,
+            10
+        );
 
         $returnedHeaders = json_decode($content, true);
 
@@ -59,7 +63,8 @@ class DefaultHeadersMiddlewareTest extends TestCase
         $downloader = $this->downloader->withMiddleware(
             $this->middleware->withHeaders([
                 'User-Agent' => 'Middleware'
-            ]));
+            ])
+        );
 
         $request = (new Request('http://headers.schrapert.dev/request.php'))
             ->withHeader('User-Agent', 'Request');
@@ -67,9 +72,12 @@ class DefaultHeadersMiddlewareTest extends TestCase
         $content = await(
             $downloader
                 ->download($request)
-                ->then(function(ResponseInterface $response) {
+                ->then(function (ResponseInterface $response) {
                     return (string)$response->getBody();
-                }), $this->eventLoop, 10);
+                }),
+            $this->eventLoop,
+            10
+        );
 
         $returnedHeaders = json_decode($content, true);
 

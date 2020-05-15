@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Http\Cache;
 
 use Schrapert\Http\RequestInterface;
@@ -13,5 +14,4 @@ interface PolicyInterface
     public function shouldCacheResponse(ResponseInterface $response, RequestInterface $request);
 
     public function isCachedResponseFresh(ResponseInterface $cachedResponse, RequestInterface $request);
-
 }

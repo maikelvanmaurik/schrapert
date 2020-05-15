@@ -1,4 +1,5 @@
 <?php
+
 namespace Schrapert\Core;
 
 use RuntimeException;
@@ -19,11 +20,11 @@ class RequestProcessorFactory implements RequestProcessorFactoryInterface
 
     public function factory($type)
     {
-        if(is_object($type)) {
+        if (is_object($type)) {
             $type = get_class($type);
         }
 
-        if(!isset($this->types[$type])) {
+        if (! isset($this->types[$type])) {
             throw new RuntimeException(sprintf("Request processor not registered for type '%s'", (string)$type));
         }
 

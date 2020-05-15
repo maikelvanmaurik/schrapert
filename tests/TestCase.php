@@ -2,7 +2,7 @@
 namespace Schrapert\Tests;
 
 use PHPUnit\Framework\TestCase as BaseTestCase;
-use Schrapert\DependencyInjection\DefaultServiceContainer;
+use Schrapert\DI\DefaultContainer;
 
 class TestCase extends BaseTestCase
 {
@@ -10,8 +10,8 @@ class TestCase extends BaseTestCase
 
     public function getContainer()
     {
-        if(!$this->container) {
-            $this->container = new DefaultServiceContainer();
+        if (! $this->container) {
+            $this->container = new DefaultContainer();
         }
         return $this->container;
     }
